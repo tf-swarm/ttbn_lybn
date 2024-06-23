@@ -1,0 +1,347 @@
+{% load extratags %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+		<script type="text/javascript" src="/static/laydate.js"></script>
+	    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+		<style>
+			.edit_permission {
+				margin-bottom: 10px;
+				background: #009c95;
+				color: white;
+				border-radius: 3px;
+				border: none;
+				cursor: pointer;
+			}
+
+			.head_div {
+				margin-left: 20px;
+				width: 100%;
+				height: auto;
+				margin-top: 15px;
+				display: inline-block;
+			}
+
+			.head_div span,
+			span {
+				float: left;
+				font-size: 18px;
+				height: 30px;
+				line-height: 30px;
+				color: black;
+				font-weight: 600;
+			}
+
+			.head_div select {
+				width: 100px;
+				height: 36px;
+				border: solid 1px #cccccc;
+				font-size: 17px;
+			}
+
+			select option {
+				font-size: 17px;
+			}
+
+			h1 {
+				display: inline-block;
+				font-size: 24px;
+				line-height: 40px;
+				height: 45px;
+				float: left;
+				color: black;
+				font-weight: 600;
+			}
+
+			.input_text {
+				width: auto;
+				height: 34px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px #cccccc;
+				text-align: center;
+				padding: 0;
+			}
+
+			.btn_model {
+				width: 70px;
+                height: 36px;
+                border: 0;
+                background: #e8e8e8;
+                border-radius: 4px 0px 0px 4px;
+                float: left;
+			}
+
+			.btn_model p {
+				color: rgba(0,0,0,.5);
+                font-weight: 700;
+                text-align: center;
+                line-height: 36px;
+                font-size: 1em;
+                margin: 0
+			}
+
+			.remove {
+				display: inline-block;
+				width: 20px;
+				height: 20px;
+				cursor: pointer;
+				float: left;
+				margin: 8px 10px 8px 18px;
+				background: url(/static/images/close_btn.png) no-repeat -220px -315px;
+			}
+
+			.spinner_select option {
+				font-size: 18px;
+			}
+
+			.activity_name {
+				width: auto;
+				height: 30px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px rgb(169, 169, 169);
+				text-align: center;
+			}
+
+            .day_count {
+				width: auto;
+				height: 34px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px #cccccc;
+				text-align: center;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body style="line-height: 0.1em; overflow-x:auto; max-height: 900px;min-width: 1470px;">
+		<div class="body-div">
+			<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+				<tr>
+					<td width="25%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">活动管理 &gt;贵族礼包(月卡)</strong></td>
+					<td width="25%" align="left" valign="middle" bgcolor="#F5F5F5">
+					</td>
+					<td width="60%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+					</td>
+					<td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+						<a href="javascript:;" id="bn_btn_one" onclick="month_card()">操作记录</a>
+					</td>
+
+					<td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+{#						<a href="javascript:;" id="bn_btn_one">操作记录</a>#}
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: 1000px;">
+						<!--主要内容开始-->
+						<form action="" method="post" id="form_may_day">
+                            {% csrf_token %}
+							<div style="height:45px; width:100%;margin-left: 20px;margin-top: 20px;">
+								<h1 style="width:auto">贵族礼包（月卡）——
+                                    <a href="javascript:;" id="alter_may_day" style="color: white;width: 112px; height: 35px; background:#1B9AF7;border-radius: 3px; float:right;margin-top: 4px;">确认更改</a>
+                                </h1>
+								<h1 style="width:268px;margin-left: 60px;">月卡开关:
+                                    <div class="btn_fath clearfix off" onclick="may_day_switch(this)" id="may_day_switch" style="float: right;border-radius: 15px;width: 92px;margin-top: 5px;">
+		                                <div class="move" id="may_day_move" data-state="off" style="width: 30px; border-radius: 15px; height: 30px; left: 0px;"></div>
+		                                <div class="btnSwitch btn1" style="height: 32px;width:40px;"></div>
+		                                <div class="btnSwitch btn2 " style="height: 32px;width:40px;"></div>
+                           			</div>
+                                </h1>
+							</div>
+							<div class="head_div" style="margin-top: 5px">
+								<span style="margin-top: 15px;">开放渠道：</span>
+								<div style="margin-left: 90px; height:auto;width:87%;">
+                                    {% for channel in channel_id %}
+                                        <div style="float: left;margin: 10px;width: 215px;height: 40px;">
+                                            <select name="channel" class="props_list_sty" style="float: left;width:auto;height: 40px;">
+                                                {% for key,value in channel_info.items %}
+                                                     <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <a onclick="$(this).parent().remove();" class="remove" id="close_channel"></a>
+                                        </div>
+                                    {% endfor %}
+									<button class="" id="add_channel" type="button" style="margin-top: 10px;width: 110px; height: 40px; font-size: 18px;background: #ff6600;color: white;border-radius: 3px;border: none;">添加渠道</button>
+								</div>
+							</div>
+							<div class="head_div">
+								<span>礼包设置：</span>
+								<div style="height: auto;width: 80%; display: inline-block;">
+                                    <div style="height: auto;width:80%;margin-top: 10px;display: inline-block;">
+                                        <div class="btn_model"style="width: 100px;margin-left: 30px;">
+                                            <p>月卡描述</p>
+                                        </div>
+                                        <input type="text" class="input_text" name="shot_value" value="{{ detail }}" placeholder="" style="float: left;width:400px;">
+                                    </div>
+                                    <div style="height: auto;width:80%;margin-top: 10px;display: inline-block;">
+	                                    <div class="btn_model"style="margin-left: 30px;">
+	                                        <p>礼包售价</p>
+	                                    </div>
+	                                    <input type="text" class="input_text" name="price" value="{{ price }}" placeholder="" style="float: left;width:100px;">
+	                                    <p style="display: inline-block;font-size: 18px;float: left">元</p>
+	                                    <div class="btn_model" style="margin-left: 38px;">
+	                                        <p>总价值</p>
+	                                    </div>
+	                                    <input type="text" class="input_text" name="total" value="{{total_price }}" placeholder="" style="float: left;width:100px;">
+	                                    <p style="display: inline-block;font-size: 18px;float: left">元</p>
+	                                     <div class="btn_model" style="margin-left: 38px;">
+	                                        <p>返利</p>
+	                                    </div>
+	                                    <input type="text" class="input_text" name="profit" value="{{ profit }}" placeholder="" style="float: left;width:100px;" >
+	                                    <p style="display: inline-block;font-size: 18px;float: left">%</p>
+                                    </div>
+
+
+                                    <div style="height: auto;width:80%;margin-top: 10px;display: inline-block;" id="good_info">
+                                        {% for key,value in rw.items %}
+                                            {% if key != 'props' %}
+                                                <div style="height: auto;width:100%;margin-top: 10px;display: inline-block;">
+                                                <div class="btn_model" style="margin-left: 30px;"><p>礼包商品</p></div>
+                                                <select name="good_name" style="float: left;width: 8rem;height: 36px;border: solid 1px #cccccc;font-size: 17px;">
+                                                    {% for info in give_reward %}
+                                                        <option value="{{ info.vale }}" {% if info.vale == key %} selected {% endif %}>{{ info.content }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <div class="btn_model" style="margin-left: 30px;"><p>总数量</p></div>
+                                                <input type="text" class="input_text" name="total_count" value="{{ value | total }}" placeholder="" style="float: left;width:100px;" readonly="readonly">
+                                                <div class="btn_model" style="margin-left: 30px;"><p>每天数量</p></div>
+                                                <input type="text" class="day_count" name="day_count" value="{{ value }}" placeholder="" style="float: left;width:100px;">
+                                            </div>
+                                            {% else %}
+                                                {% for val2 in value %}
+                                                    <div style="height: auto;width:100%;margin-top: 10px;display: inline-block;">
+                                                <div class="btn_model" style="margin-left: 30px;"><p>礼包商品</p></div>
+                                                <select name="props_id" style="float: left;width: 8rem;height: 36px;border: solid 1px #cccccc;font-size: 17px;">
+                                                    {% for props in weapon_list %}
+                                                        <option value="{{ props.vale }}" {% if props.vale == val2.id %} selected {% endif %}>{{ props.content }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <div class="btn_model" style="margin-left: 30px;"><p>总数量</p></div>
+                                                <input type="text" class="input_text" name="total_count" value="{{ val2.count | total }}" placeholder="" style="float: left;width:100px;" readonly="readonly">
+                                                <div class="btn_model" style="margin-left: 30px;"><p>每天数量</p></div>
+                                                <input type="text" class="day_count" name="props_count" value="{{ val2.count }}" placeholder="" style="float: left;width:100px;">
+                                            </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <div style="height: auto;width:100%;margin-top: 10px;display: inline-block;">
+                                            <div class="btn_model" style="margin-left: 30px;"><p>主打商品</p></div>
+                                            <select name="main_good_name" style="float: left;width: 8rem;height: 36px;border: solid 1px #cccccc;font-size: 17px;">
+                                                <option value="{{ main_good.name }}">{{ main_good.name | good_name }}</option>
+                                            </select>
+                                            <div class="btn_model" style="margin-left: 30px;"><p>总数量</p></div>
+                                            <input type="text" class="input_text" name="total_count" value="{{ main_good.count | total }}" placeholder="" style="float: left;width:100px;" readonly="readonly">
+                                            <div class="btn_model" style="margin-left: 30px;"><p>每天数量</p></div>
+                                            <input type="text" class="day_count" name="main_day_count" value="{{ main_good.count }}" placeholder="" style="float: left;width:100px;">
+                                        </div>
+                                    </div>
+								</div>
+							    <div class="head_div" style="height: 100px;"></div>
+
+                            </div>
+		                </form>
+                        <!--主要内容结束-->
+                    </td>
+		        </tr>
+            </table>
+		</div>
+
+		<script type="text/javascript">
+            var CowCnt = 1;
+            $('#add_channel').click(function(){
+                var chanel_list = {{ chanel_list|safe }};
+                var stc_html = '';
+                stc_html += '<div style="float: left;margin: 10px;width: 215px;height: 40px;">';
+                stc_html += '<select name="channel" class="props_list_sty" style="float: left;width:auto;height: 40px;">';
+                for(m in chanel_list) {
+                    chanel = '<option value="'+m+'">'+chanel_list[m]+'</option>';
+                    stc_html += chanel
+                }
+                stc_html += '</select>';
+                stc_html += '<a class="remove" id="close_channel'+CowCnt+'"></a>';
+                stc_html += '</div>';
+
+                $('#add_channel').before(stc_html);
+                //删除内容
+                $("#close_channel"+CowCnt).click(function (){
+                    $(this).parent().remove();
+                });
+                CowCnt++;
+            });
+		</script>
+        <script type="text/javascript">
+            function may_day_switch(th) {
+				var ele = $(th).children(".move");
+				if(ele.attr("data-state") == "on") {
+					ele.animate({
+						left: "0"
+					}, 300, function() {
+						ele.attr("data-state", "off");
+					});
+					$(th).removeClass("on").addClass("off");
+				} else if(ele.attr("data-state") == "off") {
+					ele.animate({
+						left: '60px'
+					}, 300, function() {
+						$(this).attr("data-state", "on");
+					});
+					$(th).removeClass("off").addClass("on");
+				}
+			};
+        </script>
+        <script type="text/javascript">
+            $(function(){
+
+                $('#alter_may_day').click(function(){
+
+                    var ele = $('#may_day_switch').children(".move");
+                    if(ele.attr("data-state") == "on"){
+                        show = 1
+                    }else if(ele.attr("data-state") == "off"){
+                        show = 0
+                    }
+                    var data_info = $.param({"show":show}) + "&" + $("#form_may_day").serialize();
+                    console.log(data_info);
+                    if(confirm("您确定修改贵族礼包月卡?")){
+                            $.post('/activity_manage/month_card_alter/', data_info, function(date) {
+                                if ( date.code) {
+                                    alert(date.info);
+                                }
+                                else {
+                                    alert(date.info);
+                                }
+                            });
+                        }else {
+                            alert("您取消了修改贵族礼包月卡");
+                        }
+                });
+
+                if({{ open|default:0 }}==1){
+                    $('#may_day_switch').attr("data-state", "on");
+                    $('#may_day_move').animate({left: '60px'}, 300, function(){
+                        $(this).attr("data-state", "on");
+                    });
+                    $('#may_day_switch').removeClass("off").addClass("on");
+                }
+            });
+        </script>
+        <script type="text/javascript">
+            {#$("input[name='day_count']")#}
+            $(".day_count").blur(function () {
+                var day_count = $(this).val();
+                $(this).prev().prev().val(day_count * 30)
+            });
+
+            function month_card() {
+                var URL= "/activity_manage/all_record/?pid=" +"month_card_record";
+                location.href=URL;
+            }
+        </script>
+	</body>
+</html>

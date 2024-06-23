@@ -1,0 +1,545 @@
+{% load extratags %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/load.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/common.css"/>
+    <link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/laydate.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.easyui.min.js"></script>
+    <script type="text/javascript"  src="/static/js/fixed_header.js"></script>
+    <script type="text/javascript" src="/static/js/load-min.js"></script>
+
+    <script>
+        $(function(){
+            $('#paging').click(function () {
+                var pag = $('.pagination-num').val() ;
+                var URL= "/run_manage/retention_rate/?page=" + pag;
+                location.href=URL;
+            });
+
+            $('#export_data').click(function () {
+                var URL= "/run_manage/deal_xls/?pid=" + 6;
+                location.href=URL;
+            });
+
+            var error_start = false;
+            var error_end = false;
+
+            $('#query_data').click(function(){
+                check_time();
+                if(error_start == true && error_end == true)
+                {
+                    $.Load_data();
+                    $("#form_search").submit();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            });
+
+            function check_time(){
+                var len_start = $('#start').val().length;
+                var len_end = $('#end').val().length;
+                if(len_start==0 || len_end==0)
+                {
+                    msgShow('系统提示', "请输入日期", 'warning');
+                    error_start = false;
+                    error_end = false;
+                }
+                else
+                {
+                    error_start = true;
+                    error_end = true;
+                }
+            }
+        });
+    </script>
+</head>
+<body style="min-width:900px">
+
+    <div class="body-div">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+            <form action="/run_manage/ltv_collect/" method="post" id="form_search">
+                {% csrf_token %}
+                <tr>
+                    <td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">运营管理 &gt;LTV汇总</strong></td>
+
+                    <td width="62%" align="left" valign="middle" bgcolor="#F5F5F5">
+                        <lable for="introduce" style="padding-left: 10px; font-size:12px;">时间:</lable>
+                            <input placeholder="请输入日期" id="start" class="laydate-icon" readonly="" value="{{start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time" style="margin-right: 5px;margin-left: 5px;">
+                        <lable for="introduce" style="padding-left: 10px; font-size:12px;">至:</lable>
+                            <input placeholder="请输入日期" id="end" class="laydate-icon"  readonly="" value="{{end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time" style="margin-right: 20px;margin-left: 5px;">
+
+                        <select name="channel" class="dowp_list_sty" style="margin-right: 20px;margin-left: 5px;" id="channel">
+                            {% for key,value in chanel_info.items %}
+                                 <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="button" value="确认查询" id="query_data" class="button">
+                        {% if page.paginator.num_pages %}
+                            <input type="button" value="导出xls" class="button_color" id="export_data" style="margin-left: 20px;"/>
+                        {% else %}
+                            <input type="button" value="导出xls" class="button_color"  style="margin-left: 20px;background-color: #8b8a8a"/>
+                        {% endif %}
+                    </td>
+
+                    <td width="12%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                    </td>
+                </tr>
+            </form>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF">
+                        <!--主要内容开始-->
+                    <div class='table-cont' id='table-cont' style="max-height: 390px;">
+                        <table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF"  id="order_title" style="margin-top: -1px;">
+                            <thead>
+                                <tr>
+                                    <th align="center" bgcolor="#EEEEEE" style="height: 37px;">日期</th>
+                                    <th align="center" bgcolor="#EEEEEE">渠道</th>
+                                    <th align="center" bgcolor="#EEEEEE">新增人数</th>
+                                    <th align="center" bgcolor="#EEEEEE">累计充值</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV1</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV2</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV3</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV4</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV5</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV6</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV7</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV8</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV9</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV10</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV11</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV12</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV13</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV14</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV15</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV16</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV17</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV18</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV19</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV20</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV21</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV22</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV23</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV24</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV25</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV26</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV27</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV28</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV29</th>
+                                    <th align="center" bgcolor="#EEEEEE">LTV30</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for info  in page %}
+                                    <tr id="hover_tr" bgcolor="#FFFFFF">
+                                        <td align="center" valign="middle" style="height: 50px;">{{info.day_time}}</td>
+                                        <td align="center" valign="middle" style="height: 50px;">{{info.channel | channel_name}}</td>
+                                        <td align="center" valign="middle" style="height: 50px;">{{info.new_user_count }}</td>
+                                        <td align="center" valign="middle" style="height: 50px;">{{info.new_pay_total }}</td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv1}}</span>
+                                            <div class="item-desc">
+                                                <label>第1天累计充值:{{info.pay_total_1}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv2}}</span>
+                                            <div class="item-desc">
+                                                <label>第2天累计充值:{{info.pay_total_2}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv3}}</span>
+                                            <div class="item-desc">
+                                                <label>第3天累计充值:{{info.pay_total_3}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv4}}</span>
+                                            <div class="item-desc">
+                                                <label>第4天累计充值:{{info.pay_total_4}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv5}}</span>
+                                            <div class="item-desc">
+                                                <label>第5天累计充值:{{info.pay_total_5}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv6}}</span>
+                                            <div class="item-desc">
+                                                <label>第6天累计充值:{{info.pay_total_6}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv7}}</span>
+                                            <div class="item-desc">
+                                                <label>第7天累计充值:{{info.pay_total_7}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv8}}</span>
+                                            <div class="item-desc">
+                                                <label>第8天累计充值:{{info.pay_total_8}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv9}}</span>
+                                            <div class="item-desc">
+                                                <label>第9天累计充值:{{info.pay_total_9}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv10}}</span>
+                                            <div class="item-desc">
+                                                <label>第10天累计充值:{{info.pay_total_10}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv11}}</span>
+                                            <div class="item-desc">
+                                                <label>第11天累计充值:{{info.pay_total_11}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv12}}</span>
+                                            <div class="item-desc">
+                                                <label>第12天累计充值:{{info.pay_total_12}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv13}}</span>
+                                            <div class="item-desc">
+                                                <label>第13天累计充值:{{info.pay_total_13}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv14}}</span>
+                                            <div class="item-desc">
+                                                <label>第14天累计充值:{{info.pay_total_14}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv15}}</span>
+                                            <div class="item-desc">
+                                                <label>第15天累计充值:{{info.pay_total_15}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv16}}</span>
+                                            <div class="item-desc">
+                                                <label>第16天累计充值:{{info.pay_total_16}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv17}}</span>
+                                            <div class="item-desc">
+                                                <label>第17天累计充值:{{info.pay_total_17}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv18}}</span>
+                                            <div class="item-desc">
+                                                <label>第18天累计充值:{{info.pay_total_18}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv19}}</span>
+                                            <div class="item-desc">
+                                                <label>第19天累计充值:{{info.pay_total_19}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv20}}</span>
+                                            <div class="item-desc">
+                                               <label>第20天累计充值:{{info.pay_total_20}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv21}}</span>
+                                            <div class="item-desc">
+                                                <label>第21天累计充值:{{info.pay_total_21}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv22}}</span>
+                                            <div class="item-desc">
+                                                <label>第22天累计充值:{{info.pay_total_22}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv23}}</span>
+                                            <div class="item-desc">
+                                                <label>第23天累计充值:{{info.pay_total_23}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv24}}</span>
+                                            <div class="item-desc">
+                                                <label>第24天累计充值:{{info.pay_total_24}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv25}}</span>
+                                            <div class="item-desc">
+                                                <label>第25天累计充值:{{info.pay_total_25}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv26}}</span>
+                                            <div class="item-desc">
+                                                <label>第26天累计充值:{{info.pay_total_26}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv27}}</span>
+                                            <div class="item-desc">
+                                                <label>第27天累计充值:{{info.pay_total_27}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv28}}</span>
+                                            <div class="item-desc">
+                                                <label>第28天累计充值:{{info.pay_total_28}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv29}}</span>
+                                            <div class="item-desc">
+                                                <label>第29天累计充值:{{info.pay_total_29}}</label>
+                                            </div>
+                                        </td>
+                                        <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                            <span>{{info.ltv30}}</span>
+                                            <div class="item-desc">
+                                                <label>第30天累计充值:{{info.pay_total_30}}</label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--主要内容结束-->
+                    <div class="datagrid-pager pagination">
+                        <table cellspacing="0" cellpadding="0" border="0">
+                            <tbody>
+                                <tr>
+                                    <!--<td>-->
+                                        <!--<select class="pagination-page-list">-->
+                                            <!--<option>10</option>-->
+                                            <!--<option>20</option>-->
+                                            <!--<option>30</option>-->
+                                            <!--<option>40</option>-->
+                                            <!--<option>50</option>-->
+                                        <!--</select>-->
+                                    <!--</td>-->
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_previous %}
+                                        <td>
+                                            <a href="{{url_date}}?page=1" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.number|add:-1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    <td>
+                                        <span style="padding-left:6px;">Page</span>
+                                    </td>
+                                    <td>
+                                        <input class="pagination-num" value="{{number}}" size="2" type="text">
+                                    </td>
+
+                                    <td>
+                                        <span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+                                    </td>
+
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_next %}
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.number|add:1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.paginator.num_pages }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_next or page.has_previous %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" group="" id="paging">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled" group="">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--</div>-->
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        !function(){
+        laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+        laydate({elem: '#demo'});//绑定元素
+        }();
+        //日期范围限制
+        var start = {
+            elem: '#start',
+            format: 'YYYY-MM-DD hh:mm:ss',
+            //min: laydate.now(), //设定最小日期为当前日期
+            max: '2099-06-16', //最大日期
+            istime: true,
+            istoday: false,
+            choose: function(datas){
+                 end.min = datas; //开始日选好后，重置结束日的最小日期
+                 end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+        var end = {
+            elem: '#end',
+            format: 'YYYY-MM-DD hh:mm:ss',
+            // min: laydate.now(),
+            max: '2099-06-16',
+            istime: true,
+            istoday: false,
+            choose: function(datas){
+                start.max = datas; //结束日选好后，充值开始日的最大日期
+            }
+        };
+
+        var valid = {
+            elem: '#valid',
+            format: 'YYYY-MM-DD hh:mm:ss',
+            // min: laydate.now(),
+            max: '2099-06-16',
+            istime: true,
+            istoday: false,
+            choose: function(datas){
+                start.max = datas; //结束日选好后，充值开始日的最大日期
+            }
+        };
+        laydate(start); //valid
+        laydate(end);
+        laydate(valid);
+        //自定义日期格式
+        laydate({
+            elem: '#test1',
+            format: 'YYYY年MM月DD日',
+            festival: true, //显示节日
+            choose: function(datas){ //选择日期完毕的回调
+                alert('得到：'+datas);
+            }
+        });
+        //日期范围限定在昨天到明天
+        laydate({
+            elem: '#hello3',
+            min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+            max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+        });
+        $('.popup').click(function(event) { //点击a标签
+                if($(this).find(".item-desc").is(':hidden')) { //如果当前隐藏
+                    $(this).parents().find(".item-desc").hide()
+                    $(this).find(".item-desc").show(); //那么就显示div
+                    $(this).find(".item-desc").css("left", document.body.scrollLeft + event.clientX + 20);
+			        $(this).find(".item-desc").css("top", document.body.scrollLeft + event.clientY + -140);
+
+                } else { //否则
+                    $(".item-desc").hide(); //就隐藏div
+
+                }
+            })
+    </script>
+</body>
+</html>

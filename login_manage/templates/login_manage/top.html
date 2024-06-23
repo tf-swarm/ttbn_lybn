@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- <script type="text/javascript" src="./js/jquery-1.7.2.js"></script> -->
+<title>天天捕鸟管理系统</title>
+<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css" />
+
+<script language="JavaScript">
+	// function logout(){
+		// if(confirm("您确定要退出吗？"))
+		// top.location = "__MODULE__/Login/logout";
+		// return false;
+	// }
+</script>
+<script language="JavaScript">
+	function showsubmenu(sid){
+		var whichEl = eval("submenu" + sid);
+		var menuTitle = eval("menuTitle" + sid);
+		if(whichEl.style.display == "none"){
+			eval("submenu" + sid + ".style.display=\"\";");
+		}else{
+			eval("submenu" + sid + ".style.display=\"none\";");
+		}
+	}
+</script>
+<!--<base target="main">-->
+<style>
+ul,li{list-style:none;margin:0;padding:0;}
+ul.tab-bq li{float:left;padding:3px 6px;margin-left:4px;line-height:24px;background:#1B9AF7;color:#FFF;font-weight:bold;border-radius:3px 3px 0 0;}
+ul.tab-bq li:first-child{margin-left:8px;}
+ul.tab-bq li:hover{background:#1B9AF7;}
+ul.tab-bq li a{color:#FFF;}
+</style>
+<script type="text/javascript" language="javascript" src="/static/js/dateTime.js"></script>
+</head>
+<body>
+<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="admin_topbg">
+	<tr>
+		<td width="12%" align="left" valign="top">
+		
+		<td width="55%" valign="bottom">
+			<ul class="tab-bq">
+				<!--<li><a href="/index/" target="rightFrame">首页</a></li>-->
+				<!--<li><a href="/server/" target="rightFrame">服务器</a></li>-->
+				 <!--<li><a href="/notice/" target="rightFrame">游戏公告</a></li>-->
+				<!--<li><a href="/broadcast/" target="rightFrame">全服广播</a></li>-->
+
+			</ul></td>
+			
+		<td width="25%" align="right" valign="middle" class="ht_welcome"><span id="showtimes"></span><br />&nbsp;您好，欢迎登录管理后台！</td>
+		
+		<td width="8%" align="right" valign="middle" class="ht_out"><a href="/login_out/" target="_top" onClick="">安全退出</a></td>
+	</tr>
+</table>
+</body>
+</html>

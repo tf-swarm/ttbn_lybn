@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% load extratags %}
+
+{% block head %}
+	<script src="/static/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/static/css/default.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/icon.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
+	<script type="text/javascript" src="/static/js/semantic.min.js"></script>
+
+	<script>
+		$(function(){
+			$('#paging').click(function () {
+				var pag = $('.pagination-num').val() ;
+				var URL= "/exchange_code/query_code/?page=" + pag;
+				location.href=URL;
+			});
+
+			$('#query_code_excel').click(function () {
+                var URL= "/exchange_code/query_excel/";
+                location.href=URL;
+            });
+		});
+
+		function Load_data(){
+		    $.Load_data();
+            $("#form_search").submit();
+		}
+	</script>
+{% endblock head %}
+
+{% block filter %}
+	 <form action="{{url_date}}" method="post" id="form_search">
+        {% csrf_token %}
+		<tr>
+			<td width="12%" height="40" align="left" valign="middle" bgcolor="#F5F5F5" style="height: 50px;">
+                <strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">兑换码管理 &gt; 兑换码查询</strong>
+            </td>
+
+			<td width="78%" align="left" valign="middle" bgcolor="#F5F5F5">
+				渠道:
+					<select name="channel" class="dowp_list_sty" style="margin-right: 10px;">
+						{% for key,value in chanel_info.items %}
+                             <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>
+                        {% endfor %}
+					</select>
+				筛选:
+					<select name="used" class="dowp_list_sty" style="margin-right: 10px;">
+						<option value="0" {% if used == '0' %} selected {% endif %}> 全部</option>
+						<option value="1" {% if used == '1' %} selected {% endif %}> 已使用</option>
+						<option value="2" {% if used == '2' %} selected {% endif %}> 未使用</option>
+					</select>
+				<lable for="introduce" style="padding-left: 10px; font-size:12px;">时间:</lable>
+					<input placeholder="请输入日期" id="start" class="laydate-icon" readonly="" value="{{start}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time" >
+				<lable for="introduce" style="padding-left: 10px; font-size:12px;">至:</lable>
+					<input placeholder="请输入日期" id="end" class="laydate-icon"  readonly="" value="{{end}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+				<lable for="introduce" style="padding-left: 10px; font-size:12px;">礼包名称:</lable>
+					<input placeholder="" class="gift_bag" name="gift_name" value="{{gift_name}}">
+				<lable for="introduce" style="padding-left: 10px; font-size:12px;">用户ID:</lable>
+					<input placeholder="" class="gift_bag" name="userId" value="{{userId}}">
+					<input type="button" value="确认查询" id="query_date" class="button" onclick="Load_data()">
+			</td>
+
+			<td width="10%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                {% if page.paginator.num_pages %}
+                    <input type="button" value="导出xls" class="button_color" id="query_code_excel" style="margin-right: 20px;width:100px;"/>
+                {% else %}
+                    <input type="button" value="导出xls" class="button_color"  style="margin-right: 20px;background-color: #8b8a8a"/>
+                {% endif %}
+
+			</td>
+		</tr>
+	</form>
+{% endblock filter %}
+
+
+{% block body %}
+	<tr>
+		<th width="60" align="center" bgcolor="#EEEEEE" style="height: 37px;">序号</th>
+		<th width="100" align="center" bgcolor="#EEEEEE">兑换码ID</th>
+		<th width="90" align="center" bgcolor="#EEEEEE">分类名称</th>
+		<!--<th width="70" align="center" bgcolor="#EEEEEE">版本号</th>-->
+		<th width="70" align="center" bgcolor="#EEEEEE">生成人</th>
+		<th width="80" align="center" bgcolor="#EEEEEE">使用情况</th>
+		<th width="80" align="center" bgcolor="#EEEEEE">玩家ID</th>
+		<th width="80" align="center" bgcolor="#EEEEEE">渠道ID</th>
+		<th width="240" align="center" bgcolor="#EEEEEE">奖励内容</th>
+		<th width="100" align="center" bgcolor="#EEEEEE">生成日期</th>
+		<th width="100" align="center" bgcolor="#EEEEEE">有效期至</th>
+		<th width="80" align="center" bgcolor="#EEEEEE">使用时间</th>
+	</tr>
+	{% if show == 0 %}
+		{% for info  in page %}
+			<tr id="hover_tr" bgcolor="#FFFFFF">
+				<td align="center" valign="middle" style="height: 50px;">{{info.orid}}</td>
+				<td align="center" valign="middle" style="height: 50px;">{{info.codeid}}</td>
+				<td align="center" valign="middle" style="height: 50px;">{{info.describe}}</td>
+				<!--<td align="center" valign="middle" style="height: 50px;">{{info.version}}</td>-->
+				<td align="center" valign="middle" style="height: 50px;">{{info.people}}</td>
+				<td align="center" valign="middle" style="height: 50px;">
+					{% if info.used == 1 %}
+						<span class="yx_jz_pub yes">√</span>
+					{% else %}
+						<span class="yx_jz_pub error">x</span>
+					{% endif %}
+				</td>
+				<td align="center" valign="middle" style="height: 50px;">
+					{% if info.uid == 0 %}
+						<span class="yx_jz_pub shows">--</span>
+					{% else %}
+						<span class="yx_jz_pub shows">{{info.uid}}</span>
+					{% endif %}
+				</td>
+				<td align="center" valign="middle" style="height: 50px;">{{info.channel}}</td>
+				<td align="center" valign="middle" style="height: 50px;">{{info.reward | convert_reward}}</td>
+				<td align="center" valign="middle" style="height: 50px;">{{info.creat_time}}</td>
+				<td align="center" valign="middle" style="height: 50px;">{{info.end_time}}</td>
+				<td align="center" valign="middle" style="height: 50px;">
+					{% if info.uid == 0  %}
+						<span class="yx_jz_pub shows">--</span>
+					{% else %}
+						<span class="yx_jz_pub shows">{{info.ex_time}}</span>
+					{% endif %}
+				</td>
+
+			</tr>
+		{% endfor %}
+	{% endif %}
+{% endblock body %}

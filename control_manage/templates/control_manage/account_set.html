@@ -1,0 +1,1146 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/account_manage.css">
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/semantic.min.js"></script>
+    <script>
+        $(function(){
+            $('#paging').click(function () {
+                var pag = $('.pagination-num').val() ;
+                var URL= "/control_manage/account_set/?page=" + pag;
+                location.href=URL;
+            });
+
+        });
+
+        var w,h,className;
+        function getSrceenWH(){
+            w = $(window).width();
+            h = $(window).height();
+            $('#dialogBg').width(w).height(h);
+        }
+
+        window.onresize = function(){
+            getSrceenWH();
+        }
+        $(window).resize();
+
+        $(function(){
+            getSrceenWH();
+            //关闭弹窗
+            $('.claseDialogBtn').click(function(){
+                $('#dialogBg').fadeOut(300,function(){
+                    $('#dialog').addClass('bounceOutUp').fadeOut();
+                    $('#edit_show').empty();
+                });
+            });
+        });
+
+        function redact(nid,account_name,phone,department) {
+            $.post('/control_manage/edit_account/',{csrfmiddlewaretoken: '{{ csrf_token }}','user_id':nid,'user_name':account_name,'phone':phone,'department':department},function (data) {
+                if(data.code){
+                    $("#user_id").val(data.user_id);
+                    $("#edit_user_name").val(data.user_name);
+                    $("#edit_phone").val(data.phone);
+                    $("#edit_department option[value='"+data.department+"']").attr("selected","selected");
+
+                    var str_html = '';
+                    var options = '';
+                    //列表 i 为索引，item为遍历值
+                    $.each(data.info, function(i,item){
+                        str_html = '<div class="label_end">';
+
+                        str_html += '<select name="account_info" class="ui dropdown" id="edit_option">';
+                        if (item.name == "game_data_collect"){
+                            game_data_collect = '<option value="game_data_collect" selected>游戏数据总汇</option>';
+                            str_html += game_data_collect
+                        }
+                        else {
+                            game_data_collect = '<option value="game_data_collect">游戏数据总汇</option>';
+                            str_html += game_data_collect
+                        }
+
+                        str_html += '<select name="account_info" class="ui dropdown" id="edit_option">';
+                        if (item.name == "run_data_collect"){
+                            run_data_collect = '<option value="run_data_collect" selected>运营数据总汇</option>';
+                            str_html += run_data_collect
+                        }
+                        else {
+                            run_data_collect = '<option value="run_data_collect">运营数据总汇</option>';
+                            str_html += run_data_collect
+                        }
+
+                        if (item.name == "order_query"){
+                            order_query = '<option value="order_query" selected>订单查询</option>';
+                            str_html += order_query
+                        }
+                        else {
+                            order_query = '<option value="order_query">订单查询</option>';
+                            str_html += order_query
+                        }
+
+                        if (item.name == "mail_general"){
+                            mail_general = '<option value="mail_general" selected>邮件总览</option>';
+                            str_html += mail_general
+                        }
+                        else {
+                            mail_general = '<option value="mail_general">邮件总览</option>';
+                            str_html += mail_general
+                        }
+
+                        if (item.name == "mail_verifier"){
+                            mail_verifier = '<option value="mail_verifier" selected>邮件审核权限</option>';
+                            str_html += mail_verifier
+                        }
+                        else {
+                            mail_verifier = '<option value="mail_verifier">邮件审核权限</option>';
+                            str_html += mail_verifier
+                        }
+
+                        if (item.name == "early_warning"){
+                            early_warning = '<option value="early_warning" selected>异常预警</option>';
+                            str_html += early_warning
+                        }
+                        else {
+                            early_warning = '<option value="early_warning">异常预警</option>';
+                            str_html += early_warning
+                        }
+
+                        if (item.name == "broadcast_set"){
+                            broadcast_set = '<option value="broadcast_set" selected>公告设置</option>';
+                            str_html += broadcast_set
+                        }
+                        else {
+                            broadcast_set = '<option value="broadcast_set">公告设置</option>';
+                            str_html += broadcast_set
+                        }
+
+                        if (item.name == "relax_general"){
+                            relax_general = '<option value="relax_general" selected>休闲场玩家总览</option>';
+                            str_html += relax_general
+                        }
+                        else {
+                            relax_general = '<option value="relax_general">休闲场玩家总览</option>';
+                            str_html += relax_general
+                        }
+
+                        if (item.name == "power_general"){
+                            power_general = '<option value="power_general" selected>能量场玩家总览</option>';
+                            str_html += power_general
+                        }
+                        else {
+                            power_general = '<option value="power_general">能量场玩家总览</option>';
+                            str_html += power_general
+                        }
+
+                        if (item.name == "channel_count"){
+                            channel_count = '<option value="channel_count" selected>渠道数据统计</option>';
+                            str_html += channel_count
+                        }
+                        else {
+                            channel_count = '<option value="channel_count">渠道数据统计</option>';
+                            str_html += channel_count
+                        }
+
+                        if (item.name == "user_period_data"){
+                            user_period_data = '<option value="user_period_data" selected>玩家期间数据统计</option>';
+                            str_html += user_period_data
+                        }
+                        else {
+                            user_period_data = '<option value="user_period_data">玩家期间数据统计</option>';
+                            str_html += user_period_data
+                        }
+
+                        if (item.name == "arena_general"){
+                            arena_general = '<option value="arena_general" selected>竞技场总览</option>';
+                            str_html += arena_general
+                        }
+                        else {
+                            arena_general = '<option value="arena_general">竞技场总览</option>';
+                            str_html += arena_general
+                        }
+
+                        if (item.name == "arena_particulars"){
+                            arena_particulars = '<option value="arena_particulars" selected>竞技场详情</option>';
+                            str_html += arena_particulars
+                        }
+                        else {
+                            arena_particulars = '<option value="arena_particulars">竞技场详情</option>';
+                            str_html += arena_particulars
+                        }
+
+                        if (item.name == "mini_general"){
+                            mini_general = '<option value="mini_general" selected>小游戏总览</option>';
+                            str_html += mini_general
+                        }
+                        else {
+                            mini_general = '<option value="mini_general">小游戏总览</option>';
+                            str_html += mini_general
+                        }
+
+                        if (item.name == "mini_particulars"){
+                            mini_particulars = '<option value="mini_particulars" selected>小游戏详情</option>';
+                            str_html += mini_particulars
+                        }
+                        else {
+                            mini_particulars = '<option value="mini_particulars">小游戏详情</option>';
+                            str_html += mini_particulars
+                        }
+
+                        if (item.name == "integral_shop"){
+                            integral_shop = '<option value="integral_shop" selected>积分商城</option>';
+                            str_html += integral_shop
+                        }
+                        else {
+                            integral_shop = '<option value="integral_shop">积分商城</option>';
+                            str_html += integral_shop
+                        }
+
+                        if (item.name == "gift_bag_shop"){
+                            gift_bag_shop = '<option value="gift_bag_shop" selected>礼包商城</option>';
+                            str_html += gift_bag_shop
+                        }
+                        else {
+                            gift_bag_shop = '<option value="gift_bag_shop">礼包商城</option>';
+                            str_html += gift_bag_shop
+                        }
+
+                        if (item.name == "integral_for_record"){
+                            integral_for_record = '<option value="integral_for_record" selected>积分商城兑换记录</option>';
+                            str_html += integral_for_record
+                        }
+                        else {
+                            integral_for_record = '<option value="integral_for_record">积分商城兑换记录</option>';
+                            str_html += integral_for_record
+                        }
+
+                        if (item.name == "limit_time_shop"){
+                            limit_time_shop = '<option value="limit_time_shop" selected>限时商城</option>';
+                            str_html += limit_time_shop
+                        }
+                        else {
+                            limit_time_shop = '<option value="limit_time_shop">限时商城</option>';
+                            str_html += limit_time_shop
+                        }
+
+                        if (item.name == "shop_for_record"){
+                            shop_for_record = '<option value="shop_for_record" selected>商城兑换记录</option>';
+                            str_html += shop_for_record
+                        }
+                        else {
+                            shop_for_record = '<option value="shop_for_record">商城兑换记录</option>';
+                            str_html += shop_for_record
+                        }
+
+                        if (item.name == "shop_for_details"){
+                            shop_for_details = '<option value="shop_for_details" selected>兑换详情</option>';
+                            str_html += shop_for_details
+                        }
+                        else {
+                            shop_for_details = '<option value="shop_for_details">兑换详情</option>';
+                            str_html += shop_for_details
+                        }
+
+                        if (item.name == "card_secret_set"){
+                            card_secret_set = '<option value="card_secret_set" selected>卡密设置</option>';
+                            str_html += card_secret_set
+                        }
+                        else {
+                            card_secret_set = '<option value="card_secret_set">卡密设置</option>';
+                            str_html += card_secret_set
+                        }
+
+                        if (item.name == "vip_exchange"){
+                            vip_exchange = '<option value="vip_exchange" selected>兑换商城VIP</option>';
+                            str_html += vip_exchange
+                        }
+                        else {
+                            vip_exchange = '<option value="vip_exchange">兑换商城VIP</option>';
+                            str_html += vip_exchange
+                        }
+
+                        if (item.name == "super_vip_exchange"){
+                            super_vip_exchange = '<option value="super_vip_exchange" selected>兑换商城SVIP</option>';
+                            str_html += super_vip_exchange
+                        }
+                        else {
+                            super_vip_exchange = '<option value="super_vip_exchange">兑换商城SVIP</option>';
+                            str_html += super_vip_exchange
+                        }
+
+                        if (item.name == "redeem_code_general"){
+                            redeem_code_general = '<option value="redeem_code_general" selected>兑换码总览</option>';
+                            str_html += redeem_code_general
+                        }
+                        else {
+                            redeem_code_general = '<option value="redeem_code_general">兑换码总览</option>';
+                            str_html += redeem_code_general
+                        }
+
+                        if (item.name == "redeem_code_query"){
+                            redeem_code_query = '<option value="redeem_code_query" selected>兑换查询</option>';
+                            str_html += redeem_code_query
+                        }
+                        else {
+                            redeem_code_query = '<option value="redeem_code_query">兑换查询</option>';
+                            str_html += redeem_code_query
+                        }
+
+                        if (item.name == "account_set"){
+                            account_set = '<option value="account_set" selected>账号管理</option>';
+                            str_html += account_set
+                        }
+
+                        str_html += '</select>';
+                        str_html += '<a onclick="$(this).parent().remove();">' + '<img src="/static/images/cross-circle.png" style="vertical-align: baseline;;">' + '</a>';
+                       	str_html += '</div>';
+                        // $("#edit_option option[value='"+item.name+"']").attr("selected","selected");
+
+                        $("#edit_show").append(str_html);
+                    });
+                    className = $(this).attr('class');
+                    $('#dialogBg').fadeIn(300);
+                    $('#dialog').removeAttr('class').addClass('animated '+className+'').fadeIn();
+                }else {
+                    alert(data.msg)
+                }
+            });
+        }
+
+
+        function open_login(account_name,phone,department) {
+            $.post('/system_manage/alter_login/', {csrfmiddlewaretoken: '{{ csrf_token }}',"user_name":account_name,"phone":phone,"department":department}, function(data) {
+                if ( data.code) {
+                    if(confirm(data.msg)){
+                        var pag = $('.pagination-num').val() ;
+                        var URL= "/control_manage/account_set/?page=" + pag;
+                        location.href=URL;
+                    }else {
+                        var pag = $('.pagination-num').val() ;
+                        var URL= "/control_manage/account_set/?page=" + pag;
+                        location.href=URL;
+                    }
+                }
+                else {
+                    alert(data.msg);
+                }
+
+            });
+        }
+
+        function delete_data(account_name,phone,department) {
+            $.post('/system_manage/delete_data/', {csrfmiddlewaretoken: '{{ csrf_token }}',"user_name":account_name,"phone":phone,"department":department}, function(msg) {
+                if ( msg.state) {
+                    if(confirm(msg.info)){
+                        var pag = $('.pagination-num').val() ;
+                        var URL= "/control_manage/account_set/?page=" + pag;
+                        location.href=URL;
+                    }else {
+                        var pag = $('.pagination-num').val() ;
+                        var URL= "/control_manage/account_set/?page=" + pag;
+                        location.href=URL;
+                    }
+                }
+                else {
+                    alert(msg.info);
+                }
+
+            });
+        }
+
+        $(function(){
+            getSrceenWH();
+            //显示弹框
+            $('#bn_btn_one').click(function(){
+                className = $(this).attr('class');
+                $('#dialogmag').fadeIn(300);
+                $('#dialohg').removeAttr('class').addClass('by_value '+className+'').fadeIn();
+            });
+
+            //关闭弹窗
+            $('.claseDialogBtn').click(function(){
+                $('#dialogmag').fadeOut(300,function(){
+                    $('#dialohg').addClass('bounceOutUp').fadeOut();
+                });
+            });
+        });
+
+
+        $(function(){
+            getSrceenWH();
+
+            //显示弹框
+            $('#red_packet').click(function(){
+                className = $(this).attr('class');
+                $('#dialogmag').fadeIn(300);
+                $('#dialohg').removeAttr('class').addClass('by_value '+className+'').fadeIn();
+            });
+
+            //关闭弹窗
+            $('.claseDialogBtn').click(function(){
+                $('#dialogmag').fadeOut(300,function(){
+                    $('#dialohg').addClass('bounceOutUp').fadeOut();
+                });
+            });
+        });
+
+
+        $(function(){
+            getSrceenWH();
+            //显示弹框
+            $('.up_cards_close').click(function(){
+                className = $(this).attr('class');
+                $('#dialogmag').fadeIn(300);
+                $('#dialohg').removeAttr('class').addClass('by_value '+className+'').fadeIn();
+            });
+
+            //关闭弹窗
+            $('.claseDialogBtn').click(function(){
+                $('#dialogmag').fadeOut(300,function(){
+                    $('#dialohg').addClass('bounceOutUp').fadeOut();
+                });
+            });
+        });
+
+    </script>
+    <style type="text/css">
+        body {overflow-y:scroll; margin: 0; padding: 0;background-color: #eeeeee}
+    </style>
+</head>
+
+<body marginwidth="0" marginheight="0" data-keyboard="false">
+    <div class="body-div">
+
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+            <form action="" method="post" id="form_search">
+                {% csrf_token %}
+                <tr>
+                    <td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">系统管理 &gt; 账号设置</strong></td>
+
+                    <td width="72%" align="left" valign="middle" bgcolor="#F5F5F5">
+
+                    </td>
+                    <td width="10%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                        {% if limit_level == 0 %}
+                            <a href="javascript:;" id="bn_btn_one" style="background-color: #0ea432">新增管理</a>
+                        {% else %}
+                            <a href="javascript:;" id="bn_btn_one_xls" style="background-color: #8b8a8a">新增管理</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            </form>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF">
+                        <!--主要内容开始-->
+                    <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:30px auto 30px auto;" styler="1px #666 solid " id="userlist">
+                        <tbody id="hover_tf">
+                            <tr>
+                                <th width="100" align="center" bgcolor="#EEEEEE" style="height: 37px;">序号</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE" style="height: 37px;">用户名</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE" style="height: 37px;">手机号</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE" style="height: 37px;">部门归属</th>
+                                <th width="200" align="center" bgcolor="#EEEEEE" style="height: 37px;">操作</th>
+
+                            </tr>
+                            {% for info  in page %}
+                                <tr id="hover_tr1" bgcolor="#FFFFFF">
+                                    <td align="center">{{info.order}}</td>
+                                    <td align="center" style="height: 37px;">{{info.account_name}}</td>
+                                    <td align="center">{{info.phone}}</td>
+                                    <td align="center">{{info.department}}</td>
+
+                                    <td align="center">
+                                        {% if info.limit_level == 1 %}
+                                            <div style="width: 150px; height: 17px;">
+                                                <a href="javascript:redact('{{info.nid}}','{{info.account_name}}','{{info.phone}}','{{info.department}}');"  style="color:blue" >编辑</a>
+                                                {% if info.login_limit == 1 %}
+                                                    <a href="javascript:open_login('{{info.account_name}}','{{info.phone}}','{{info.department}}');" style="margin-left: 10px;color: red">禁用</a>
+                                                {% else %}
+                                                    <a href="javascript:open_login('{{info.account_name}}','{{info.phone}}','{{info.department}}');" style="margin-left: 10px;color: red">开启</a>
+                                                {% endif %}
+                                                <a href="javascript:delete_data('{{info.account_name}}','{{info.phone}}','{{info.department}}');" style="margin-left: 10px;">删除</a>
+                                            </div>
+                                        {% else %}
+                                            <div style="width: 150px; height: 17px;">
+                                                <a href="javascript:redact('{{info.nid}}','{{info.account_name}}','{{info.phone}}','{{info.department}}');"  style="color:blue" >编辑</a>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!--主要内容结束-->
+                    <div class="datagrid-pager pagination">
+                        <table cellspacing="0" cellpadding="0" border="0">
+                            <tbody>
+                                <tr>
+                                    <!--<td>-->
+                                        <!--<select class="pagination-page-list">-->
+                                            <!--<option>10</option>-->
+                                            <!--<option>20</option>-->
+                                            <!--<option>30</option>-->
+                                            <!--<option>40</option>-->
+                                            <!--<option>50</option>-->
+                                        <!--</select>-->
+                                    <!--</td>-->
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_previous %}
+                                        <td>
+                                            <a href="{{url_date}}?page=1" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.number|add:-1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    <td>
+                                        <span style="padding-left:6px;">Page</span>
+                                    </td>
+                                    <td>
+                                        <input class="pagination-num" value="{{number}}" size="2" type="text">
+                                    </td>
+                                    <td>
+                                        <span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+                                    </td>
+
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_next %}
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.number|add:1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.paginator.num_pages }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_next or page.has_previous %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" group="" id="paging">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled" group="">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--</div>-->
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!-----------------------------弹窗---------------------------->
+    <div id="dialogBg"></div>
+    <div id="dialog" class="animated" style="margin: auto;position: fixed; left: 25%; top: 10%;width: 660px;height: 735px;">
+        <div class="dialogTop"style="height: 80px;width: 100%;">
+            <h4 class="headline">
+                新增管理/管理编辑
+            </h4>
+        </div>
+        <form action="" method="post" id="edit_form">
+            {% csrf_token %}
+            <ul class="editInfos">
+                <div  style="height: 120px;">
+                    <div class="new_management">
+                        <div class="btn_model">
+                            <p>用户名</p>
+                        </div>
+                        <input type="text" name="user_name" id="edit_user_name" value=""/>
+                        <input type="text" name="user_id" id="user_id" value="" style="display: none"/>
+                    </div>
+                    <div class="new_management">
+                        <div class="btn_model">
+                            <p>手机号</p>
+                        </div>
+                        <input type="text" name="phone" id="edit_phone" value=""/>
+                    </div>
+                    <div class="new_management">
+                        <div class="btn_model">
+                            <p>部门归属</p>
+                        </div>
+                        <select name="edit_department" id="edit_department">
+                            <option value="开发">开发</option>
+                            <option value="老板">老板</option>
+                            <option value="产品">产品</option>
+                            <option value="运营">运营</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="vised">
+                    <div class="data_display">
+                         <div id="edit_show">
+
+                         </div>
+                        <div class="column" id="pdd-prize-column">
+                            <button class="edit_permission" id="pdd-prize" type="button" >添加权限</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn_select">
+                    <a href="javascript:;" class="claseDialogBtn" id="edit_cancel">取消</a>
+                    <a href="javascript:edit_submit();" id="edit_submit">确定</a>
+                </div>
+            </ul>
+        </form>
+    </div>
+
+    <div id="dialogmag"></div>
+    <div id="dialohg" class="by_value" style="margin: auto;position: fixed; left: 25%; top: 10%;width: 660px;height: 735px;">
+        <div class="dialogTophg" style="height: 80px;width: 100%;">
+            <h4 class="headline">
+                新增管理/管理编辑
+            </h4>
+        </div>
+        <form action="" method="post" id="add_form">
+            {% csrf_token %}
+            <ul class="editInfosed">
+                <div  style="height: 120px;">
+                    <div class="new_management">
+                        <div class="btn_model">
+                            <p>用户名</p>
+                        </div>
+                        <input type="text" name="user_name" id="add_user_name" value="" />
+                    </div>
+
+                    <div class="new_management">
+                        <div class="btn_model">
+                            <p>手机号</p>
+                        </div>
+                        <input type="text" name="phone" id="add_phone" value="" />
+                    </div>
+
+                    <div class="new_management">
+                        <div class="btn_model">
+                            <p>部门归属</p>
+                        </div>
+                        <select name="add_department" id="add_department">
+                            <option value="开发">开发</option>
+                            <option value="老板">老板</option>
+                            <option value="产品">产品</option>
+                            <option value="运营">运营</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="vised">
+                    <div class="data_display">
+                        <div id="add_show">
+
+                        </div>
+                        <div class="column" id="add-prize-column" style="margin-left: 10px; ">
+                            <button class="add_permission" id="add-prize" type="button" >添加权限</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn_select">
+                    <a href="javascript:;" class="claseDialogBtn" id="add_cancel">取消</a>
+                    <a href="javascript:;" id="add_submit">确定</a>
+                </div>
+            </ul>
+        </form>
+    </div>
+
+
+<script type="text/javascript">
+
+    {#--------------------------------------------编辑弹框-------------------------------------------#}
+    $('#pdd-prize').click(function(){
+        var html_str='';
+        var arry = [];
+        html_str = '<div class="label_end">';
+        html_str += '<select name="account_info" class="ui dropdown" id="edit_option" style="width:131px">';
+        $("#edit_show select option:selected").each(function(){
+            arry.push($(this).val());
+        });
+
+        if(arry.length <1){
+            html_str += '<option value="game_data_collect">游戏数据总汇</option>';
+            html_str += '<option value="run_data_collect">运营数据总汇</option>';
+            html_str += '<option value="order_query">订单查询</option>';
+            html_str += '<option value="mail_general">邮件总览</option>';
+            html_str += '<option value="mail_verifier">邮件审核权限</option>';
+            html_str += '<option value="broadcast_set">公告设置</option>';
+            html_str += '<option value="early_warning">异常预警</option>';
+            html_str += '<option value="channel_count">渠道数据统计</option>';
+            html_str += '<option value="user_period_data">玩家期间数据统计</option>';
+            html_str += '<option value="relax_general">休闲场玩家总览</option>';
+            html_str += '<option value="power_general">能量场玩家总览</option>';
+            html_str += '<option value="player_limits">玩家总览操作</option>';
+            html_str += '<option value="arena_general">竞技场总览</option>';
+            html_str += '<option value="arena_particulars">竞技场详情</option>';
+            html_str += '<option value="mini_general">小游戏总览</option>';
+            html_str += '<option value="mini_particulars">小游戏详情</option>';
+            html_str += '<option value="integral_shop">积分商城</option>';
+            html_str += '<option value="integral_for_record">积分商城兑换记录</option>';
+            html_str += '<option value="gift_bag_shop">礼包商城</option>';
+            html_str += '<option value="limit_time_shop">限时商城</option>';
+            html_str += '<option value="shop_for_record">商城兑换记录</option>';
+            html_str += '<option value="card_secret_set">卡密设置</option>';
+            html_str += '<option value="shop_for_details">兑换详情</option>';
+            html_str += '<option value="vip_exchange">兑换商城VIP</option>';
+            html_str += '<option value="super_vip_exchange">兑换商城SVIP</option>';
+            html_str += '<option value="redeem_code_general">兑换码总览</option>';
+            html_str += '<option value="redeem_code_query">兑换查询</option>';
+
+        }else {
+            $("#edit_show select option:selected").each(function(){
+                if(($(this).val() !="game_data_collect") && ($.inArray("game_data_collect", arry) == -1) && (html_str.search('<option value="game_data_collect" selected>游戏数据总汇</option>') == -1) ){
+                    game_data_collect = '<option value="game_data_collect" selected>游戏数据总汇</option>';
+                    html_str += game_data_collect
+                }
+
+                if(($(this).val() !="run_data_collect") && ($.inArray("run_data_collect", arry) == -1) && (html_str.search('<option value="run_data_collect" selected>运营数据总汇</option>') == -1) ){
+                    run_data_collect = '<option value="run_data_collect" selected>运营数据总汇</option>';
+                    html_str += run_data_collect
+                }
+
+                if(($(this).val() !="order_query") && ($.inArray("order_query", arry) == -1) && (html_str.search('<option value="order_query">订单查询</option>') == -1)){
+                    order_query = '<option value="order_query">订单查询</option>';
+                    html_str += order_query
+                }
+
+                if($(this).val() !="mail_general" && $.inArray("mail_general", arry) == -1 && html_str.search('<option value="mail_general">邮件总览</option>') == -1){
+                    mail_general = '<option value="mail_general">邮件总览</option>';
+                    html_str += mail_general
+                }
+
+                if($(this).val() !="mail_verifier" && $.inArray("mail_verifier", arry) == -1 && html_str.search('<option value="mail_verifier">邮件审核权限</option>') == -1){
+                    mail_verifier = '<option value="mail_verifier">邮件审核权限</option>';
+                    html_str += mail_verifier
+                }
+
+                if($(this).val() !="early_warning" && $.inArray("early_warning", arry) == -1 && html_str.search('<option value="early_warning">异常预警</option>') == -1){
+                    early_warning = '<option value="early_warning">异常预警</option>';
+                    html_str += early_warning
+                }
+
+                if($(this).val() !="broadcast_set" && $.inArray("broadcast_set", arry) == -1 && html_str.search('<option value="broadcast_set">公告设置</option>') == -1){
+                    broadcast_set = '<option value="broadcast_set">公告设置</option>';
+                    html_str += broadcast_set
+                }
+
+                if($(this).val() !="channel_count" && $.inArray("channel_count", arry) == -1 && html_str.search('<option value="channel_count">渠道数据统计</option>') == -1){
+                    channel_count = '<option value="channel_count">渠道数据统计</option>';
+                    html_str += channel_count
+                }
+
+                if($(this).val() !="user_period_data" && $.inArray("user_period_data", arry) == -1 && html_str.search('<option value="user_period_data">玩家期间数据统计</option>') == -1){
+                    user_period_data = '<option value="user_period_data">玩家期间数据统计</option>';
+                    html_str += user_period_data
+                }
+
+
+                if($(this).val() !="relax_general" && $.inArray("relax_general", arry) == -1 && html_str.search('<option value="relax_general">休闲场玩家总览</option>') == -1){
+                    relax_general = '<option value="relax_general">休闲场玩家总览</option>';
+                    html_str += relax_general
+                }
+
+                if($(this).val() !="power_general" && $.inArray("power_general", arry) == -1 && html_str.search('<option value="power_general">能量场玩家总览</option>') == -1){
+                    power_general = '<option value="power_general">能量场玩家总览</option>';
+                    html_str += power_general
+                }
+
+                if($(this).val() !="player_limits" && $.inArray("player_limits", arry) == -1 && html_str.search('<option value="player_limits">玩家总览操作</option>') == -1){
+                    player_limits = '<option value="player_limits">玩家总览操作</option>';
+                    html_str += player_limits
+                }
+
+
+                if($(this).val() !="arena_general" && $.inArray("arena_general", arry) == -1 && html_str.search('<option value="arena_general">竞技场总览</option>') == -1){
+                    arena_general = '<option value="arena_general">竞技场总览</option>';
+                    html_str += arena_general
+                }
+
+                if($(this).val() !="arena_particulars" && $.inArray("arena_particulars", arry) == -1 && html_str.search('<option value="arena_particulars">竞技场详情</option>') == -1){
+                    arena_particulars = '<option value="arena_particulars">竞技场详情</option>';
+                    html_str += arena_particulars
+                }
+
+                if($(this).val() !="mini_general" && $.inArray("mini_general", arry) == -1 && html_str.search('<option value="mini_general">小游戏总览</option>') == -1){
+                    mini_general = '<option value="mini_general">小游戏总览</option>';
+                    html_str += mini_general
+                }
+
+                if($(this).val() !="mini_particulars" && $.inArray("mini_particulars", arry) == -1 && html_str.search('<option value="mini_particulars">小游戏详情</option>') == -1){
+                    mini_particulars = '<option value="mini_particulars">小游戏详情</option>';
+                    html_str += mini_particulars
+                }
+
+                if($(this).val() !="integral_shop" && $.inArray("integral_shop", arry) == -1 && html_str.search('<option value="integral_shop">积分商城</option>') == -1){
+                    integral_shop = '<option value="integral_shop">积分商城</option>';
+                    html_str += integral_shop
+                }
+
+                if($(this).val() !="integral_for_record" && $.inArray("integral_for_record", arry) == -1 && html_str.search('<option value="integral_for_record">积分商城兑换记录</option>') == -1){
+                    integral_for_record = '<option value="integral_for_record">积分商城兑换记录</option>';
+                    html_str += integral_for_record
+                }
+
+                if($(this).val() !="gift_bag_shop" && $.inArray("gift_bag_shop", arry) == -1 && html_str.search('<option value="gift_bag_shop">礼包商城</option>') == -1){
+                    gift_bag_shop = '<option value="gift_bag_shop">礼包商城</option>';
+                    html_str += gift_bag_shop
+                }
+
+                if($(this).val() !="limit_time_shop" && $.inArray("limit_time_shop", arry) == -1 && html_str.search('<option value="limit_time_shop">限时商城</option>') == -1){
+                    limit_time_shop = '<option value="limit_time_shop">限时商城</option>';
+                    html_str += limit_time_shop
+                }
+
+                if($(this).val() !="shop_for_record" && $.inArray("shop_for_record", arry) == -1 && html_str.search('<option value="shop_for_record">商城兑换记录</option>') == -1){
+                    shop_for_record = '<option value="shop_for_record">商城兑换记录</option>';
+                    html_str += shop_for_record
+                }
+
+                if($(this).val() !="card_secret_set" && $.inArray("card_secret_set", arry) == -1 && html_str.search('<option value="card_secret_set">卡密设置</option>') == -1){
+                    card_secret_set = '<option value="card_secret_set">卡密设置</option>';
+                    html_str += card_secret_set
+                }
+
+                if($(this).val() !="shop_for_details" && $.inArray("shop_for_details", arry) == -1 && html_str.search('<option value="shop_for_details">兑换详情</option>') == -1){
+                    shop_for_details = '<option value="shop_for_details">兑换详情</option>';
+                    html_str += shop_for_details
+                }
+
+                if($(this).val() !="vip_exchange" && $.inArray("vip_exchange", arry) == -1 && html_str.search('<option value="vip_exchange">兑换商城VIP</option>') == -1){
+                    vip_exchange = '<option value="vip_exchange">兑换商城VIP</option>';
+                    html_str += vip_exchange
+                }
+                if($(this).val() !="super_vip_exchange" && $.inArray("super_vip_exchange", arry) == -1 && html_str.search('<option value="super_vip_exchange">兑换商城SVIP</option>') == -1){
+                    super_vip_exchange = '<option value="super_vip_exchange">兑换商城SVIP</option>';
+                    html_str += super_vip_exchange
+                }
+
+                if($(this).val() !="redeem_code_general" && $.inArray("redeem_code_general", arry) == -1 && html_str.search('<option value="redeem_code_general">兑换码总览</option>') == -1){
+                    redeem_code_general = '<option value="redeem_code_general">兑换码总览</option>';
+                    html_str += redeem_code_general
+                }
+
+                if($(this).val() !="redeem_code_query" && $.inArray("redeem_code_query", arry) == -1 && html_str.search('<option value="redeem_code_query">兑换查询</option>') == -1){
+                    redeem_code_query = '<option value="redeem_code_query">兑换查询</option>';
+                    html_str += redeem_code_query
+                }
+
+                if(html_str.length==108){
+                    html_str += '<option value="select_info">默认选择</option>';
+                }
+        });
+
+        }
+        html_str += '</select>';
+        html_str += '<a onclick="$(this).parent().remove();">' + '<img src="/static/images/cross-circle.png" style="vertical-align: baseline;;">' + '</a>';
+        html_str += '</div>';
+        $('#edit_show').append(html_str);
+    })
+
+    {#--------------------------------------------新添加弹框-------------------------------------------#}
+    $('#add-prize').click(function(){
+        var html_str='';
+        var arry = [];
+        html_str = '<div class="label_end">';
+        html_str += '<select name="account_info" class="ui dropdown" id="edit_option" style="width:131px">';
+        $("#add_show select option:selected").each(function(){
+            arry.push($(this).val());
+        });
+
+        if(arry.length <1){
+            html_str += '<option value="game_data_collect">游戏数据总汇</option>';
+            html_str += '<option value="run_data_collect">运营数据总汇</option>';
+            html_str += '<option value="order_query">订单查询</option>';
+            html_str += '<option value="mail_general">邮件总览</option>';
+            html_str += '<option value="mail_verifier">邮件审核权限</option>';
+            html_str += '<option value="broadcast_set">公告设置</option>';
+            html_str += '<option value="early_warning">异常预警</option>';
+            html_str += '<option value="channel_count">渠道数据统计</option>';
+            html_str += '<option value="user_period_data">玩家期间数据统计</option>';
+            html_str += '<option value="relax_general">休闲场玩家总览</option>';
+            html_str += '<option value="power_general">能量场玩家总览</option>';
+            html_str += '<option value="player_limits">玩家总览操作</option>';
+            html_str += '<option value="arena_general">竞技场总览</option>';
+            html_str += '<option value="arena_particulars">竞技场详情</option>';
+            html_str += '<option value="mini_general">小游戏总览</option>';
+            html_str += '<option value="mini_particulars">小游戏详情</option>';
+            html_str += '<option value="integral_shop">积分商城</option>';
+            html_str += '<option value="integral_for_record">积分商城兑换记录</option>';
+            html_str += '<option value="gift_bag_shop">礼包商城</option>';
+            html_str += '<option value="limit_time_shop">限时商城</option>';
+            html_str += '<option value="shop_for_record">商城兑换记录</option>';
+            html_str += '<option value="card_secret_set">卡密设置</option>';
+            html_str += '<option value="shop_for_details">兑换详情</option>';
+            html_str += '<option value="vip_exchange">兑换商城VIP</option>';
+            html_str += '<option value="super_vip_exchange">兑换商城SVIP</option>';
+            html_str += '<option value="redeem_code_general">兑换码总览</option>';
+            html_str += '<option value="redeem_code_query">兑换查询</option>';
+        }else {
+            $("#add_show select option:selected").each(function(){
+                if(($(this).val() !="game_data_collect") && ($.inArray("game_data_collect", arry) == -1) && (html_str.search('<option value="game_data_collect" selected>游戏数据总汇</option>') == -1) ){
+                    game_data_collect = '<option value="game_data_collect" selected>游戏数据总汇</option>';
+                    html_str += game_data_collect
+                }
+
+                if(($(this).val() !="run_data_collect") && ($.inArray("run_data_collect", arry) == -1) && (html_str.search('<option value="run_data_collect" selected>运营数据总汇</option>') == -1) ){
+                    run_data_collect = '<option value="run_data_collect" selected>运营数据总汇</option>';
+                    html_str += run_data_collect
+                }
+
+                if(($(this).val() !="order_query") && ($.inArray("order_query", arry) == -1) && (html_str.search('<option value="order_query">订单查询</option>') == -1)){
+                    order_query = '<option value="order_query">订单查询</option>';
+                    html_str += order_query
+                }
+
+                if($(this).val() !="mail_general" && $.inArray("mail_general", arry) == -1 && html_str.search('<option value="mail_general">邮件总览</option>') == -1){
+                    mail_general = '<option value="mail_general">邮件总览</option>';
+                    html_str += mail_general
+                }
+
+                if($(this).val() !="mail_verifier" && $.inArray("mail_verifier", arry) == -1 && html_str.search('<option value="mail_verifier">邮件审核权限</option>') == -1){
+                    mail_verifier = '<option value="mail_verifier">邮件审核权限</option>';
+                    html_str += mail_verifier
+                }
+
+                if($(this).val() !="early_warning" && $.inArray("early_warning", arry) == -1 && html_str.search('<option value="early_warning">异常预警</option>') == -1){
+                    early_warning = '<option value="early_warning">异常预警</option>';
+                    html_str += early_warning
+                }
+
+                if($(this).val() !="broadcast_set" && $.inArray("broadcast_set", arry) == -1 && html_str.search('<option value="broadcast_set">公告设置</option>') == -1){
+                    broadcast_set = '<option value="broadcast_set">公告设置</option>';
+                    html_str += broadcast_set
+                }
+
+                if($(this).val() !="channel_count" && $.inArray("channel_count", arry) == -1 && html_str.search('<option value="channel_count">渠道数据统计</option>') == -1){
+                    channel_count = '<option value="channel_count">渠道数据统计</option>';
+                    html_str += channel_count
+                }
+
+                if($(this).val() !="user_period_data" && $.inArray("user_period_data", arry) == -1 && html_str.search('<option value="user_period_data">玩家期间数据统计</option>') == -1){
+                    user_period_data = '<option value="user_period_data">玩家期间数据统计</option>';
+                    html_str += user_period_data
+                }
+
+
+                if($(this).val() !="relax_general" && $.inArray("relax_general", arry) == -1 && html_str.search('<option value="relax_general">休闲场玩家总览</option>') == -1){
+                    relax_general = '<option value="relax_general">休闲场玩家总览</option>';
+                    html_str += relax_general
+                }
+
+                if($(this).val() !="power_general" && $.inArray("power_general", arry) == -1 && html_str.search('<option value="power_general">能量场玩家总览</option>') == -1){
+                    power_general = '<option value="power_general">能量场玩家总览</option>';
+                    html_str += power_general
+                }
+
+                if($(this).val() !="player_limits" && $.inArray("player_limits", arry) == -1 && html_str.search('<option value="player_limits">玩家总览操作</option>') == -1){
+                    player_limits = '<option value="player_limits">玩家总览操作</option>';
+                    html_str += player_limits
+                }
+
+
+                if($(this).val() !="arena_general" && $.inArray("arena_general", arry) == -1 && html_str.search('<option value="arena_general">竞技场总览</option>') == -1){
+                    arena_general = '<option value="arena_general">竞技场总览</option>';
+                    html_str += arena_general
+                }
+
+                if($(this).val() !="arena_particulars" && $.inArray("arena_particulars", arry) == -1 && html_str.search('<option value="arena_particulars">竞技场详情</option>') == -1){
+                    arena_particulars = '<option value="arena_particulars">竞技场详情</option>';
+                    html_str += arena_particulars
+                }
+
+                if($(this).val() !="mini_general" && $.inArray("mini_general", arry) == -1 && html_str.search('<option value="mini_general">小游戏总览</option>') == -1){
+                    mini_general = '<option value="mini_general">小游戏总览</option>';
+                    html_str += mini_general
+                }
+
+                if($(this).val() !="mini_particulars" && $.inArray("mini_particulars", arry) == -1 && html_str.search('<option value="mini_particulars">小游戏详情</option>') == -1){
+                    mini_particulars = '<option value="mini_particulars">小游戏详情</option>';
+                    html_str += mini_particulars
+                }
+
+                if($(this).val() !="integral_shop" && $.inArray("integral_shop", arry) == -1 && html_str.search('<option value="integral_shop">积分商城</option>') == -1){
+                    integral_shop = '<option value="integral_shop">积分商城</option>';
+                    html_str += integral_shop
+                }
+
+                if($(this).val() !="integral_for_record" && $.inArray("integral_for_record", arry) == -1 && html_str.search('<option value="integral_for_record">积分商城兑换记录</option>') == -1){
+                    integral_for_record = '<option value="integral_for_record">积分商城兑换记录</option>';
+                    html_str += integral_for_record
+                }
+
+                if($(this).val() !="gift_bag_shop" && $.inArray("gift_bag_shop", arry) == -1 && html_str.search('<option value="gift_bag_shop">礼包商城</option>') == -1){
+                    gift_bag_shop = '<option value="gift_bag_shop">礼包商城</option>';
+                    html_str += gift_bag_shop
+                }
+
+                if($(this).val() !="limit_time_shop" && $.inArray("limit_time_shop", arry) == -1 && html_str.search('<option value="limit_time_shop">限时商城</option>') == -1){
+                    limit_time_shop = '<option value="limit_time_shop">限时商城</option>';
+                    html_str += limit_time_shop
+                }
+
+                if($(this).val() !="shop_for_record" && $.inArray("shop_for_record", arry) == -1 && html_str.search('<option value="shop_for_record">商城兑换记录</option>') == -1){
+                    shop_for_record = '<option value="shop_for_record">商城兑换记录</option>';
+                    html_str += shop_for_record
+                }
+
+                if($(this).val() !="card_secret_set" && $.inArray("card_secret_set", arry) == -1 && html_str.search('<option value="card_secret_set">卡密设置</option>') == -1){
+                    card_secret_set = '<option value="card_secret_set">卡密设置</option>';
+                    html_str += card_secret_set
+                }
+
+                if($(this).val() !="shop_for_details" && $.inArray("shop_for_details", arry) == -1 && html_str.search('<option value="shop_for_details">兑换详情</option>') == -1){
+                    shop_for_details = '<option value="shop_for_details">兑换详情</option>';
+                    html_str += shop_for_details
+                }
+
+                if($(this).val() !="vip_exchange" && $.inArray("vip_exchange", arry) == -1 && html_str.search('<option value="vip_exchange">兑换商城VIP</option>') == -1){
+                    vip_exchange = '<option value="vip_exchange">兑换商城VIP</option>';
+                    html_str += vip_exchange
+                }
+                if($(this).val() !="super_vip_exchange" && $.inArray("super_vip_exchange", arry) == -1 && html_str.search('<option value="super_vip_exchange">兑换商城SVIP</option>') == -1){
+                    super_vip_exchange = '<option value="super_vip_exchange">兑换商城SVIP</option>';
+                    html_str += super_vip_exchange
+                }
+
+                if($(this).val() !="redeem_code_general" && $.inArray("redeem_code_general", arry) == -1 && html_str.search('<option value="redeem_code_general">兑换码总览</option>') == -1){
+                    redeem_code_general = '<option value="redeem_code_general">兑换码总览</option>';
+                    html_str += redeem_code_general
+                }
+
+                if($(this).val() !="redeem_code_query" && $.inArray("redeem_code_query", arry) == -1 && html_str.search('<option value="redeem_code_query">兑换查询</option>') == -1){
+                    redeem_code_query = '<option value="redeem_code_query">兑换查询</option>';
+                    html_str += redeem_code_query
+                }
+
+                if(html_str.length==108){
+                    html_str += '<option value="select_info">默认选择</option>';
+                }
+        });
+
+        }
+        html_str += '</select>';
+        html_str += '<a onclick="$(this).parent().remove();">' + '<img src="/static/images/cross-circle.png" style="vertical-align: baseline;;">' + '</a>';
+        html_str += '</div>';
+        $('#add_show').append(html_str);
+    })
+
+
+    $('#add_submit').click(function() {
+        var params = $('#add_form').serialize();
+        $.post('/system_manage/add_login_info/', params, function(ret) {
+            if (ret.state) {
+                alert("添加账号成功！");
+                $('#dialogmag').fadeOut(300,function(){
+                    $('#dialohg').addClass('bounceOutUp').fadeOut();
+                });
+                var pag = $('.pagination-num').val() ;
+                var URL= "/system_manage/G_account_setting/?page=" + pag;
+                location.href=URL;
+            }
+            else {
+                alert("添加账号失败！");
+            }
+
+        });
+    });
+
+    function edit_submit() {
+        var data_info = $("#edit_form").serialize();
+        $.post('/system_manage/alter_layout/', data_info, function(ret) {
+            if (ret.code) {
+                alert(ret.msg);
+                $('#dialogBg').fadeOut(300,function(){
+                    $('#dialog').addClass('bounceOutUp').fadeOut();
+                    $('#edit_show').empty();
+                });
+                var pag = $('.pagination-num').val() ;
+                var URL= "/system_manage/G_account_setting/?page=" + pag;
+                location.href=URL;
+            }
+            else {
+                alert(ret.msg);
+            }
+
+        });
+    }
+</script>
+</body>
+</html>

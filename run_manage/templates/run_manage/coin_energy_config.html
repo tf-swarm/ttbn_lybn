@@ -1,0 +1,435 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/laydate.js"></script>
+    <style>
+        .edit_permission{
+                margin-bottom: 10px;
+                background: #009c95;
+                color: white;
+                border-radius: 3px;
+                border: none;
+                cursor: pointer;
+        }
+        .head_div {
+            margin-left: 20px;
+            width: 100%;
+            height: auto;
+            margin-top: 25px;
+            display:inline-block;
+        }
+        .head_div span,span{ float: left;
+                        font-size: 18px;
+                        height: 30px;
+                        line-height: 30px;
+                        color: black;
+                        font-weight: 600;}
+
+        .head_div select{
+            width: 100px;
+            height: 36px;
+            border: solid 1px #cccccc;
+            font-size: 17px;
+        }
+        select option{
+            font-size: 17px;
+        }
+        h1{    display: block;
+                font-size: 24px;
+                line-height: 40px;
+                height: 45px;
+                float: left;
+                color: black;
+                font-weight: 600;}
+
+        .btn_model{ width: 100px;
+                        height: 38px;
+                        background: #e8e8e8;
+                        border-radius: 4px 0px 0px 4px;
+                        float: left;
+        }
+        .btn_model p{
+            color: rgba(0,0,0,.5);
+            font-weight: 700;
+            text-align: center;
+            line-height: 38px;
+            font-size: 1em;
+            margin: 0;
+        }
+        .spinner_select option{font-size: 18px;}
+    </style>
+</head>
+
+<body style="line-height: 0.1em; overflow-x:auto; max-height: 900px;">
+    <div class="body-div">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+            <tr>
+                <td width="25%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">运营管理 &gt;金币和鸟蛋炮倍配置</strong></td>
+                <td width="25%" align="left" valign="middle" bgcolor="#F5F5F5">
+
+                </td>
+
+                <td width="60%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+
+                </td>
+
+                <td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                    <a href="javascript:;" id="bn_btn_one" onclick="happy_record()">操作记录</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: auto;">
+                    <!--主要内容开始-->
+                    <form action="" method="post" id="form_coin_pool">
+                        {% csrf_token %}
+                        <div style="height: 40px; width:100%;margin-left: 30px;margin-top: 20px;">
+                            <h1 style="width:356px;">金币场炮倍池设置——
+                                <a href="javascript:;" id="alter_coin_pool" style="color: white;width: 112px; height: 35px; background:#1B9AF7;border-radius: 3px; float:right;margin-top: 4px;">确认更改</a>
+                            </h1>
+
+                        </div>
+                        <div style="height: 80%; margin: 10px;">
+                            <div class="head_div" style="height: auto">
+                                {% for info  in coin_list %}
+                                    <div style="width: 640px;float: left;" id="add_div">
+                                        <div style="margin-left: 100px;">
+                                            <input type="text" style="border: none;font-size: 23px;text-align: center;width: 120px;height: 32px;float: left;" readonly="readonly" class="for_up" name="start_barrel" id="start_coin{{ info.index}}" value="{{ info.area.0 }}">
+                                            <h1 style="height: 36px;width: 45px;margin-top: -5px;">倍~</h1>
+                                            <input type="text" style="border: none;font-size: 23px;text-align: center;width: 120px;height: 32px;float: left;" readonly="readonly" class="for_up" name="end_barrel" id="end_coin{{ info.index }}" value="{{ info.area.1 }}">
+                                            <h1 style="height: 36px;width: 26px;margin-top: -5px;">倍</h1>
+                                            <h1></h1>
+                                        </div>
+                                        <div style="width: 540px;float: left;">
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                                <div class="btn_model">
+                                                    <p>抽/送分的比率：</p>
+                                                </div>
+                                                <input type="text" style="height: 38px;float: left;" class="for_up" name="rate" id="rate_coin{{ info.index }}" value="{{ info.rate }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>控制概率纠正：</p>
+                                                </div>
+                                                <input type="text" style="height: 38px;float: left;" class="for_up" name="kill" id="kill_coin{{ info.index }}" value="{{ info.kill }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                <p>抽/送分的额度：</p>
+                                                </div>
+                                                <input type="text" style="height: 38px;float: left;" class="for_up" name="total" id="total_coin{{ info.index }}" value="{{ info.total }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>最低分鸟控制：</p>
+                                                </div>
+                                                <input type="text" style="height: 38px;float: left;" class="for_up" name="point" id="point_coin{{ info.index }}" οnkeyup="this.value=this.value.replace(^[1-9]\d{2}\.\d{2}$,'');" value="{{ info.point }}">
+                                            </div>
+                                        </div>
+
+                                        <a onclick="remove_coin({{ info.area}});" id="coin_click{{ info.area.0 }}_{{ info.area.1 }}" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;">
+                                            <img src="/static/images/message_error.png" style="vertical-align: baseline;height:36px;width:36px;">
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                                <button class="edit_permission" id="coin_add_barrel" type="button" style="width: 110px; height: 40px; font-size: 18px;float: left;margin-top: 40px;">添加炮倍池</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!--主要内容结束-->
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: auto;">
+                    <!--主要内容开始-->
+                    <form action="" method="post" id="form_power_pool">
+                        {% csrf_token %}
+                        <div style="height: 40px; width:100%;margin-left: 30px;margin-top: 20px;">
+                            <h1 style="width:356px;">鸟蛋场炮倍池设置——
+                                <a href="javascript:;" id="alter_power_pool" style="color: white;width: 112px; height: 35px; background:#1B9AF7;border-radius: 3px; float:right;margin-top: 4px;">确认更改</a>
+                            </h1>
+
+                        </div>
+                        <div style="height: 80%; margin: 10px;">
+                            <div class="head_div" style="height: auto">
+                                {% for info  in power_list %}
+                                    <div style="width: 640px;float: left;" id="add_div">
+                                        <div style="margin-left: 100px;">
+                                            <input type="text" style="border: none;font-size: 23px;text-align: center;width: 120px;height: 32px;float: left;" readonly="readonly" class="for_up" name="start_barrel" id="start_power{{ info.index }}" value="{{ info.area.0 }}">
+                                            <h1 style="height: 36px;width: 45px;margin-top: -5px;">倍~</h1>
+                                            <input type="text" style="border: none;font-size: 23px;text-align: center;width: 120px;height: 32px;float: left;" readonly="readonly" class="for_up" name="end_barrel" id="end_power{{ info.index }}" value="{{ info.area.1 }}">
+                                            <h1 style="height: 36px;width: 26px;margin-top: -5px;">倍</h1>
+                                            <h1></h1>
+                                        </div>
+                                        <div style="width: 540px;float: left;">
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                                <div class="btn_model">
+                                                    <p>抽/送分的比率：</p>
+                                                </div>
+                                                <input type="text" style="height: 38px;float: left;" class="for_up" name="rate" id="rate_power{{ info.index }}" value="{{ info.rate }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>控制概率纠正：</p>
+                                                </div>
+                                                <input type="text" style="height: 38px;float: left;" class="for_up" name="kill" id="kill_power{{ info.index }}" value="{{ info.kill }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                <p>抽/送分的额度：</p>
+                                                </div>
+                                                <input type="text" style="height: 38px;float: left;" class="for_up" name="total" id="total_power{{ info.index }}" value="{{ info.total }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>最低分鸟控制：</p>
+                                                </div>
+                                                <input type="text" style="height: 38px;float: left;" class="for_up" name="point" id="point_power{{ info.index }}" οnkeyup="this.value=this.value.replace(/[^0-9-]+/,'');" value="{{ info.point }}">
+                                            </div>
+                                        </div>
+
+                                        <a onclick="remove_power({{ info.area}});" id="power_click{{ info.area.0 }}_{{ info.area.1 }}" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;">
+                                            <img src="/static/images/message_error.png" style="vertical-align: baseline;height:36px;width:36px;">
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                                <button class="edit_permission" id="power_add_barrel" type="button" style="width: 110px; height: 40px; font-size: 18px;float: left;margin-top: 40px;">添加炮倍池</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!--主要内容结束-->
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<script type="text/javascript">
+    var coin_barrel = 1;
+    $('#coin_add_barrel').click(function() {
+        var html = [
+                '<div style="width: 640px;float: left;" id="add_div">',
+                    '<div style="margin-left: 150px;">',
+                        '<h1 style="float: left;width: auto;">',
+                            '<input type="text" style="text-align: center;width: 90px;height: 32px;float: left;" class="for_up" name="start_barrel" id="start_coin" value="">',
+                            '<h1 style="height: 36px;width: 46px">倍-</h1>',
+                            '<input type="text" style="text-align: center;width: 90px;height: 32px;float: left;" class="for_up" name="end_barrel" id="end_coin" value="">',
+                            '<h1 style="height: 36px;width: 26px">倍</h1>',
+                        '<h1>',
+                    '</div>',
+                    '<div style="width: 540px;float: left;">',
+                        '<div style="float: left;width: 100%;margin-bottom: 20px;">',
+                            '<div class="btn_model">',
+                                '<p>抽/送分的比率：</p>',
+                            '</div>',
+                            '<input type="text" style="height: 38px;float: left;" class="for_up" name="rate" id="rate_coin" value="">',
+                            '<div class="btn_model" style="margin-left: 10px;">',
+                                '<p>控制概率纠正：</p>',
+                            '</div>',
+                            '<input type="text" style="height: 38px;float: left;" class="for_up" name="kill" id="kill_coin" value="">',
+                        '</div>',
+
+                        '<div style="float: left;width: 100%;margin-bottom: 20px;">',
+                            '<div class="btn_model">',
+                                '<p>抽/送分的额度：</p>',
+                            '</div>',
+                            '<input type="text" style="height: 38px;float: left;" class="for_up" name="total" id="total_coin" value="">',
+                            '<div class="btn_model" style="margin-left: 10px;">',
+                                '<p>最低分鸟控制：</p>',
+                            '</div>',
+                            '<input type="text" style="height: 38px;float: left;" class="for_up" name="point" id="point_coin" onkeyup="this.value=this.value.replace(/[^0-9-]+/,\'\')" value="">',
+                        '</div>',
+                    '</div>',
+                    '<a id="coin_click'+coin_barrel+'" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;">',
+                        '<img src="/static/images/message_error.png" style="vertical-align: baseline;height:36px;width:36px;">',
+                    '</a>',
+                '</div>',
+            ].join('');
+        $('#coin_add_barrel').before(html);
+        $("#coin_click"+coin_barrel).click(function (){
+            $(this).parent().remove();
+        });
+        coin_barrel++;
+    });
+
+    var chip_barrel = 1;
+    $('#power_add_barrel').click(function() {
+        var html = [
+                '<div style="width: 640px;float: left;" id="add_div">',
+                    '<div style="margin-left: 150px;">',
+                        '<h1 style="float: left;width: auto;">',
+                            '<input type="text" style="text-align: center;width: 90px;height: 32px;float: left;" class="for_up" name="start_barrel" id="start_power" value="">',
+                            '<h1 style="height: 36px;width: 46px">倍-</h1>',
+                            '<input type="text" style="text-align: center;width: 90px;height: 32px;float: left;" class="for_up" name="end_barrel" id="start_power" value="">',
+                            '<h1 style="height: 36px;width: 26px">倍</h1>',
+                        '<h1>',
+                    '</div>',
+                    '<div style="width: 540px;float: left;">',
+                        '<div style="float: left;width: 100%;margin-bottom: 20px;">',
+                            '<div class="btn_model">',
+                                '<p>抽/送分的比率：</p>',
+                            '</div>',
+                            '<input type="text" style="height: 38px;float: left;" class="for_up" name="rate" id="rate_power" value="">',
+                            '<div class="btn_model" style="margin-left: 10px;">',
+                                '<p>控制概率纠正：</p>',
+                            '</div>',
+                            '<input type="text" style="height: 38px;float: left;" class="for_up" name="kill" id="kill_power" value="">',
+                        '</div>',
+
+                        '<div style="float: left;width: 100%;margin-bottom: 20px;">',
+                            '<div class="btn_model">',
+                                '<p>抽/送分的额度：</p>',
+                            '</div>',
+                            '<input type="text" style="height: 38px;float: left;" class="for_up" name="total" id="total_power" value="">',
+                            '<div class="btn_model" style="margin-left: 10px;">',
+                                '<p>最低分鸟控制：</p>',
+                            '</div>',
+                            '<input type="text" style="height: 38px;float: left;" class="for_up" name="point" id="point_power" onkeyup="this.value=this.value.replace(/[^0-9-]+/,\'\')" value="">',
+                        '</div>',
+                    '</div>',
+                    '<a id="power_click'+chip_barrel+'" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;">',
+                        '<img src="/static/images/message_error.png" style="vertical-align: baseline;height:36px;width:36px;">',
+                    '</a>',
+                '</div>',
+            ].join('');
+        $('#power_add_barrel').before(html);
+        $("#power_click"+chip_barrel).click(function (){
+            $(this).parent().remove();
+        });
+        chip_barrel++;
+    });
+
+    function remove_coin(area){
+        var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":3,"room_type":2,"barrel_list": area.toString()});
+        if(confirm("您确定删除金币场炮倍区间?")){
+            $.post('/run_manage/coin_energy_config/', data_info, function(data) {
+                if (data.status) {
+                    alert(data.info);
+                    $("#coin_click"+area[0]+"_"+area[1]).parent().remove();
+                }
+                else {
+                    alert(data.info);
+                }
+            });
+        }else {
+            alert("您取消删除金币场炮倍区间");
+        }
+
+	}
+
+	function remove_power(area){
+        console.log(area[0]);
+        var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":3,"room_type":1,"barrel_list": area.toString()});
+        if(confirm("您确定删除鸟蛋场炮倍区间?")){
+            $.post('/run_manage/coin_energy_config/', data_info, function(data) {
+                if (data.status) {
+                    alert(data.info);
+                    $("#power_click"+area[0]+"_"+area[1]).parent().remove();
+                }
+                else {
+                    alert(data.info);
+                }
+            });
+        }else {
+            alert("您取消删除鸟蛋场炮倍区间");
+        }
+
+	}
+
+    $(function(){
+        $('#alter_coin_pool').click(function(){
+			var data_info = $.param({"pid":2,"room_type":2}) + "&" + $("#form_coin_pool").serialize();
+            if(confirm("您确定修改金币场炮倍池?")){
+                $.post('/run_manage/coin_energy_config/', data_info, function(data) {
+                    if (data.status) {
+                        alert(data.info);
+                    }
+                    else {
+                        alert(data.info);
+                    }
+                });
+            }else {
+                alert("您取消了金币场炮倍池");
+            }
+
+		});
+
+        $('#alter_power_pool').click(function(){
+			var data_info = $.param({"pid":2,"room_type":1}) + "&" + $("#form_power_pool").serialize();
+            if(confirm("您确定修改鸟蛋场炮倍池?")){
+                $.post('/run_manage/coin_energy_config/', data_info, function(data) {
+                    if (data.status) {
+                        alert(data.info);
+                    }
+                    else {
+                        alert(data.info);
+                    }
+                });
+            }else {
+                alert("您取消了鸟蛋场炮倍池");
+            }
+		});
+
+    });
+
+    !function(){
+    laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+    laydate({elem: '#demo'});//绑定元素
+    }();
+    //日期范围限制
+    var start = {
+        elem: '#start',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        //min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+             end.min = datas; //开始日选好后，重置结束日的最小日期
+             end.start = datas //将结束日的初始值设定为开始日
+        }
+    };
+    var end = {
+        elem: '#end',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+
+    var valid = {
+        elem: '#valid',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+    laydate(start); //valid
+    laydate(end);
+    laydate(valid);
+    //自定义日期格式
+    laydate({
+        elem: '#test1',
+        format: 'YYYY年MM月DD日',
+        festival: true, //显示节日
+        choose: function(datas){ //选择日期完毕的回调
+            alert('得到：'+datas);
+        }
+    });
+    //日期范围限定在昨天到明天
+    laydate({
+        elem: '#hello3',
+        min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+        max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+    });
+
+    </script>
+</body>
+</html>

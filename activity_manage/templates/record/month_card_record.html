@@ -1,0 +1,61 @@
+{% extends 'base.html' %}{% load extratags %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="/static/css/default.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/icon.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/icons.css">
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/semantic.min.js"></script>
+
+    <script>
+        $(function(){
+            $('#paging').click(function () {
+                var pag = $('.pagination-num').val() ;
+                var URL= "/activity_manage/all_record/?page=" + pag + "&pid=" + "month_card_record";
+                location.href=URL;
+            });
+
+        });
+    </script>
+{% endblock head %}
+
+{% block filter %}
+   <form action="#" method="post" id="form_search">
+        {% csrf_token %}
+        <tr>
+            <td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">月卡 &gt; 操作记录</strong></td>
+
+            <td width="72%" align="left" valign="middle" bgcolor="#F5F5F5">
+
+            </td>
+            <td width="10%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+
+            </td>
+        </tr>
+    </form>
+{% endblock filter %}
+
+{% block body %}
+    <tr>
+        <th width="150" align="center" bgcolor="#EEEEEE" style="height: 37px;">操作时间</th>
+        <th width="100" align="center" bgcolor="#EEEEEE">管理员</th>
+        <th width="200" align="center" bgcolor="#EEEEEE">操作</th>
+        <th width="80" align="center" bgcolor="#EEEEEE">售价</th>
+        <th width="80" align="center" bgcolor="#EEEEEE">总价值</th>
+        <th width="80" align="center" bgcolor="#EEEEEE">礼包商品</th>
+    </tr>
+    {% for info  in page %}
+        <tr id="hover_tr1" bgcolor="#FFFFFF">
+            <td align="center" style="height: 37px;">{{info.operation_time}}</td>
+            <td align="center">{{info.phone}}</td>
+            {% if info.swich == '1' %}
+                <td align="center">贵族礼包开启</td>
+            {% else %}
+                <td align="center">贵族礼包关闭</td>
+            {% endif %}
+            <td align="center" style="color: red;">{{info.price}}</td>
+            <td align="center" style="color: red;">{{info.total}}</td>
+            <td align="center" style="color: red;" class="unicode">{{ info.json_data|json_loads }}</td>
+        </tr>
+    {% endfor %}
+{% endblock body %}

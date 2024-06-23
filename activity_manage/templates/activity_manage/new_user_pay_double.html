@@ -1,0 +1,302 @@
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<link rel="stylesheet" type="text/css" href="/static/css/account_manage.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/css/default.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+        <link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+        <script type="text/javascript" src="/static/laydate.js"></script>
+	    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+{#   		<script type="text/javascript" src="/static/js/account_manage.js"></script>#}
+	    <script type="text/javascript" src="/static/js/semantic.min.js"></script>
+
+		<style>
+			.head_div {
+				margin-left: 20px;
+				width: 450px;
+				height: 35px;
+				margin-top: 30px;
+			}
+			.head_div span{float: left;  font-size: 18px;  height: 30px; line-height: 30px;color: black;font-weight: 600;}
+
+			.spinner_select option {
+				font-size: 18px;
+			}
+
+			.double_name {
+				width: auto;
+				height: 36px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px #A0A0A0;
+				text-align: center;
+			}
+
+			h1 {
+				display: block;
+				font-size: 24px;
+				line-height: 40px;
+				height: 45px;
+				float: left;
+				color: black;
+				font-weight: 600;
+			}
+
+			h1 a {
+				color: white;
+				width: 112px;
+				height: 35px;
+				background: #1B9AF7;
+				border-radius: 3px;
+				float: right;
+				margin-top: 4px;
+			}
+
+			.elapsed_time{
+				width: 70px;
+				height: 32px;
+				line-height: 32px;
+				background: #e8e8e8;
+				border-radius: 3px 0px 0px 3px;
+				float: left;
+				font-size: 14px;
+				text-align: center;
+				font-weight: 600;
+			}
+
+			.spinner_select{width: 210px;height: 40px; background:#e8e8e8; margin:10px; font-size: 18px;float: left;}
+			.spinner_select option{font-size: 18px;}
+			.add_rewards{width: 210px;height: 40px; background:white; margin:10px; font-size: 18px;border: solid 1px #A0A0A0;text-align: center;float: left;}
+		    .double_name{width: auto;height: 36px;margin: 0;font-size: 16px; border:solid 1px #A0A0A0;text-align: center;}
+		</style>
+
+	</head>
+
+	<body style="line-height: 0.1em; overflow:auto;">
+		<div class="body-div">
+			<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+				<tr>
+					<td width="25%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">活动管理 &gt; 新用户充值翻倍</strong></td>
+					<td width="25%" align="left" valign="middle" bgcolor="#F5F5F5"></td>
+					<td width="60%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update"></td>
+					<td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+						<a href="javascript:;" id="bn_btn_one" onclick="pay_double()">操作记录</a>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4" valign="top" bgcolor="#FFFFFF">
+						<!--主要内容开始-->
+						<form action="" method="post" id="form_info">
+                            {% csrf_token %}
+							<div style="height: 40px; width:100%;margin-left: 30px;margin-top: 20px;">
+								<h1 style="width:325px;">新用户充值翻倍——
+                                    <a href="javascript:;" id="pay_double" >确认更改</a>
+                                </h1>
+                                <h1 style="width:265px;margin-left: 60px;">登录提示开关:
+                                    <div class="btn_fath clearfix off" onclick="toogle(this)"id="switch_info" style="float: right;border-radius: 15px;width: 92px;margin-top: 5px;">
+		                                <div class="move" data-state="off" style="width:30px;border-radius: 15px;height: 30px;"></div>
+		                                <div class="btnSwitch btn1" style="height: 32px;width:40px;"></div>
+		                                <div class="btnSwitch btn2 "style="height: 32px;width:40px;"></div>
+                           			</div>
+                                </h1>
+							</div>
+
+
+							<div style="height: 370px; margin: 10px;">
+								<div class="head_div" style="width: 100%;">
+									<span>活动名称：</span>
+									<input type="text" class="double_name" name="activity_name" value="{{act_name}}" placeholder="请输入活动名称" style="font-weight: 400; float: left;" />
+									<span style="margin-left: 50px;">活动显示顺序：</span>
+									<input type="text" class="double_name" maxlength="3" onkeyup="value=value.replace(/[^\d]/g,'')" name="order" value="{{order}}" placeholder="活动顺序" style="font-weight: 400;float: left; width: 120px;" />
+								</div>
+								<div class="head_div" style="height: 100px;">
+									<span>活动描述：</span>
+									<textarea cols="50" rows="15" id="led" name="activity_desc" placeholder="请输入活动描述" style="width:310px;height:160px;font-size: 16px;font-weight: 400;">{{act_desc}}</textarea>
+								</div>
+								<div class="head_div" style="margin-top: 90px;">
+									<span>活动周期：</span>
+									<span class="elapsed_time" style="font-size: 14px;height: 32px;">开始时间</span>
+									<input placeholder="请输入日期" style="height: 32px;font-size: 16px;width: 240px;" id="start" class="laydate-icon" readonly="" value="{{start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+								</div>
+
+								<div class="head_div">
+									<span style="float: left; font-size: 15px; margin: 0px; width: 90px; height: 32px;line-height: 32px;"></span>
+									<span class="elapsed_time" style="font-size: 14px;height: 32px;">结束时间</span>
+									<input placeholder="请输入日期" style="height: 32px;font-size: 16px;width: 240px;" id="end" class="laydate-icon" readonly="" value="{{end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+								</div>
+							</div>
+
+							<div style="height: 1px;width: 100%; height:auto;border-top: 1px #C2C2C2 solid">
+								<div style="height: 40px; width:120px;margin-left: 30px; margin-top: 20px;">
+									<h1 style="display: block; font-weight: 600; color: black; font-size: 22px;width:223px;line-height: 40px; height: 45px;">福利商品</h1>
+								</div>
+								<div style="margin-left: 150px; height:360px;width:1550px;display: block;  overflow: auto;" >
+                                    {% for info  in pay_info %}
+                                        <div style="height: 140px;width: 275px; float: left;margin: 10px;">
+                                            <select name="chip_name" class="spinner_select">
+												{% for pro  in welfare %}
+													<option value="{{pro.good_id}}" {% if info.key == pro.good_id %} selected {% endif %}>{{pro.good_name}}</option>
+
+												{% endfor %}
+                                            </select><a onclick="$(this).parent().remove();" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;margin-top:10px;">
+                                            <img src="/static/images/message_error.png" style="vertical-align: baseline;"></a>
+                                            <input type="text" class="add_rewards" name="input_info" value="{{info.vales}}">
+                                            <p style="font-size:30px;line-height:40px;height:40px;float:left;margin-top:10px;">%</p>
+                                        </div>
+                                    {% endfor %}
+									<div id="add_div"></div>
+                                    <button class="edit_permission" id="pdd-prize" type="button" style="margin-top:20px; width: 110px; height: 40px; font-size: 18px;">添加新奖品</button>
+								</div>
+							</div>
+						</form>
+						<!--主要内容结束-->
+					</td>
+				</tr>
+			</table>
+		</div>
+
+
+<script type="text/javascript">
+    var prizeRowCnt = 1;
+    $('#pdd-prize').click(function() {
+        var List = {{ page|safe }};
+        var str_html = ' <div style="height: 140px;width: 275px; float: left;margin: 10px;">';
+        str_html += '<select name="chip_name" class="spinner_select">';
+        $.each(List, function(index, item){
+            str_html += '<option value="'+item.product+'" selected="selected">'+item.name+'</option>';
+        });
+        str_html += '</select>';
+        str_html += '<a onclick="$(this).parent().remove();" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;margin-top:10px;"><img src="/static/images/message_error.png" style="vertical-align: baseline;">' + '</a>';
+        str_html += '<input type="text" class="add_rewards" name="input_info" id="" value="0" />';
+        str_html += '<p style="font-size:30px;line-height:40px;height:40px;float:left;margin-top:10px;">%'+'</p>';
+        str_html += '</div>';
+
+        var html = [
+                str_html
+            ].join('');
+
+        prizeRowCnt++;
+        $('#add_div').append(html);
+    })
+
+    $(function(){
+        $('#pay_double').click(function(){
+			var ele = $('#switch_info').children(".move");
+			if(ele.attr("data-state") == "on"){
+				tips = 1
+			}else if(ele.attr("data-state") == "off"){
+				tips = 0
+				}
+			var data_info = $.param({"tips":tips}) + "&" + $("#form_info").serialize();
+
+            if(confirm("您确定修改充值翻倍?")){
+                $.post('/activity_manage/pay_double/', data_info, function(date) {
+                    if ( date.code) {
+                        alert(date.info);
+                    }
+                    else {
+                        alert(date.info);
+                    }
+                });
+            }else {
+                alert("您取消了修改充值翻倍");
+            }
+
+		});
+    });
+
+    function pay_double() {
+        var URL= "/activity_manage/all_record/?pid=" +"pay_double_record";
+        location.href=URL;
+    }
+
+    !function(){
+    laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+    laydate({elem: '#demo'});//绑定元素
+    }();
+    //日期范围限制
+    var start = {
+        elem: '#start',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        //min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+             end.min = datas; //开始日选好后，重置结束日的最小日期
+             end.start = datas //将结束日的初始值设定为开始日
+        }
+    };
+    var end = {
+        elem: '#end',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+
+    var valid = {
+        elem: '#valid',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+    laydate(start); //valid
+    laydate(end);
+    laydate(valid);
+    //自定义日期格式
+    laydate({
+        elem: '#test1',
+        format: 'YYYY年MM月DD日',
+        festival: true, //显示节日
+        choose: function(datas){ //选择日期完毕的回调
+            alert('得到：'+datas);
+        }
+    });
+    //日期范围限定在昨天到明天
+    laydate({
+        elem: '#hello3',
+        min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+        max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+    });
+
+    function toogle(th){
+		var ele = $(th).children(".move");
+		if(ele.attr("data-state") == "on"){
+			ele.animate({left: "0"}, 300, function(){
+			ele.attr("data-state", "off");
+		});
+		$(th).removeClass("on").addClass("off");
+		}else if(ele.attr("data-state") == "off"){
+			ele.animate({left: '60px'}, 300, function(){
+				$(this).attr("data-state", "on");
+			});
+			$(th).removeClass("off").addClass("on");
+		}
+	}
+
+	$(function () {
+		if({{ tips|default:0 }}==1){
+			$('#switch_info').attr("data-state", "on");
+			$('#switch_info').removeClass("off").addClass("on");
+		}
+	});
+    </script>
+
+	</body>
+
+</html>

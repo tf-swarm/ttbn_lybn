@@ -1,0 +1,1048 @@
+{% load extratags %}
+<html>
+	<head>
+		<title>用户管理 &gt; 金币玩家总览</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet"  href="/static/css/popup.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+        <link type="text/css" rel="stylesheet" href="/static/css/load.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/style.css" />
+        <link type="text/css" rel="stylesheet" href="/static/css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/css/jquery-ui.css" />
+        <link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+        <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+		<script type="text/javascript" src="/static/laydate.js"></script>
+        <script type="text/javascript" src="/static/js/load-min.js"></script>
+        <script type="text/javascript" src="/static/js/common.js"></script>
+        <script type="text/javascript" src="/static/js/jquery.easyui.min.js"></script>
+        <script type="text/javascript"  src="/static/js/fixed_header.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <style type="text/css">
+        	.btn_select{height: 40px; margin-top: 30px;border-top: 1px dotted #ccc;}
+
+        	.btn_select a{display: inline-block;background: #09F;
+                 color: #FFF; float: left;width: 100px;
+                 text-align: center;line-height: 32px;font-weight: 600;
+                 border-radius: 3px;
+                 border: none;
+                 cursor: pointer;
+                 font-size: 15px;
+                 margin-top: 15px;}
+            .hide_data{display:none}
+        </style>
+
+	</head>
+<script>
+    $(function () {
+        $('#paging').click(function () {
+            var pag = $('.pagination-num').val() ;
+            var URL= "/users_manage/new_player_overview?page=" + pag;
+            location.href=URL;
+        });
+
+        $('#export_data').click(function () {
+            var room_type = 1
+            var URL= "/users_manage/derived_user/?room_type="+ room_type;
+            location.href=URL;
+        });
+
+        $('#all_export_data').click(function () {
+            var URL= "/users_manage/one_key_derived_user/";
+            location.href=URL;
+        });
+
+        var error_start = false;
+        var error_end = false;
+        $('#query_data').click(function(){
+            check_time();
+            if(error_start == true && error_end == true)
+            {
+                $.Load_data();
+                $("#form_search").submit();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        });
+
+        function check_time(){
+            var len_start = $('#start').val().length;
+            var len_end = $('#end').val().length;
+            if(len_start==0 || len_end == 0)
+            {
+                msgShow('系统提示', "请输入日期", 'warning');
+                error_start = false;
+                error_end = false;
+            }
+            else
+            {
+                error_start = true;
+                error_end = true;
+            }
+        }
+
+        $('.popup').click(function(event) { //点击a标签
+            if($(this).find(".item-desc").is(':hidden')) { //如果当前隐藏
+                $(this).parents().find(".item-desc").hide()
+                $(this).find(".item-desc").show(); //那么就显示div
+                $(this).find(".item-desc").css("left", document.body.scrollLeft + event.clientX + 20);
+                $(this).find(".item-desc").css("top", document.body.scrollLeft + event.clientY + -140);
+
+            } else { //否则
+                $(".item-desc").hide(); //就隐藏div
+
+            }
+        });
+
+        $(document).click(function() {
+            $(".item-desc").hide();
+
+        });
+        $(".popup").click(function(event) {
+            event.stopPropagation();
+        });
+
+        var w,h,className;
+        w = $(window).width();
+        h = $(window).height();
+        $('#dialogBg').width(w).height(h);
+        //关闭封冻弹窗
+        $('.claseDialogBtn').click(function(){
+            $('#dialogBg').fadeOut(300,function(){
+                $('#dialog').addClass('bounceOutUp').fadeOut();
+            });
+        });
+
+        //关闭金币炮倍区间
+        $('.cancel_info').click(function(){
+            $('#dialogmag').fadeOut(300,function(){
+                $('#dialohg').addClass('bounceOutUp').fadeOut();
+                $('.coin_fix').remove();
+            });
+        });
+
+        //关闭鸟蛋炮倍区间  $('#power_list').empty();
+        $('.cancel_give').click(function(){
+            $('#Dialog_give').fadeOut(300,function(){
+                $('#popup_give').addClass('bounceOutUp').fadeOut();
+                $('.power_fix').remove();
+            });
+        });
+
+        //关闭玩家昵称
+        $('.cancel_sign').click(function(){
+            $('#dialogmag_nine').fadeOut(300,function(){
+                $('#dialohg_nine').addClass('bounceOutUp').fadeOut();
+            });
+        });
+    });
+
+    //显示封冻弹框
+    function freeze_up(price_us) {
+        $("#user_id").val(price_us);
+        $("#confirm_id").val(price_us);
+        className = $(this).attr('class');
+        $('#dialogBg').fadeIn(300);
+        $('#dialog').removeAttr('class').addClass('animated '+className+'').fadeIn();
+    }
+
+    //显示玩家昵称
+    function alter_name(user_id, nick) {
+        $("#add_uid").val(user_id);
+        $("#sign_id").html(nick);
+        className = $(this).attr('class');
+        $('#dialogmag_nine').fadeIn(300);
+        $('#dialohg_nine').removeAttr('class').addClass('animated '+className+'').fadeIn();
+    }
+
+    //金币炮倍区间控制
+    function coin_section(uid) {
+        console.log(uid);
+        var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":1,"room_type":2,"uid":uid});
+        $.post('/users_manage/user_barrel/', data_info, function(data) {
+            if (data.status) {
+                 console.log(data.control);
+                $.each(data.control, function(index, info){
+                    var html = [
+                        '<div class="coin_fix" style="margin-top: 10px;height: 135px;">',
+                            '<div style="margin-left: 76px;">',
+                                '<input type="text" style="margin-top: -5px;border: none;font-size: 18px;text-align: center;width: 120px;height: 32px;float: left;" readonly="readonly" class="for_up" name="start_barrel" id="coin_start" value="'+info.area[0]+'">',
+                                '<h1 style="font-size: 18px;height: 36px;width: 35px;float: left;">倍~</h1>',
+                                '<input type="text" style="margin-top: -5px;border: none;font-size: 18px;text-align: center;width: 120px;height: 32px;float: left;" readonly="readonly" class="for_up" name="end_barrel" id="coin_end" value="'+info.area[1]+'">',
+                                '<h1 style="font-size: 18px;height: 36px;width: 26px;float: left;">倍</h1>',
+                                '</h1>',
+                            '</div>',
+                            '<div style="width: 450px;float: left;">',
+                                '<div style="height: auto; width: 100%; display: inline-block;">',
+                                    '<label style="margin-left: 20px;float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">抽/送分的比率</label>',
+                                        '<input type="text" name="rate" id="coin_rate" value="'+info.rate+'"  style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left; text-align: center;"/>',
+                                    '<label style="float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">控制概率纠正</label>',
+                                    '<input type="text" name="kill" id="coin_kill" value="'+info.kill+'" style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left;text-align: center;"/>',
+                                '</div>',
+
+                                '<div style="height: auto; width: 100%; display: inline-block;margin-top: 26px;">',
+                                    '<label style="margin-left: 20px;float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">抽/送分的额度</label>',
+                                    '<input type="text" name="total" id="coin_total" value="'+info.total+'"  style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left; text-align: center;"/>',
+                                    '<label style="float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">最低分鸟控制</label>',
+                                    '<input type="text" name="point" id="coin_point" onkeyup="this.value=this.value.replace(/[^0-9-]+/,\'\')" value="'+info.point+'" style="border: 1px solid #e5e5e5;width: 136px;height: 32px;float: left;text-align: center;"/>',
+                                '</div>',
+                            '</div>',
+                            '<a onclick="remove_coin('+info.area+','+index+');" id="coin_click'+index+'" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;">',
+                                '<img src="/static/images/message_error.png" style="vertical-align: baseline;height:36px;width:36px;">',
+                            '</a>',
+                        '</div>',
+                    ].join('');
+                    if($("#coin_click"+index).length>0) {
+                        return true;
+                    } else {
+                        console.log(html);
+                        $('#add_coin_barrel').before(html);
+                    }
+                });
+
+                $("#user_name").text(uid);
+                $("#player_id").val(uid);
+                className = $(this).attr('class');
+                $('#dialogmag').fadeIn(300);
+                $('#dialohg').removeAttr('class').addClass('animated '+className+'').fadeIn();
+            }else {
+                alert(data.info);
+            }
+        });
+
+    }
+
+    //鸟蛋炮倍区间控制
+    function power_section(uid) {
+        var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":1,"room_type":1,"uid":uid});
+        $.post('/users_manage/user_barrel/', data_info, function(data) {
+            if (data.status) {
+                $.each(data.control, function(index, info){
+                    var html = [
+                        '<div class="power_fix" style="margin-top: 10px;height: 135px;">',
+                            '<div style="margin-left: 76px;">',
+                                '<input type="text" style="margin-top: -5px;border: none;font-size: 18px;text-align: center;width: 120px;height: 32px;float: left;" readonly="readonly" class="for_up" name="start_barrel" id="power_start" value="'+info.area[0]+'">',
+                                '<h1 style="font-size: 18px;height: 36px;width: 35px;float: left;">倍~</h1>',
+                                '<input type="text" style="margin-top: -5px;border: none;font-size: 18px;text-align: center;width: 120px;height: 32px;float: left;" readonly="readonly" class="for_up" name="end_barrel" id="power_end" value="'+info.area[1]+'">',
+                                '<h1 style="font-size: 18px;height: 36px;width: 26px;float: left;">倍</h1>',
+                                '</h1>',
+                            '</div>',
+                            '<div style="width: 450px;float: left;">',
+                                '<div style="height: auto; width: 100%; display: inline-block;">',
+                                    '<label style="margin-left: 20px;float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">抽/送分的比率</label>',
+                                        '<input type="text" name="rate" id="power_rate" value="'+info.rate+'"  style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left; text-align: center;"/>',
+                                    '<label style="float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">控制概率纠正</label>',
+                                    '<input type="text" name="kill" id="power_kill" value="'+info.kill+'" style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left;text-align: center;"/>',
+                                '</div>',
+
+                                '<div style="height: auto; width: 100%; display: inline-block;margin-top: 26px;">',
+                                    '<label style="margin-left: 20px;float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">抽/送分的额度</label>',
+                                    '<input type="text" name="total" id="power_total" value="'+info.total+'"  style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left; text-align: center;"/>',
+                                    '<label style="float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">最低分鸟控制</label>',
+                                    '<input type="text" name="point" id="power_point" onkeyup="this.value=this.value.replace(/[^0-9-]+/,\'\')" value="'+info.point+'" style="border: 1px solid #e5e5e5;width: 136px;height: 32px;float: left;text-align: center;"/>',
+                                '</div>',
+                            '</div>',
+                            '<a onclick="remove_power('+info.area+','+index+');" id="power_click'+index+'" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;">',
+                                '<img src="/static/images/message_error.png" style="vertical-align: baseline;height:36px;width:36px;">',
+                            '</a>',
+                        '</div>',
+                    ].join('');
+                    if($("#power_click"+index).length>0) {
+                        return true;
+                    } else {
+                        $('#add_power_barrel').before(html);
+                    }
+                });
+                $("#power_id").val(uid);
+                $("#power_name").text(uid);
+
+                className = $(this).attr('class');
+                $('#Dialog_give').fadeIn(300);
+                $('#popup_give').removeAttr('class').addClass('animated '+className+'').fadeIn();
+            }else {
+                alert(data.info);
+            }
+        });
+    }
+
+</script>
+<body style="min-width:2100px;">
+	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+        <form action="/users_manage/relax_overview/" method="post" id="form_search">
+            {% csrf_token %}
+            <tr>
+                <td width="12%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">用户管理 &gt; 金币玩家总览</strong></td>
+
+                <td width="68%" align="left" valign="middle" bgcolor="#F5F5F5">
+                    <select name="channel" class="dowp_list_sty" style="margin-right: 6px;">
+                        {% for key,value in chanel_info.items %}
+                             <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <lable for="introduce" style="padding-left: 10px; font-size:12px;">时间:</lable>
+                        <input placeholder="请输入日期" id="start" class="laydate-icon" readonly="" value="{{start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time" style="margin-right: 5px;margin-left: 5px;">
+                    <lable for="introduce" style="padding-left: 10px; font-size:12px;">至:</lable>
+                        <input placeholder="请输入日期" id="end" class="laydate-icon"  readonly="" value="{{end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time" style="margin-right: 20px;margin-left: 5px;">
+
+                    <select name="query_info" class="dowp_list_sty" style="margin-right: 20px;margin-left: 5px;">
+                        {% for info in Data_info %}
+                             <option value="{{ info.vale }}" {% if query_info == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" class="text-box_normal" value="{{input_data}}" placeholder="" name="input_data" size="30" maxlength="20" style="width: 160px"/>
+
+                    <select name="sort_field" class="dowp_list_sty" style="margin-right: 6px;margin-left: 5px;">
+                        {% for info in filter_data %}
+                             <option value="{{ info.vale }}" {% if sort_field == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="sort_order" class="dowp_list_sty" style="width: 80px; margin-right: 20px;margin-left: 5px;">
+                        {% for info in sort_data %}
+                             <option value="{{ info.vale }}" {% if sort_order == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <input type="button" value="确认查询" id="query_data" class="button">
+                    {% if page.paginator.num_pages %}
+                        <input type="button" value="导出xls" class="button_color" id="export_data" style="margin-left: 20px;"/>
+                    {% else %}
+                        <input type="button" value="导出xls" class="button_color"  style="margin-left: 20px;background-color: #8b8a8a"/>
+                    {% endif %}
+                </td>
+
+                <td width="20%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                    {% if "206" in user_limit  %}
+                        <input type="button" value="一键导出" class="button_color" id="all_export_data" style="margin: 10px;float: left;"/>
+                    {% else %}
+                        <input type="button" value="一键导出" class="button_color"  style="margin: 10px;float: left;display: none;"/>
+                    {% endif %}
+{#                    <a href="/users_manage/play_record/" id="bn_btn_one">操作记录</a>#}
+                </td>
+            </tr>
+        </form>
+
+        <tr>
+            <td colspan="3" valign="top" bgcolor="#FFFFFF">
+                <!--主要内容开始-->
+                <div class='table-cont' id='table-cont'>
+                    <table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF"  id="order_title" style="margin-top: -1px;">
+                        <thead>
+                            <tr>
+                                <th align="center" bgcolor="#EEEEEE" style="height: 37px;">ID</th>
+                                <th align="center" bgcolor="#EEEEEE">昵称</th>
+                                <th align="center" bgcolor="#EEEEEE">渠道ID</th>
+                                <th align="center" bgcolor="#EEEEEE">渠道标识</th>
+                                <th align="center" bgcolor="#EEEEEE">总充值</th>
+                                <th align="center" bgcolor="#EEEEEE">当日充值</th>
+                                <th align="center" bgcolor="#EEEEEE">当日话费券产出</th>
+                                {% if "207" in user_limit  %}
+                                    <th align="center" bgcolor="#EEEEEE">个人未产出话费券额度</th>
+                                    <th align="center" bgcolor="#EEEEEE">个人未产出龙蛋额度</th>
+                                {% endif %}
+                                <th align="center" bgcolor="#EEEEEE">当前话费券</th>
+                                <th align="center" bgcolor="#EEEEEE">话费券总数(商城兑换消耗)</th>
+                                <th align="center" bgcolor="#EEEEEE">当日产出/消耗龙蛋</th>
+                                <th align="center" bgcolor="#EEEEEE">总产出/消耗龙蛋</th>
+                                <th align="center" bgcolor="#EEEEEE">当前龙蛋</th>
+                                <th align="center" bgcolor="#EEEEEE">当日消耗钻石(总消耗)</th>
+                                <th align="center" bgcolor="#EEEEEE">当前钻石</th>
+                                <th align="center" bgcolor="#EEEEEE">当日金币产出</th>
+                                <th align="center" bgcolor="#EEEEEE">当日金币消耗</th>
+                                <th align="center" bgcolor="#EEEEEE">当前金币</th>
+                                <th align="center" bgcolor="#EEEEEE">打鸟消耗</th>
+                                <th align="center" bgcolor="#EEEEEE">当日消耗锁/冰/狂/传</th>
+                                <th align="center" bgcolor="#EEEEEE">当前锁/冰/狂/传</th>
+                                <th align="center" bgcolor="#EEEEEE">新手成长积分</th>
+                                <th align="center" bgcolor="#EEEEEE">当日游戏时长/总游戏时长(分钟)</th>
+                                <th align="center" bgcolor="#EEEEEE">当前最大炮倍数</th>
+                                <th align="center" bgcolor="#EEEEEE">当前场次</th>
+                                <th align="center" bgcolor="#EEEEEE">当日出奖率(返奖率)</th>
+                                {% if "205" in user_limit  %}
+                                    <th align="center" bgcolor="#EEEEEE">操作</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        {% for info in page %}
+                            <tr id="hover_tr" class="user_sign{{info.uid}}" bgcolor="#FFFFFF">
+                                <td align="center" class="popup">
+                                    <span>{{info.uid}}</span>
+                                    <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                        {% if "204" in user_limit %}
+                                            <label>绑定手机：{{info.phone}}</label><br/>
+                                            <label>兑换手机：{{info.exchange_phone}}</label><br/>
+                                        {% else %}
+                                            <label>绑定手机：{{info.phone|hide_phone}}</label><br/>
+                                            <label>兑换手机：{{info.exchange_phone|hide_phone}}</label><br/>
+                                        {% endif %}
+                                        <label>登录次数：{{info.day_login_time}}/{{info.login_time}}</label><br/>
+                                        <label>系统设备：{{info.platform}}</label><br/>
+                                        <label>最近登录IP：{{info.createIp}}</label><br/>
+                                        <label>注册日期：{{info.createTime}}</label><br/>
+                                        <label>最近登录日期：{{info.session_login}}</label><br/>
+                                    </div>
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">{{info.nick}}</td>
+                                <td align="center" valign="middle" style="height: 50px;">{{info.channelid| channel_name}}</td>
+                                <td align="center" valign="middle" style="height: 50px;">{{info.subchannel|default:0}}</td>
+                                <td align="center" class="popup" valign="middle" style="height: 50px;">
+                                    <span><font color="#208f20">{{info.pay_total}}</font></span>
+                                    <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                        <label>sdk：<font color="#da70d6">{{info.sdk_pay_total}}</font></label><br/>
+                                        <label>微信：<font color="#208f20">{{info.weixin_pay_total}}</font></label><br/>
+                                        <label>支付宝：<font color="#208f20">{{info.ali_pay_total}}</font></label><br/>
+                                        <label>当日兑换码：<font color="#208f20">{{info.day_cdkey_pay_total}}</font></label><br/>
+                                        <label>总兑换码：<font color="#208f20">{{info.cdkey_pay_total}}</font></label><br/>
+                                    </div>
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    <font color="#208f20">{{info.day_pay_total}}</font>
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    <font color="#0a0afd">{{info.day_in_silver_coupon}}</font>
+                                </td>
+                                {% if "207" in user_limit  %}
+                                    <td align="center" valign="middle" style="height: 50px;">{{info.person_coupon_pool}}</td>
+                                    <td align="center" valign="middle" style="height: 50px;">{{info.person_shut_pool}}</td>
+                                {% endif %}
+                                <td align="center" valign="middle" style="height: 50px;">{{info.silver_coupon}}</td>
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    <font color="#fd3e3e">{{info.in_silver_coupon}}</font>
+                                    <br/>
+                                    {{info.virtual_silver_coupon}}
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                    <span><font color="#208f20">{{info.day_in_warhead}}/{{info.day_out_warhead}}</font></span>
+                                    <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                        <label>---产出---：</label><br/>
+                                        <label>毒：<font color="#da70d6">{{info.relax_day_in_props_701}}</font></label><br/>
+                                        <label>冰：<font color="#208f20">{{info.relax_day_in_props_702}}</font></label><br/>
+                                        <label>火：<font color="#208f20">{{info.relax_day_in_props_703}}</font></label><br/>
+                                        <label>圣：<font color="#208f20">{{info.relax_day_in_props_704}}</font></label><br/>
+                                        <label>---消耗---：</label><br/>
+                                        <label>毒：<font color="#da70d6">{{info.relax_day_out_props_701}}</font></label><br/>
+                                        <label>冰：<font color="#208f20">{{info.relax_day_out_props_702}}</font></label><br/>
+                                        <label>火：<font color="#208f20">{{info.relax_day_out_props_703}}</font></label><br/>
+                                        <label>圣：<font color="#208f20">{{info.relax_day_out_props_704}}</font></label><br/>
+                                    </div>
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                    <span><font color="#208f20">{{info.all_in_warhead}}/{{info.all_out_warhead}}</font></span>
+                                    <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                        <label>---总产出---：</label><br/>
+                                        <label>毒：<font color="#da70d6">{{info.relax_in_props_701}}</font></label><br/>
+                                        <label>冰：<font color="#208f20">{{info.relax_in_props_702}}</font></label><br/>
+                                        <label>火：<font color="#208f20">{{info.relax_in_props_703}}</font></label><br/>
+                                        <label>圣：<font color="#208f20">{{info.relax_in_props_704}}</font></label><br/>
+                                        <label>---总消耗---：</label><br/>
+                                        <label>毒：<font color="#da70d6">{{info.relax_out_props_701}}</font></label><br/>
+                                        <label>冰：<font color="#208f20">{{info.relax_out_props_702}}</font></label><br/>
+                                        <label>火：<font color="#208f20">{{info.relax_out_props_703}}</font></label><br/>
+                                        <label>圣：<font color="#208f20">{{info.relax_out_props_704}}</font></label><br/>
+                                    </div>
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;" class="popup">
+                                    <span><font color="#208f20">{{info.day_props_701_704}}</font></span>
+                                    <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                        <label>毒：<font color="#da70d6">{{info.props_701}}</font></label><br/>
+                                        <label>冰：<font color="#208f20">{{info.props_702}}</font></label><br/>
+                                        <label>火：<font color="#208f20">{{info.props_703}}</font></label><br/>
+                                        <label>圣：<font color="#208f20">{{info.props_704}}</font></label><br/>
+                                    </div>
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    {{info.day_out_diamond}}
+                                    </br>
+                                    {{info.out_diamond}}
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">{{info.diamond}}</td>
+                                <td align="center" valign="middle" class="popup" style="height: 50px;">
+                                    <span>{{info.day_in_coin}}</span>
+                                    {% if info.in_coin_pop|length > 0 %}
+                                        <div class="item-desc">
+                                            {% for in_coin in info.in_coin_pop %}
+                                                <label>{{in_coin}}</label><br/>
+                                            {%endfor%}
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    {{info.day_out_coin}}
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    {{info.coin}}
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    {{info.day_coin_wash}}
+                                </td>
+
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    {{info.relax_day_out_props_201}}/{{info.relax_day_out_props_202}}
+                                    /{{info.relax_day_out_props_203}}/{{info.relax_day_out_props_205}}
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    {{info.props_201}}/{{info.props_202}}
+                                    /{{info.props_203}}/{{info.props_205}}
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">{{info.player_active_value}}</td>
+                                <td align="center" valign="middle" style="height: 50px;">
+                                    {{info.play_time}}
+                                    </br>
+                                    {{info.total_play_time}}
+                                </td>
+                                <td align="center" valign="middle" style="height: 50px;">{{info.relax_multiple}}</td>
+                                <td align="center" valign="middle" style="height: 50px;">{{info.room_id |room_name}}</td>
+
+                                <td align="center" class="popup">
+                                    <span>
+                                        <font color="#208f20">{{ info.relax_day_award_rate }}</font>
+                                        <br/>
+                                        <font color="#0a0afd">{{info.relax_award_rate}}</font>
+                                    </span>
+                                    <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                        <label>当日出奖率=((当日产出毒龙蛋*1/2)+(冰龙蛋*10/2)+(火龙蛋*50/2)+(圣磷蛋*100/2) + 当日话费券产出/100)/当日充值</label><br/>
+                                    </div>
+                                </td>
+
+                                <td align="center" valign="middle" class="w_update" style="width: 215px;">
+                                    <div style="width: 275px; height: 17px;">
+                                        {% if "212" in user_limit  %}
+                                            {% if info.freeze_user == 0 %}
+                                                <span class="freeze_day{{info.uid}}" style="margin-right: 10px;color: red;display: none;"></span>
+                                                <a href="javascript:freeze_up('{{info.uid}}');" class="freeze{{info.uid}}" style="color:blue">封冻</a>
+                                            {% else %}
+                                                <span class="freeze_day{{info.uid}}" style="margin-right: 10px;color: red;">{{info.freeze_user|count_down}}天</span>
+                                                <a href="javascript:freeze_up('{{info.uid}}');" class="freeze{{info.uid}}" style="color: red">解封</a>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        {% if "213" in user_limit  %}
+                                            <a href="javascript:alter_name('{{info.uid}}','{{info.nick}}');" class="alter_name{{info.uid}}" style="color:blue;margin-left: 10px;">修改昵称</a>
+                                        {% endif %}
+
+                                        {% if "205" in user_limit  %}
+                                            {% if info.coin_control %}
+                                                <a href="javascript:coin_section('{{info.uid}}');" class="set_coin{{info.uid}}" style="color:red; margin-left: 10px;">金币炮倍区间</a>
+                                            {% else %}
+                                                <a href="javascript:coin_section('{{info.uid}}');" class="set_coin{{info.uid}}" style="color:blue; margin-left: 10px;">金币炮倍区间</a>
+                                            {% endif %}
+                                            {% if info.power_control %}
+                                                <a href="javascript:power_section('{{info.uid}}');" class="set_power{{info.uid}}" style="color:red; margin-left: 10px;">鸟蛋炮倍区间</a>
+                                            {% else %}
+                                                <a href="javascript:power_section('{{info.uid}}');" class="set_power{{info.uid}}" style="color:blue; margin-left: 10px;">鸟蛋炮倍区间</a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <!--主要内容结束-->
+                <div class="datagrid-pager pagination">
+                    <table cellspacing="0" cellpadding="0" border="0">
+                        <tbody>
+                            <tr>
+                                <!--<td>-->
+                                    <!--<select class="pagination-page-list">-->
+                                        <!--<option>10</option>-->
+                                        <!--<option>20</option>-->
+                                        <!--<option>30</option>-->
+                                        <!--<option>40</option>-->
+                                        <!--<option>50</option>-->
+                                    <!--</select>-->
+                                <!--</td>-->
+                                <td>
+                                    <div class="pagination-btn-separator"></div>
+                                </td>
+                                {% if page.has_previous %}
+                                    <td>
+                                        <a href="{{url_date}}?page=1" class="l-btn l-btn-small l-btn-plain">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{url_date}}?page={{ page.number|add:-1 }}" class="l-btn l-btn-small l-btn-plain">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                {% else %}
+                                    <td>
+                                        <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                {% endif %}
+
+                                <td>
+                                    <div class="pagination-btn-separator"></div>
+                                </td>
+                                <td>
+                                    <span style="padding-left:6px;">Page</span>
+                                </td>
+                                <td>
+                                    <input class="pagination-num" value="{{number}}" size="2" type="text">
+                                </td>
+                                <td>
+                                    <span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+                                </td>
+
+                                <td>
+                                    <div class="pagination-btn-separator"></div>
+                                </td>
+                                {% if page.has_next %}
+                                    <td>
+                                        <a href="{{url_date}}?page={{ page.number|add:1 }}" class="l-btn l-btn-small l-btn-plain">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{url_date}}?page={{ page.paginator.num_pages }}" class="l-btn l-btn-small l-btn-plain">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                {% else %}
+                                    <td>
+                                        <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                {% endif %}
+                                <td>
+                                    <div class="pagination-btn-separator"></div>
+                                </td>
+                                {% if page.has_next or page.has_previous %}
+                                    <td>
+                                        <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" group="" id="paging">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                {% else %}
+                                    <td>
+                                        <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled" group="">
+                                            <span class="l-btn-left l-btn-icon-left">
+                                                <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                {% endif %}
+                                <td><strong style="display: block">玩家人数：</strong></td>
+                                <td><label style="display: block">{{ online_users }}</label></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        </tr>
+    </table>
+    <div id="dialogBg"></div>
+    <div id="dialog" class="animated" style="margin: auto;position: fixed; left: 42%; top: 10%;">
+        <div class="dialogTop">
+            <h4  style="text-align: center; margin-left: 16px; font-size: 16px;font-weight: 800">
+                封冻 <span style="color: red; text-align: center; font-size: 16px;">(谨慎操作)</span>
+                <a href="javascript:;" class="claseDialogBtn" style="display: inline-block; float: right;font-size: 22px">&times;</a>
+            </h4>
+        </div>
+        <form id="freeze_up_form">
+            {% csrf_token %}
+            <ul class="editInfos">
+                 <div class="one" style="margin-bottom: 30px; margin-top: 10px;margin-left: 15px;">
+                      <label style="margin-left:27px;">用户ID：</label>
+                      <input type="text" name="user_id" id="user_id" value="" readonly="readonly" style="border: 1px solid #e5e5e5;width: 156px;height: 22px;"/>
+                 </div>
+
+                 <div class="one" style="margin-bottom: 30px; margin-top: 30px; margin-left: 15px;">
+                      <label >确认用户ID：</label>
+                      <input type="text" name="confirm_id" id="confirm_id" value="" readonly="readonly" style="border: 1px solid #e5e5e5;width: 156px;height: 22px;" />
+                </div>
+
+                <div class="one" style="margin-bottom: 10px;">
+                    <label style="margin-left:30px;">冻结天数：</label>
+                    <select onchange="" name="freezing_day" id="product_id" class="in_info" >
+                       <option value="0">0</option>
+                       <option value="7">7</option>
+                       <option value="30">30</option>
+                       <option value="180">180</option>
+                       <option value="32850">永久</option>
+                    </select>
+                 </div>
+                <div class="btn_select" style="height: 40px; margin-top: 30px;border-top: 1px dotted #ccc;">
+                   <a href="javascript:;" id="freeze_ok" style="margin-left: 10px;">确定</a>
+                   <a href="javascript:;" class="claseDialogBtn" style="float: right; margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;" class="claseDialogBtn">取消</a>
+                </div>
+            </ul>
+        </form>
+    </div>
+
+    <div id="dialogmag"></div>
+    <div id="dialohg" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 540px;height:auto;">
+        <form id="form_coin">
+            {% csrf_token %}
+            <div class="dialogTophg" style="height: 30px;width: 100%;">
+                <h4  style="text-align: left; margin-left: 16px; font-size: 20px;font-weight: 800">
+                    设置“<label style=" font-size: 20px;font-weight: 800;" id="user_name"></label>”
+                    <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="player_id" name="uid" value="" />
+                </h4>
+            </div>
+            <ul class="editInfos" id="coin_list" style="overflow: auto;height: 325px;">
+                <button class="button" id="add_coin_barrel" type="button" style="float: left;margin-top: 10px;margin-left: 20px;">添加炮倍池</button>
+            </ul>
+            <div class="btn_select" style="height: 40px;border-top: 1px dotted #ccc;">
+               <a href="javascript:;" id="set_coin_barrel" style="margin-left: 10px;">确定</a>
+               <a href="javascript:;" class="cancel_info" style="float: right; margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;">取消</a>
+            </div>
+        </form>
+    </div>
+
+
+    <div id="Dialog_give"></div>
+    <div id="popup_give" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 520px;height:auto;">
+        <form id="form_power">
+            {% csrf_token %}
+            <div class="dialogTophg" style="height: 30px;width: 100%;">
+                <h4  style="text-align: left; margin-left: 16px; font-size: 20px;font-weight: 800">
+                    设置“<label style=" font-size: 20px;font-weight: 800;" id="power_name"></label>”
+                    <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="power_id" name="uid" value="" />
+                </h4>
+            </div>
+            <ul class="editInfos" id="power_list" style="overflow: auto;height: 325px;">
+                <button class="button" id="add_power_barrel" type="button" style="float: left;margin-top: 10px;margin-left: 20px;">添加炮倍池</button>
+            </ul>
+            <div class="btn_select" style="height: 40px;border-top: 1px dotted #ccc;">
+               <a href="javascript:;" id="set_power_barrel" style="margin-left: 10px;">确定</a>
+               <a href="javascript:;" class="cancel_give" style="float: right; margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;">取消</a>
+            </div>
+        </form>
+    </div>
+
+    <div id="dialogmag_nine"></div>
+    <div id="dialohg_nine" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 520px;height:auto;">
+        <form id="user_nick_info">
+            {% csrf_token %}
+            <div class="dialogTophg" style="height: 30px;width: 100%;">
+                <h4  style="text-align: left; margin-left: 16px; font-size: 20px;font-weight: 800">
+                    设置“<label style=" font-size: 20px;font-weight: 800;" id="sign_id"></label>”
+                    <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="add_uid" name="user_id" value="" />
+                </h4>
+            </div>
+            <ul class="editInfos">
+                <div style="height: auto; width: 100%; display: inline-block;">
+                    <label style="float: left;display: inline-block;margin-left:27px;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:100px; background:#cacbcd;color: #333;font-family: Microsoft yahei;">修改选择</label>
+                    <select name="user_nick" id="user_nick" onchange="nick_deal(this)" style="border: 1px solid #e5e5e5;width:auto;height: 32px;float: left;" >
+                        <option value="0">恢复默认昵称</option>
+                        <option value="1">修改昵称</option>
+                    </select>
+                    <label class="nick_label" style="float: left;display: none;margin-left:25px;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:90px; background:#cacbcd;color: #333;font-family: Microsoft yahei;">新昵称</label>
+                    <input type="text" name="new_nick" id="new_nick" value="" style="display: none;border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left;text-align: center;"/>
+				</div>
+
+                <div class="btn_select" style="height: 40px; margin-top: 30px;border-top: 1px dotted #ccc;">
+                   <a href="javascript:;" id="alter_nick" style="margin-left: 10px;">确定</a>
+                   <a href="javascript:;" class="cancel_sign" style="float: right; margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;">取消</a>
+                </div>
+            </ul>
+        </form>
+    </div>
+
+<script>
+$('#freeze_ok').click(function() {
+    var params = $.param({"pid":1}) + "&" + $('#freeze_up_form').serialize();
+    $.post('/users_manage/user_control/', params, function(data) {
+        if ( data.code) {
+            alert(data.info);
+            if (data.frozen == 0)
+            {   $(".freeze_day"+data.uid).hide()
+                $(".freeze_day"+data.uid).html("")
+                $(".freeze"+data.uid).css("color","blue")
+                $(".freeze"+data.uid).html("封冻")
+            }else {
+                $(".freeze_day"+data.uid).show()
+                $(".freeze_day"+data.uid).css("color","red")
+                $(".freeze_day"+data.uid).html(data.frozen+"天")
+                $(".freeze"+data.uid).css("color","red")
+                $(".freeze"+data.uid).html("解封")
+            }
+            $('#dialogBg').fadeOut(300,function(){
+                $('#dialog').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert(data.info);
+        }
+
+    });
+});
+
+function nick_deal(data){
+    var nick =data.options[data.selectedIndex].value;
+    if (nick == "0"){
+        $(".nick_label").hide()
+        $("#new_nick").hide()
+    }else {
+        $(".nick_label").show()
+        $("#new_nick").show()
+    }
+
+
+}
+
+
+var coin_barrel = $("#coin_list > div").length;
+$('#add_coin_barrel').click(function() {
+    var html = [
+        '<div class="coin_fix" style="margin-top: 10px;height: 135px;">',
+            '<div style="margin-left: 76px;">',
+                '<input type="text" style="margin-top: -5px;font-size: 18px;text-align: center;width: 120px;height: 32px;float: left;" class="for_up" name="start_barrel" id="coin_start" value="">',
+                '<h1 style="font-size: 18px;height: 36px;width: 35px;float: left;">倍~</h1>',
+                    '<input type="text" style="margin-top: -5px;font-size: 18px;text-align: center;width: 120px;height: 32px;float: left;" class="for_up" name="end_barrel" id="coin_end" value="">',
+                    '<h1 style="font-size: 18px;height: 36px;width: 26px;float: left;">倍</h1>',
+                '<h1>',
+            '</div>',
+            '<div style="width: 450px;float: left;">',
+                '<div style="height: auto; width: 100%; display: inline-block;">',
+                    '<label style="margin-left: 20px;float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">抽/送分的比率</label>',
+                    '<input type="text" name="rate" id="coin_rate" value=""  style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left; text-align: center;"/>',
+                    '<label style="float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">控制概率纠正</label>',
+                    '<input type="text" name="kill" id="coin_kill" value="" style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left;text-align: center;"/>',
+                '</div>',
+
+                '<div style="height: auto; width: 100%; display: inline-block;margin-top: 26px;">',
+                    '<label style="margin-left: 20px;float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">抽/送分的额度</label>',
+                    '<input type="text" name="total" id="coin_total" value=""  style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left; text-align: center;"/>',
+                    '<label style="float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">最低分鸟控制</label>',
+                    '<input type="text" name="point" id="coin_point" onkeyup="this.value=this.value.replace(/[^0-9-]+/,\'\')" value="" style="border: 1px solid #e5e5e5;width: 136px;height: 32px;float: left;text-align: center;"/>',
+                '</div>',
+            '</div>',
+
+            '<a id="coin_click'+coin_barrel+'" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;">',
+                '<img src="/static/images/message_error.png" style="vertical-align: baseline;height:36px;width:36px;">',
+            '</a>',
+        '</div>',
+        ].join('');
+    $('#add_coin_barrel').before(html);
+    $("#coin_click"+coin_barrel).click(function (){
+        $(this).parent().remove();
+    });
+    coin_barrel++;
+});
+
+
+var power_barrel = $("#power_list > div").length;
+$('#add_power_barrel').click(function() {
+    var html = [
+        '<div class="power_fix" style="margin-top: 10px;height: 135px;">',
+            '<div style="margin-left: 76px;">',
+                '<input type="text" style="margin-top: -5px;font-size: 18px;text-align: center;width: 120px;height: 32px;float: left;" class="for_up" name="start_barrel" id="power_start" value="">',
+                '<h1 style="font-size: 18px;height: 36px;width: 35px;float: left;">倍~</h1>',
+                    '<input type="text" style="margin-top: -5px;font-size: 18px;text-align: center;width: 120px;height: 32px;float: left;" class="for_up" name="end_barrel" id="power_end" value="">',
+                    '<h1 style="font-size: 18px;height: 36px;width: 26px;float: left;">倍</h1>',
+                '<h1>',
+            '</div>',
+            '<div style="width: 450px;float: left;">',
+                '<div style="height: auto; width: 100%; display: inline-block;">',
+                    '<label style="margin-left: 20px;float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">抽/送分的比率</label>',
+                    '<input type="text" name="rate" id="power_rate" value=""  style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left; text-align: center;"/>',
+                    '<label style="float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">控制概率纠正</label>',
+                    '<input type="text" name="kill" id="power_kill" value="" style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left;text-align: center;"/>',
+                '</div>',
+
+                '<div style="height: auto; width: 100%; display: inline-block;margin-top: 26px;">',
+                    '<label style="margin-left: 20px;float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">抽/送分的额度</label>',
+                    '<input type="text" name="total" id="power_total" value=""  style="border: 1px solid #e5e5e5;width: 120px;height: 32px;float: left; text-align: center;"/>',
+                    '<label style="float: left;display: inline-block;border: 1px solid #e5e5e5; height: 30px; text-align: center;line-height: 30px; width:auto; background:#cacbcd;color: #333;font-family: Microsoft yahei;">最低分鸟控制</label>',
+                    '<input type="text" name="point" id="power_point" onkeyup="this.value=this.value.replace(/[^0-9-]+/,\'\')" value="" style="border: 1px solid #e5e5e5;width: 136px;height: 32px;float: left;text-align: center;"/>',
+                '</div>',
+            '</div>',
+
+            '<a id="power_click'+power_barrel+'" style="display:inline-block;width: 40px; height: 40px;cursor: pointer;float: left;">',
+                '<img src="/static/images/message_error.png" style="vertical-align: baseline;height:36px;width:36px;">',
+            '</a>',
+        '</div>',
+        ].join('');
+    $('#add_power_barrel').before(html);
+    $("#power_click"+power_barrel).click(function (){
+        $(this).parent().remove();
+    });
+    power_barrel++;
+});
+
+
+function remove_coin(area1,area2,index){
+    var uid = $("#user_name").text();
+    var barrel_list = [area1,area2].toString();
+    var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":3,"room_type":2,"uid":uid,"barrel_list": barrel_list});
+    if(confirm("您确定删除金币场炮倍区间?")){
+        $.post('/users_manage/user_barrel/', data_info, function(data) {
+            if (data.status) {
+                alert(data.info);
+                $("#coin_click"+index).parent().remove();
+            }
+            else {
+                alert(data.info);
+            }
+        });
+    }else {
+        alert("您取消删除金币场炮倍区间");
+    }
+}
+
+function remove_power(area1,area2,index){
+    var uid = $("#power_name").text();
+    var barrel_list = [area1,area2].toString();
+    var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":3,"room_type":1,"uid":uid,"barrel_list": barrel_list});
+    if(confirm("您确定删除鸟蛋场炮倍区间?")){
+        $.post('/users_manage/user_barrel/', data_info, function(data) {
+            if (data.status) {
+                alert(data.info);
+                $("#coin_click"+index).parent().remove();
+            }
+            else {
+                alert(data.info);
+            }
+        });
+    }else {
+        alert("您取消删除鸟蛋场炮倍区间");
+    }
+}
+
+$('#set_coin_barrel').click(function() {
+    var coin_data = $.param({"pid":2,"room_type":2}) + "&" + $('#form_coin').serialize();
+    $.post('/users_manage/user_barrel/', coin_data, function(data) {
+        if ( data.status) {
+            alert(data.info);
+            $('#dialogmag').fadeOut(300,function(){
+                $('#dialohg').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert(data.info);
+        }
+    });
+});
+
+
+$('#set_power_barrel').click(function() {
+    var power_data = $.param({"pid":2,"room_type":1}) + "&" + $('#form_power').serialize();
+    $.post('/users_manage/user_barrel/', power_data, function(data) {
+        if ( data.status) {
+            alert(data.info);
+            $('#Dialog_give').fadeOut(300,function(){
+                $('#popup_give').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert(data.info);
+        }
+    });
+});
+
+$('#alter_nick').click(function() {
+    var params = $.param({"pid":2}) + "&" + $('#user_nick_info').serialize();
+    $.post('/users_manage/user_control/', params, function(data) {
+        if ( data.status) {
+            alert(data.msg);
+
+            $(".alter_name"+data.uid).attr("href","javascript:alter_name("+data.uid+","+data.nick+");");
+            $('#dialogmag_nine').fadeOut(300,function(){
+                $('#dialohg_nine').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert(data.msg);
+        }
+
+    });
+});
+
+
+!function(){
+laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+laydate({elem: '#demo'});//绑定元素
+}();
+//日期范围限制
+var start = {
+    elem: '#start',
+    format: 'YYYY-MM-DD hh:mm:ss',
+    //min: laydate.now(), //设定最小日期为当前日期
+    max: '2099-06-16', //最大日期
+    istime: true,
+    istoday: false,
+    choose: function(datas){
+         end.min = datas; //开始日选好后，重置结束日的最小日期
+         end.start = datas //将结束日的初始值设定为开始日
+    }
+};
+var end = {
+    elem: '#end',
+    format: 'YYYY-MM-DD hh:mm:ss',
+    // min: laydate.now(),
+    max: '2099-06-16',
+    istime: true,
+    istoday: false,
+    choose: function(datas){
+        start.max = datas; //结束日选好后，充值开始日的最大日期
+    }
+};
+laydate(start);
+laydate(end);
+//自定义日期格式
+laydate({
+    elem: '#test1',
+    format: 'YYYY年MM月DD日',
+    festival: true, //显示节日
+    choose: function(datas){ //选择日期完毕的回调
+        alert('得到：'+datas);
+    }
+});
+//日期范围限定在昨天到明天
+laydate({
+    elem: '#hello3',
+    min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+    max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+var znhycode = [
+	{
+    "AutoId": "190",
+    "CodeType": "ZNHYCODEMAX",
+    "CodeValue": "1",
+    "CodeName": "运营管理",
+    "CodeUpType": "",
+    "maxhycode": [{
+        "AutoId": "201",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "1",
+        "CodeName": "游戏数据汇总",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "202",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "2",
+        "CodeName": "运营数据汇总",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "203",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "3",
+        "CodeName": "订单查询",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "204",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "4",
+        "CodeName": "邮件总览",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "205",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "5",
+        "CodeName": "金币和鸟蛋炮倍配置",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "206",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "6",
+        "CodeName": "广播总览",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "207",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "7",
+        "CodeName": "公告总览",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "208",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "8",
+        "CodeName": "异常预警",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "209",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "9",
+        "CodeName": "邮件审核权限",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "210",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "10",
+        "CodeName": "硬核渠道",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "211",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "11",
+        "CodeName": "留存汇总",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "212",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "12",
+        "CodeName": "LTV汇总",
+        "CodeUpType": "190",
+    }, {
+        "AutoId": "213",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "13",
+        "CodeName": "鸟蛋场房间池控制",
+        "CodeUpType": "190",
+    }
+    ]
+},
+{
+    "AutoId": "191",
+    "CodeType": "ZNHYCODEMAX",
+    "CodeValue": "2",
+    "CodeName": "货币统计",
+    "CodeUpType": "",
+    "maxhycode": [{
+        "AutoId": "301",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "100",
+        "CodeName": "渠道数据统计",
+        "CodeUpType": "191",
+    }, {
+        "AutoId": "302",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "101",
+        "CodeName": "付费数据统计",
+        "CodeUpType": "191",
+    }, {
+        "AutoId": "303",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "102",
+        "CodeName": "时段统计",
+        "CodeUpType": "191",
+    }, {
+        "AutoId": "304",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "103",
+        "CodeName": "礼盒数据统计",
+        "CodeUpType": "191",
+    }]
+},
+
+{
+    "AutoId": "192",
+    "CodeType": "ZNHYCODEMAX",
+    "CodeValue": "3",
+    "CodeName": "用户管理",
+    "CodeUpType": "",
+    "maxhycode": [{
+        "AutoId": "401",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "200",
+        "CodeName": "金币玩家总览",
+        "CodeUpType": "192",
+    }, {
+        "AutoId": "402",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "201",
+        "CodeName": "鸟蛋玩家总览",
+        "CodeUpType": "192",
+    },{
+        "AutoId": "404",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "203",
+        "CodeName": "玩家期间数据统计",
+        "CodeUpType": "192",
+    }, {
+        "AutoId": "405",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "204",
+        "CodeName": "玩家手机隐藏权限",
+        "CodeUpType": "192",
+    }, {
+        "AutoId": "406",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "205",
+        "CodeName": "玩家炮倍控制权限",
+        "CodeUpType": "192",
+    }, {
+        "AutoId": "407",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "206",
+        "CodeName": "玩家一键导出权限",
+        "CodeUpType": "192",
+    }, {
+        "AutoId": "408",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "207",
+        "CodeName": "玩家个人未产出权限",
+        "CodeUpType": "192",
+    }, {
+        "AutoId": "409",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "208",
+        "CodeName": "保险箱详情",
+        "CodeUpType": "192",
+    }, {
+        "AutoId": "500",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "209",
+        "CodeName": "魂王争霸赛",
+        "CodeUpType": "192",
+    }, {
+        "AutoId": "501",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "210",
+        "CodeName": "停服维护",
+        "CodeUpType": "192",
+    },{
+        "AutoId": "502",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "211",
+        "CodeName": "保险箱权限",
+        "CodeUpType": "192",
+    },{
+        "AutoId": "503",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "212",
+        "CodeName": "玩家封冻",
+        "CodeUpType": "192",
+    },{
+        "AutoId": "504",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "213",
+        "CodeName": "玩家昵称修改",
+        "CodeUpType": "192",
+    },{
+        "AutoId": "505",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "214",
+        "CodeName": "玩家解锁",
+        "CodeUpType": "192",
+    },{
+        "AutoId": "506",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "215",
+        "CodeName": "用户赠送详情",
+        "CodeUpType": "192",
+    }]
+},
+{
+    "AutoId": "193",
+    "CodeType": "ZNHYCODEMAX",
+    "CodeValue": "4",
+    "CodeName": "商城管理",
+    "CodeUpType": "",
+    "maxhycode": [{
+        "AutoId": "500",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "300",
+        "CodeName": "限时商城",
+        "CodeUpType": "193",
+    }, {
+        "AutoId": "501",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "301",
+        "CodeName": "兑换记录",
+        "CodeUpType": "193",
+    }, {
+        "AutoId": "502",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "302",
+        "CodeName": "卡密设置",
+        "CodeUpType": "193",
+    }, {
+        "AutoId": "503",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "303",
+        "CodeName": "兑换详情",
+        "CodeUpType": "193",
+    }, {
+        "AutoId": "504",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "304",
+        "CodeName": "兑换记录发货-会员权限",
+        "CodeUpType": "193",
+    }, {
+        "AutoId": "505",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "305",
+        "CodeName": "兑换记录发货-管理员权限",
+        "CodeUpType": "193",
+    }]
+},
+    {
+    "AutoId": "194",
+    "CodeType": "ZNHYCODEMAX",
+    "CodeValue": "5",
+    "CodeName": "礼包商城管理",
+    "CodeUpType": "",
+    "maxhycode": [{
+        "AutoId": "600",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "400",
+        "CodeName": "礼包商城",
+        "CodeUpType": "194",
+    }]
+},
+{
+    "AutoId": "195",
+    "CodeType": "ZNHYCODEMAX",
+    "CodeValue": "6",
+    "CodeName": "活动管理",
+    "CodeUpType": "",
+    "maxhycode": [
+        {
+        "AutoId": "700",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "500",
+        "CodeName": "红包总览",
+        "CodeUpType": "195",
+    }, {
+        "AutoId": "701",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "501",
+        "CodeName": "登录豪礼",
+        "CodeUpType": "195",
+    }, {
+        "AutoId": "702",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "502",
+        "CodeName": "白送50元",
+        "CodeUpType": "195",
+    }, {
+        "AutoId": "703",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "503",
+        "CodeName": "7天登录奖励",
+        "CodeUpType": "195",
+    }, {
+        "AutoId": "704",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "504",
+        "CodeName": "累计充值返奖",
+        "CodeUpType": "195",
+    }, {
+        "AutoId": "705",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "505",
+        "CodeName": "大富翁",
+        "CodeUpType": "195",
+    }, {
+        "AutoId": "706",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "506",
+        "CodeName": "福袋抽奖",
+        "CodeUpType": "195",
+    }, {
+        "AutoId": "707",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "507",
+        "CodeName": "登陆抽奖",
+        "CodeUpType": "195",
+    }, {
+        "AutoId": "708",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "508",
+        "CodeName": "专属礼包",
+        "CodeUpType": "195",
+    }, {
+        "AutoId": "709",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "509",
+        "CodeName": "充值积分排行榜",
+        "CodeUpType": "195",
+    }]
+},
+    {
+    "AutoId": "196",
+    "CodeType": "ZNHYCODEMAX",
+    "CodeValue": "7",
+    "CodeName": "兑换码管理",
+    "CodeUpType": "",
+    "maxhycode": [
+        {
+        "AutoId": "800",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "600",
+        "CodeName": "兑换码总览",
+        "CodeUpType": "196",
+    }, {
+        "AutoId": "801",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "601",
+        "CodeName": "兑换码查询",
+        "CodeUpType": "196",
+    }]
+},
+    {
+    "AutoId": "197",
+    "CodeType": "ZNHYCODEMAX",
+    "CodeValue": "8",
+    "CodeName": "权限管理",
+    "CodeUpType": "",
+    "maxhycode": [
+        {
+        "AutoId": "900",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "700",
+        "CodeName": "游戏配置",
+        "CodeUpType": "197",
+    }, {
+        "AutoId": "900",
+        "CodeType": "ZNHYCODE",
+        "CodeValue": "701",
+        "CodeName": "微信绑定",
+        "CodeUpType": "197",
+    }]
+}
+];
+

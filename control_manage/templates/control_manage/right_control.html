@@ -1,0 +1,350 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/account_manage.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/zyzn.css">
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/load_hycode.js"></script>
+    <script type="text/javascript" src="/static/js/hgz_hycode.js"></script>
+    <script type="text/javascript" src="/static/js/add_control.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/semantic.min.js"></script>
+    <script>
+        $(function(){
+            $('#paging').click(function () {
+                var pag = $('.pagination-num').val() ;
+                var URL= "/control_manage/account_set/?page=" + pag;
+                location.href=URL;
+            });
+
+        });
+    </script>
+</head>
+
+<body marginwidth="0" marginheight="0" data-keyboard="false">
+    <div class="body-div">
+
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+            <form action="" method="post" id="form_search">
+                {% csrf_token %}
+                <tr>
+                    <td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">系统管理 &gt; 账号设置</strong></td>
+
+                    <td width="72%" align="left" valign="middle" bgcolor="#F5F5F5">
+
+                    </td>
+                    <td width="10%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                        {% if limit_level == 0 %}
+                            <a href="javascript:show_manage();" id="bn_btn_one" style="background-color: #0ea432">新增管理</a>
+                        {% else %}
+                            <a href="javascript:;" id="bn_btn_one_xls" style="background-color: #8b8a8a">新增管理</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            </form>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF">
+                        <!--主要内容开始-->
+                    <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:30px auto 30px auto;" styler="1px #666 solid " id="userlist">
+                        <tbody id="hover_tf">
+                            <tr>
+                                <th width="100" align="center" bgcolor="#EEEEEE" style="height: 37px;">序号</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE" style="height: 37px;">用户名</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE" style="height: 37px;">手机号</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE" style="height: 37px;">部门归属</th>
+                                <th width="200" align="center" bgcolor="#EEEEEE" style="height: 37px;">操作</th>
+
+                            </tr>
+                            {% for info  in page %}
+                                <tr id="hover_tr1" bgcolor="#FFFFFF">
+                                    <td align="center">{{info.order}}</td>
+                                    <td align="center" style="height: 37px;">{{info.account_name}}</td>
+                                    <td align="center">{{info.phone}}</td>
+                                    <td align="center">{{info.department}}</td>
+
+                                    <td align="center">
+                                        {% if info.limit_level == 1 %}
+                                            <div style="width: 150px; height: 17px;">
+                                                <a href="javascript:redact('{{info.nid}}','{{info.phone}}');"  style="color:blue" >编辑</a>
+                                                {% if info.login_limit == 1 %}
+                                                    <a href="javascript:open_login('{{info.nid}}','{{info.phone}}','{{info.department}}');" style="margin-left: 10px;color: red">禁用</a>
+                                                {% else %}
+                                                    <a href="javascript:open_login('{{info.nid}}','{{info.phone}}','{{info.department}}');" style="margin-left: 10px;color: red">开启</a>
+                                                {% endif %}
+                                                <a href="javascript:delete_data('{{info.nid}}','{{info.phone}}','{{info.department}}');" style="margin-left: 10px;">删除</a>
+                                            </div>
+                                        {% else %}
+                                            <div style="width: 150px; height: 17px;">
+                                                <a href="javascript:redact('{{info.nid}}','{{info.phone}}');"  style="color:blue" >编辑</a>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!--主要内容结束-->
+                    <div class="datagrid-pager pagination">
+                        <table cellspacing="0" cellpadding="0" border="0">
+                            <tbody>
+                                <tr>
+                                    <!--<td>-->
+                                        <!--<select class="pagination-page-list">-->
+                                            <!--<option>10</option>-->
+                                            <!--<option>20</option>-->
+                                            <!--<option>30</option>-->
+                                            <!--<option>40</option>-->
+                                            <!--<option>50</option>-->
+                                        <!--</select>-->
+                                    <!--</td>-->
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_previous %}
+                                        <td>
+                                            <a href="{{url_date}}?page=1" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.number|add:-1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    <td>
+                                        <span style="padding-left:6px;">Page</span>
+                                    </td>
+                                    <td>
+                                        <input class="pagination-num" value="{{number}}" size="2" type="text">
+                                    </td>
+                                    <td>
+                                        <span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+                                    </td>
+
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_next %}
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.number|add:1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.paginator.num_pages }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_next or page.has_previous %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" group="" id="paging">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled" group="">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--</div>-->
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<script type="text/javascript">
+
+    function redact(user_id,phone) {
+        var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":1,"user_id":user_id,"phone":phone});
+        $.post('/control_manage/edit_account/', data_info, function(data) {
+            if ( data.status) {
+                var name = data.user_name;
+                var department = data.department;
+                var control_list = data.control_list;
+                show_control(user_id,name,phone, department,control_list,'show');
+            }else {
+                alert(data.msg);
+            }
+        });
+
+    }
+
+    function show_manage() {
+        add_control("show");
+    }
+
+    function update_control() {
+        var control_list = [];
+        var val = '';
+        var valname = '';
+        $('.options-table .input-checkbox:checked').each(function() {
+            val += $(this).data("value") + '-';
+            valname += $(this).data("name") + '-';
+            control_list.push($(this).data("value"));
+        });
+        if (val != '') {
+            val = val.substring(0, val.lastIndexOf('-'));
+        }
+        if (valname != '') {
+            valname = valname.substring(0, valname.lastIndexOf('-'));
+        }
+        var user_id = $(".aui_middle .user_id").val();
+        var user_name = $(".aui_middle .user_name").val();
+        var phone = $(".aui_middle .phone").val();
+        var department = $(".aui_middle .department").val();
+        var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":2,"user_id":user_id,"user_name":user_name,"phone":phone,"department":department,"control_list":control_list.toString()});
+        $.post('/control_manage/alter_layout/', data_info, function(data) {
+            if ( data.status) {
+                alert(data.msg);
+                $('.aui_state_box').remove();
+            }else {
+                alert(data.msg);
+            }
+        });
+
+    }
+
+    function add_manage() {
+        var control_list = [];
+        var val = '';
+        var valname = '';
+        $('.options-table .input-checkbox:checked').each(function() {
+            val += $(this).data("value") + '-';
+            valname += $(this).data("name") + '-';
+            control_list.push($(this).data("value"));
+        });
+        if (val != '') {
+            val = val.substring(0, val.lastIndexOf('-'));
+        }
+        if (valname != '') {
+            valname = valname.substring(0, valname.lastIndexOf('-'));
+        }
+        var user_name = $(".aui_middle .add_user_name").val();
+        var phone = $(".aui_middle .add_phone").val();
+        var department = $(".aui_middle .add_department").val();
+        var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":3,"user_name":user_name,"phone":phone,"department":department,"control_list":control_list.toString()});
+        $.post('/control_manage/add_login_info/', data_info, function(data) {
+            if ( data.status) {
+                alert(data.msg);
+                $('.aui_state_box').remove();
+            }else {
+                alert(data.msg);
+            }
+        });
+
+    }
+
+    function open_login(user_id,phone,department) {
+        var json_data = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"user_id":user_id,"phone":phone,"department":department});
+        $.post('/control_manage/alter_login/', json_data, function(data) {
+            if ( data.status) {
+                if(confirm(data.msg)){
+                    var pag = $('.pagination-num').val() ;
+                    var URL= "/control_manage/account_set/?page=" + pag;
+                    location.href=URL;
+                }else {
+                    var pag = $('.pagination-num').val() ;
+                    var URL= "/control_manage/account_set/?page=" + pag;
+                    location.href=URL;
+                }
+            }
+            else {
+                alert(data.msg);
+            }
+        });
+    }
+
+function delete_data(user_id,phone,department) {
+    var json_data = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"user_id":user_id,"phone":phone,"department":department});
+    $.post('/control_manage/delete_data/', json_data, function(data) {
+        if ( data.status) {
+            if(confirm(data.msg)){
+                var pag = $('.pagination-num').val() ;
+                var URL= "/control_manage/account_set/?page=" + pag;
+                location.href=URL;
+            }else {
+                var pag = $('.pagination-num').val() ;
+                var URL= "/control_manage/account_set/?page=" + pag;
+                location.href=URL;
+            }
+        }
+        else {
+            alert(data.msg);
+        }
+
+    });
+}
+</script>
+</body>
+</html>

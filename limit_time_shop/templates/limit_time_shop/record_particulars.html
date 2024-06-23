@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>兑换记录 > 发货信息</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css" />
+<script src="/static/js/jquery-2.0.0.min.js"></script>
+</head>
+<body>
+<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+    <tr>
+        <td height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:20px;">发货详情 >{{ship_info.good_name}}</strong></td>
+    </tr>
+
+    <tr>
+        <td valign="top" bgcolor="#FFFFFF">
+            <!--主要内容开始-->
+            <form action=" " method="post" id="shipping_info">
+                <table width="97%" border="0" align="center" cellpadding="10" cellspacing="1" bgcolor="#DFDFDF" style="margin:30px auto 30px auto;" id="userlist">
+                <tr>
+                    <td align="right" bgcolor="#F9F9F9"><strong>订单ID：</strong></td>
+                    <td bgcolor="#F9F9F9"><input type="text" name="order_id" readonly="readonly" style="border:none;background:#F9F9F9" value="{{order}}" /></td>
+                </tr>
+
+                <tr>
+                    <td align="right" bgcolor="#F9F9F9"><strong>兑换人ID：</strong></td>
+                    <td bgcolor="#F9F9F9"><input type="text" name="uid" readonly="readonly" style="border:none;background:#F9F9F9" value="{{ship_info.uid}}" /></td>
+                    <!--<td width="342" rowspan="14" align="center" valign="middle" bgcolor="#F9F9F9"><img src="/static/images/2018.png" width="257" height="177" border="0"></td>-->
+                </tr>
+
+                <tr>
+                    <td align="right" bgcolor="#F9F9F9"><strong>姓名：</strong></td>
+                    <td bgcolor="#F9F9F9"><input type="text" name="payer_name" readonly="readonly" style="border:none;background:#F9F9F9" value="{{ship_info.nick}}" /></td>
+                </tr>
+
+                <tr>
+                    <td width="237" align="right" bgcolor="#F9F9F9"><strong>性别：</strong></td>
+                   {% if ship_info.sex == 0 %}
+                        <td bgcolor="#F9F9F9"><input type="text" name="sex" readonly="readonly" style="border:none;background:#F9F9F9" value="男" /></td>
+                    {% else %}
+                        <td bgcolor="#F9F9F9"><input type="text" name="sex" readonly="readonly" style="border:none;background:#F9F9F9" value="女" /></td>
+                    {% endif %}
+                </tr>
+
+                <tr>
+                    <td width="237" align="right" bgcolor="#F9F9F9"><strong>地区：</strong></td>
+                    <td bgcolor="#F9F9F9"><input type="text" name="area" readonly="readonly" style="border:none;background:#F9F9F9" value="{{ship_info.area}}" /></td>
+                </tr>
+
+
+                <tr>
+                  	<td align="right" bgcolor="#E3F8FF"><strong>地址：</strong></td>
+                    <td bgcolor="#F9F9F9"><input type="text" name="address" readonly="readonly" style="border:none;background:#F9F9F9;width: 100%;" value="{{ship_info.address}}" /></td>
+               	</tr>
+
+                <tr>
+                  	<td align="right" bgcolor="#E3F8FF"><strong>手机号码：</strong></td>
+                    <td bgcolor="#F9F9F9"><input type="text" name="phone" readonly="readonly" style="border:none;background:#F9F9F9" value="{{ship_info.phone}}" /></td>
+               	</tr>
+
+                <tr>
+                  	<td align="right" bgcolor="#E3F8FF" ><strong>邮箱：</strong></td>
+                    <td bgcolor="#F9F9F9"><input type="text" name="mail" readonly="readonly" style="border:none;background:#F9F9F9" value="{{ship_info.mail}}" /></td>
+               	</tr>
+                {% if ship_info.good_type == 1 or ship_info.good_type == 5 %}
+                <tr>
+                    <td align="right" bgcolor="#E3F8FF" ><strong>快递单号：</strong></td>
+                    <td bgcolor="#F9F9F9" class="cursor">
+                        <input type="text" name="express_number" readonly="readonly" style="border:none;background:#F9F9F9" value="{{order_number.express_number}}" />
+                    </td>
+                </tr>
+                {% endif %}
+                {% if ship_info.good_type == 4 %}
+                    <tr>
+                        <td align="right" bgcolor="#E3F8FF"><strong>卡号：</strong></td>
+                        <td bgcolor="#F9F9F9" class="cursor"><input type="text" name="card_number" value="{{order_number.card_number}}" class="order_id" readonly="readonly" style="border:none;background:#F9F9F9" /></td>
+                    </tr>
+
+                    <tr>
+                        <td align="right" bgcolor="#E3F8FF"><strong>卡密：</strong></td>
+                        <td bgcolor="#F9F9F9" class="cursor"><input type="text" name="card_close" value="{{order_number.card_close}}" class="order_id" readonly="readonly" style="border:none;background:#F9F9F9"/></td>
+                    </tr>
+                {% endif %}
+                <tr>
+                  <td align="center" bgcolor="#F9F9F9">&nbsp;</td>
+                  <td colspan="2" align="left" bgcolor="#F9F9F9">
+                      <input id="button" type="button" onclick="javascrtpt:window.location.href='/limit_time_shop/shop_exchange_info/?page={{page}}'" value="返回" class="returns">
+                  </td>
+              </tr>
+            </table>
+            </form>
+            <!--主要内容结束-->
+        </td>
+    </tr>
+</table>
+</body>
+</html>

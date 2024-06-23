@@ -1,0 +1,785 @@
+{% load extratags %}
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="/static/css/default.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/red_popup.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+        <link type="text/css" rel="stylesheet" href="/static/css/load.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+        <link type="text/css" rel="stylesheet" href="/static/css/style.css" />
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/red_packet.css">
+
+		<script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+        <script type="text/javascript" src="/static/js/load-min.js"></script>
+		<script type="text/javascript" src="/static/js/common.js"></script>
+		<script type="text/javascript" src="/static/js/jquery.easyui.min.js"></script>
+		<script type="text/javascript"  src="/static/laydate.js"></script>
+		<script type="text/javascript"  src="/static/js/fixed_header.js"></script>
+		<script src="/static/js/bootstrap.min.js"></script>
+        <script src="/static/js/jquery.cookie.js"></script>
+		<script>
+			$(function(){
+				$('#paging').click(function () {
+					var pag = $('.pagination-num').val() ;
+					var URL= "/activity_manage/red_packet/?page=" + pag;
+					location.href=URL;
+				});
+
+				$('#pay_rank_xls').click(function () {
+				    var URL= "/activity_manage/export_xls/?rid=" +"pay_rank";
+					location.href=URL;
+				});
+
+				var error_start = false;
+                var error_end = false;
+
+                $('#query_data').click(function(){
+                    check_time();
+                    if(error_start == true && error_end == true)
+                    {
+                        $.Load_data();
+                        $("#pay_rank").submit();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                });
+
+                function check_time(){
+                    var len_start = $('#start').val().length;
+                    var len_end = $('#end').val().length;
+                    if(len_start==0 || len_end==0)
+                    {
+                        msgShow('系统提示', "请输入日期", 'warning');
+                        error_start = false;
+                        error_end = false;
+                    }
+                    else
+                    {
+                        error_start = true;
+                        error_end = true;
+                    }
+                }
+
+				$('.popup').click(function(event) { //点击a标签
+                    if($(this).find(".item-desc").is(':hidden')) { //如果当前隐藏
+                        $(this).parents().find(".item-desc").hide()
+                        $(this).find(".item-desc").show(); //那么就显示div
+                        $(this).find(".item-desc").css("left", document.body.scrollLeft + event.clientX + -(700));
+                        $(this).find(".item-desc").css("top", document.body.scrollLeft + event.clientY + -(100));
+
+                    } else { //否则
+                        $(".item-desc").hide(); //就隐藏div
+
+                    }
+                })
+                $(document).click(function() {
+                    $(".item-desc").hide();
+
+                });
+                $(".popup").click(function(event) {
+                    event.stopPropagation();
+                });
+
+                var w,h,className;
+                function getSrceenWH(){
+                    w = $(window).width();
+                    h = $(window).height();
+                    $('#dialogBg').width(w).height(h);
+                }
+
+                getSrceenWH();
+
+                //显示弹框
+                $('#create_activity').click(function(){
+                    $.post('/activity_manage/deal_integral_rank/', {csrfmiddlewaretoken:'{{ csrf_token }}',"rid":3}, function(data) {
+                        if ( data.status) {
+                            $("#day_start").val(data.start);
+                            $("#day_end").val(data.end);
+                            $("#integral_name").val(data.name);
+                            if (data.tips==1){
+                                $('#integral').attr("data-state", "off");
+                                $('#integral').removeClass("off").addClass("on");
+                                $('#move_integral').animate({left: '60px'}, 300, function(){
+                                    $(this).attr("data-state", "on");
+                                });
+                            }
+                            $("#integral_order").val(data.order);
+                            $(" select option[value='"+data.hot+"']").attr("selected","selected");
+                            $("#integral_desc").val(data.desc);
+
+                            $("#people").val(data.count);
+                            $.each(data.channel,function(i,item){
+                                $(":checkbox[value='"+item+"']").prop("checked",true);
+                        　　});
+
+                        {#    $.each(data.level,function(i,item){#}
+                        {#        var index = i + 1;#}
+                        {#        if (item.length>1){#}
+                        {#            $("#start_range"+index).val(item[0]);#}
+                        {#            $("#end_range"+index).val(item[item.length-1])#}
+                        {#        }else {#}
+                        {#            $("#start_range"+index).val(item[0]);#}
+                        {#            $("#end_range"+index).val(item[0])#}
+                        {#        }#}
+                        {##}
+                        {#　　});#}
+
+                        {#    $.each(data.reward,function(i,info){#}
+                        {#        var index = i + 1;#}
+                        {#        if(info.type == "0"){#}
+                        {#            $("#number"+index).val(info.count);#}
+                        {#            $("#goods_name"+index).val(info.name);#}
+                        {#            $("#reward"+index).val(info.type);#}
+                        {##}
+                        {#        }else {#}
+                        {#            $("#number"+index).val(info.count);#}
+                        {#            $("#reward"+index).val(info.type);#}
+                        {#        }#}
+                        {#　　});#}
+
+                            className = $(this).attr('class');
+                            $('#dialogmag').fadeIn(300);
+                            $('#dialohg').removeAttr('class').addClass('by_value '+className+'').fadeIn();
+                        }
+                        else {
+                            alert("数据显示异常!");
+                        }
+                    });
+                });
+
+                //关闭弹窗
+                $('.claseDialogBtn').click(function(){
+                    $('#dialogmag').fadeOut(300,function(){
+                        $('#dialohg').addClass('bounceOutUp').fadeOut();
+                    });
+                });
+			});
+
+    </script>
+
+    <style>
+        .by_value td {
+            font-size: 14px;
+        }
+
+        .head_div {
+            width: 100%;
+            display: inline-block;
+            max-height: 360px;
+            overflow: auto;
+            height: 30px;
+            margin-bottom: 20px;
+        }
+
+        .excuseme {
+            width: 94%;
+            display: inline-block;
+            float: left;
+            height: 30px;
+        }
+
+        .excuseme p,.Hotp {
+            display: inline-block;
+            float: left;
+            width: 80px;
+            text-align: center;
+            margin-left: 20px;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .excuseme input {
+            float: left;
+            width: 50px;
+            border: 1px solid #C0C0C0;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        .excuseme select {
+            float: left;
+            width: 100px;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .excuseme select option {
+            font-size: 14px;
+        }
+
+        .excuseme a {
+            display: inline-block;
+            width: 50px;
+            height: 25px;
+            cursor: pointer;
+            float: left;
+            margin-top: 2px;
+            background: #C0C0C0;
+            border-radius: 0px 3px 3px 0px;
+            ;
+            line-height: 25px;
+            text-align: center;
+        }
+
+        .max_div {
+            height: auto;
+            overflow-y: auto;
+            max-height: 320px;
+            width: 100%;
+            display: inline-block;
+        }
+
+        .max_div button {
+            margin-top: 0px;
+            width: 80px;
+            height: 30px;
+            font-size: 14px;
+            margin-left: 20px;
+            float: left;
+            background: #009c95;
+            color: white;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .activity_input{
+            border: 1px solid #C0C0C0;
+            text-align: center;
+            margin-left: 10px;
+            float: left;
+            margin-top: 2px;
+        }
+</style>
+</head>
+
+	<body style="min-width: 1610px;">
+		<div class="body-div">
+			<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+				<tbody>
+					<form action="/activity_manage/recharge_integral/" method="post" id="pay_rank">
+                        {% csrf_token %}
+						<tr>
+							<td width="10%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">活动管理 &gt; 充值积分周期榜</strong></td>
+							<td width="50%" align="left" valign="middle" bgcolor="#F5F5F5">
+{#                                渠道:<select name="channel" class="dowp_list_sty" style="margin-right: 20px;margin-left: 5px;">#}
+{#                                        {% for key,value in official.items %}#}
+{#                                             <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>#}
+{#                                        {% endfor %}#}
+{#                                    </select>#}
+								<lable for="introduce" style="padding-left: 10px; font-size:12px;">时间:</lable>
+									<input placeholder="请输入日期" id="start" class="laydate-icon" readonly="" value="{{start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+								<lable for="introduce" style="padding-left: 10px; font-size:12px;">至:</lable>
+									<input placeholder="请输入日期" id="end" class="laydate-icon"  readonly="" value="{{end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+                                <input type="button" value="确认查询" id="query_data" class="button" style="width: 112px;margin-left: 20px;" onclick="Load_data()">
+							</td>
+							<td width="12%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+								<a href="javascript:;" class="bn_btn_one" id="create_activity" style="float: left;">活动生成</a>
+{#								<a href="#" id="bn_btn_one" onclick="red_packet_record()" style="float: left;">操作记录</a>#}
+{#                                {% if page.paginator.num_pages %}#}
+{#									<input type="button" value="导出xls" class="button_color" id="pay_rank_xls" style="margin-left: 20px;margin-top: 10px;"/>#}
+{#								{% else %}#}
+{#									<input type="button" value="导出xls" class="button_color"  style="margin-left: 20px; background-color: #8b8a8a;margin-top: 10px;"/>#}
+{#								{% endif %}#}
+							</td>
+							<td width="5%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+
+							</td>
+						</tr>
+					</form>
+					<tr>
+						<td colspan="4" valign="top" bgcolor="#FFFFFF">
+							<!--主要内容开始-->
+							<div class='table-cont' id='table-cont'>
+								<table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF" id="order_title" style="margin-top: -1px;">
+									<thead>
+										 <tr>
+                                            <th align="center" bgcolor="#EEEEEE" style="height: 37px;">日期</th>
+                                            <th align="center" bgcolor="#EEEEEE" style="height: 37px;">玩家ID</th>
+                                            <th align="center" bgcolor="#EEEEEE" style="height: 37px;">昵称</th>
+                                            <th align="center" bgcolor="#EEEEEE" style="height: 37px;">渠道</th>
+                                            <th align="center" bgcolor="#EEEEEE" style="height: 37px;">充值积分</th>
+                                        </tr>
+									</thead>
+									<tbody>
+										{% for info  in page %}
+											<tr id="hover_tr" bgcolor="#FFFFFF">
+												<td align="center" valign="middle" style="height: 50px;">{{info.day_time}}</td>
+                                                <td align="center" valign="middle" style="height: 50px;">{{info.uid}}</td>
+                                                <td align="center" valign="middle" style="height: 50px;">{{info.nick}}</td>
+                                                <td align="center" valign="middle" style="height: 50px;">{{info.channel_id | channel_name}}</td>
+                                                <td align="center" valign="middle" style="height: 50px;">{{info.point}}</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+							<!--主要内容结束-->
+							<div class="datagrid-pager pagination">
+								<table cellspacing="0" cellpadding="0" border="0">
+									<tbody>
+										<tr>
+											<!--<td>-->
+												<!--<select class="pagination-page-list">-->
+													<!--<option>10</option>-->
+													<!--<option>20</option>-->
+													<!--<option>30</option>-->
+													<!--<option>40</option>-->
+													<!--<option>50</option>-->
+												<!--</select>-->
+											<!--</td>-->
+											<td>
+												<div class="pagination-btn-separator"></div>
+											</td>
+											{% if page.has_previous %}
+												<td>
+													<a href="{{url_date}}?page=1" class="l-btn l-btn-small l-btn-plain">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-first">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+												<td>
+													<a href="{{url_date}}?page={{ page.number|add:-1 }}" class="l-btn l-btn-small l-btn-plain">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-prev">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+											{% else %}
+												<td>
+													<a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-first">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+												<td>
+													<a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-prev">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+											{% endif %}
+
+											<td>
+												<div class="pagination-btn-separator"></div>
+											</td>
+											<td>
+												<span style="padding-left:6px;">Page</span>
+											</td>
+											<td>
+												<input class="pagination-num" value="{{number}}" size="2" type="text">
+											</td>
+											<td>
+												<span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+											</td>
+
+											<td>
+												<div class="pagination-btn-separator"></div>
+											</td>
+											{% if page.has_next %}
+												<td>
+													<a href="{{url_date}}?page={{ page.number|add:1 }}" class="l-btn l-btn-small l-btn-plain">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-next">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+												<td>
+													<a href="{{url_date}}?page={{ page.paginator.num_pages }}" class="l-btn l-btn-small l-btn-plain">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-last">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+											{% else %}
+												<td>
+													<a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-next">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+												<td>
+													<a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-last">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+											{% endif %}
+											<td>
+												<div class="pagination-btn-separator"></div>
+											</td>
+											{% if page.has_next or page.has_previous %}
+												<td>
+													<a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" group="" id="paging">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-load">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+											{% else %}
+												<td>
+													<a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled" group="">
+														<span class="l-btn-left l-btn-icon-left">
+															<span class="l-btn-text l-btn-empty">&nbsp;</span>
+															<span class="l-btn-icon pagination-load">&nbsp;</span>
+														</span>
+													</a>
+												</td>
+											{% endif %}
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- 弹框 style -->
+		<div id="dialogmag"></div>
+		<div id="dialohg" class="by_value" style="margin: auto;position: fixed; left: 6%; top: 5%;width:1550px;height:auto;">
+			<div class="dialogTophg" style="height:45px;width: 100%;">
+				<p class="htt4">
+					活动生成
+				</p>
+			</div>
+			<form action="" method="post" id="recharge_form">
+                {% csrf_token %}
+				<table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF" id="order_title">
+					<tr>
+						<td align="right" style="width: 170px;" bgcolor="#EEEEEE">起始时间：</td>
+						<td align="left" bgcolor="#EEEEEE">
+							<input placeholder="请输入日期" id="day_start" class="laydate-icon" readonly="" value="{{new_time}}" style="width: 235px;margin-left: 20px;float: left;" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+							<input placeholder="请输入日期" id="day_end" class="laydate-icon" readonly="" value="{{new_time}}" style="width: 235px;margin-left: 20px;float: left;" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+						    <label style="font-size: 15px;margin-top: 6px;margin-right: 10px;margin-left: 60px;float: left;">登陆显示开关:</label>
+                            <div class="btn_fath clearfix off" onclick="integral(this)" id="integral" style="border-radius: 15px;width: 92px;margin-top: 0px;float: left;">
+								<div class="move" id="move_integral" data-state="off" style="width: 30px; border-radius: 15px; height: 30px; left: 0px;"></div>
+								<div class="btnSwitch btn1" style="height: 32px;width:40px;"></div>
+								<div class="btnSwitch btn2 " style="height: 32px;width:40px;"></div>
+							</div>
+                        </td>
+					</tr>
+					<tr>
+						<td align="right" bgcolor="white">活动：</td>
+						<td align="left" bgcolor="white">
+							<p class="Hotp">活动名称：</p >
+							<input type="text" name="integral_name" id="integral_name" value="" class="activity_input" />
+							<p style="width: 120px;" class="Hotp">活动显示顺序：</p >
+							<input type="text" id="integral_order" value="" name="order" class="activity_input" style="width: 80px;"/>
+							<p class="Hotp">Hot：</p >
+							<select style="margin-top: 2px;" name="hot_info" id="hot_info">
+								{% for new in hot_name%}
+                                     <option value="{{ new.vale }}" {% if hot == new.vale %} selected {% endif %} >{{ new.content}}</option>
+                                {% endfor %}
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" bgcolor="#EEEEEE">活动描述：</td>
+						<td align="left" bgcolor="#EEEEEE">
+                            <textarea id="integral_desc" name="integral_desc" style="width:350px;height:150px;float: left;font-size: 15px;margin-left: 20px;"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" bgcolor="white">选择渠道：</td>
+						<td align="left" bgcolor="white">
+                            <div style="width: 100%;height: auto;overflow-y: auto;">
+                                {% for key,value in official.items %}
+                                    {% if key != "0" %}
+                                        <input type="checkbox" name="channel" value="{{ key }}" style="margin-left: 20px;"/>{{ value }}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+						</td>
+					</tr>
+                    <tr>
+						<td align="right" bgcolor="#EEEEEE">上榜人数：</td>
+						<td align="left" bgcolor="#EEEEEE">
+							<input type="text" id="people" value="" name="people" style="border: 1px solid #C0C0C0;height:25px;text-align: center;margin-left: 20px;" />
+						</td>
+					</tr>
+				</table>
+				<div class="btn_select" style="width: 98%">
+					<a href="javascript:;" class="claseDialogBtn" id="cancel">取消</a>
+					<a href="javascript:;" id="alter_pay_rank">确定</a>
+				</div>
+			</form>
+		</div>
+		<!-- 弹框 End -->
+<script>
+    !function(){
+    laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+    laydate({elem: '#demo'});//绑定元素
+    }();
+    //日期范围限制
+    var start = {
+        elem: '#start',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        //min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+             end.min = datas; //开始日选好后，重置结束日的最小日期
+             end.start = datas //将结束日的初始值设定为开始日
+        }
+    };
+    var end = {
+        elem: '#end',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+
+    var day_start = {
+        elem: '#day_start',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            day_start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+
+    var day_end = {
+        elem: '#day_end',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            day_start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+
+    var valid = {
+        elem: '#valid',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+    laydate(start); //valid
+    laydate(end);
+    laydate(day_start);
+    laydate(day_end);
+    laydate(valid);
+    //自定义日期格式
+    laydate({
+        elem: '#test1',
+        format: 'YYYY年MM月DD日',
+        festival: true, //显示节日
+        choose: function(datas){ //选择日期完毕的回调
+            alert('得到：'+datas);
+        }
+    });
+    //日期范围限定在昨天到明天
+    laydate({
+        elem: '#hello3',
+        min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+        max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+    });
+
+    function integral(th) {
+        var ele = $(th).children(".move");
+        if(ele.attr("data-state") == "on") {
+            ele.animate({
+                left: "0"
+            }, 300, function() {
+                ele.attr("data-state", "off");
+            });
+            $(th).removeClass("on").addClass("off");
+        } else if(ele.attr("data-state") == "off") {
+            ele.animate({
+                left: '60px'
+            }, 300, function() {
+                $(this).attr("data-state", "on");
+            });
+            $(th).removeClass("off").addClass("on");
+        }
+    }
+
+    function uploading(pid) {
+        var pic_id = pid;
+        var file_info = $('#picture'+pid)[0].files[0];
+        var form_data = new FormData();
+        form_data.append('picture',file_info);
+        form_data.append('pic_id',pic_id);
+        form_data.append('rid',1);
+
+        if(confirm("您确定上传图片?")){
+            $.ajax({
+                url:"/activity_manage/deal_integral_rank/",
+                type:'POST',
+                data: form_data,
+                processData: false,
+                contentType: false,
+                headers:{"X-CSRFToken":$.cookie('csrftoken')},
+                success: function(result) {
+                    alert(result.msg);
+                },
+                error: function(result) {
+                    alert(result.msg);
+                }
+
+            });
+        }else {
+            alert("您取消了上传图片");
+        }
+    }
+
+	$(function(){
+	    var error_people = false;
+	    var error_desc = false;
+	    var error_order = false;
+	    var error_name = false;
+	    var error_start = false;
+        var error_end = false;
+
+	    $('#alter_pay_rank').click(function(){
+	        var ele = $('#integral').children(".move");
+
+			if(ele.attr("data-state") == "on"){
+				switch_show = 1
+			}else if(ele.attr("data-state") == "off"){
+				switch_show = 0
+            }
+            check_time();
+            check_name();
+			check_desc();
+			check_order();
+			if(error_desc == true && error_order == true && error_name == true && error_start == true && error_end == true)
+            {
+                var data_info =  $.param({"open":switch_show,"rid":2}) + "&" + $("#recharge_form").serialize();
+                if(confirm("您确定设置充值积分周期榜?")){
+                    $.post('/activity_manage/deal_integral_rank/', data_info, function(result) {
+                        if ( result.status) {
+                            alert(result.info);
+                            $('#dialogmag').fadeOut(300,function(){
+                                $('#dialohg').addClass('bounceOutUp').fadeOut();
+                            });
+                        }
+                        else {
+                            alert(result.info);
+                        }
+                    });
+                }else {
+                    alert("您取消设置充值积分周期榜");
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        });
+
+	    function check_people(){
+            var len_people = $('#people').val().length;
+            if(len_people==0)
+            {
+                alert("请输入上榜人数!");
+                error_people = false;
+            }
+            else
+            {
+                error_people = true;
+            }
+        }
+
+        function check_desc(){
+            var len_desc = $('#integral_desc').val().length;
+            if(len_desc==0)
+            {
+                alert("请输入活动描述!");
+                error_desc = false;
+            }
+            else
+            {
+                error_desc = true;
+            }
+        }
+
+        function check_order(){
+            var len_order = $('#integral_order').val().length;
+            if(len_order==0)
+            {
+                alert("请输入活动显示顺序!");
+                error_order = false;
+            }
+            else
+            {
+                error_order = true;
+            }
+        }
+
+        function check_name(){
+            var len_name = $('#integral_name').val().length;
+            if(len_name==0)
+            {
+                alert("请输入活动名称!");
+                error_name = false;
+            }
+            else
+            {
+                error_name = true;
+            }
+        }
+
+        function check_time(){
+            var len_start = $('#day_start').val().length;
+            var len_end = $('#day_end').val().length;
+            if(len_start==0 || len_end==0)
+            {
+                alert("请输入日期");
+                error_start = false;
+                error_end = false;
+            }
+            else
+            {
+                error_start = true;
+                error_end = true;
+            }
+        }
+        
+	});
+</script>
+</body>
+</html>

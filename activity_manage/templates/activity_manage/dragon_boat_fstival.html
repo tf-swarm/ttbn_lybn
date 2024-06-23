@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+		<script type="text/javascript" src="/static/laydate.js"></script>
+	    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+		<style>
+			.add_reward_info {
+				margin-bottom: 10px;
+				background: #009c95;
+				color: white;
+				border-radius: 3px;
+				border: none;
+				cursor: pointer;
+			}
+
+			.head_div {
+				margin-left: 20px;
+				width: 100%;
+				height: auto;
+				margin-top: 15px;
+				display: inline-block;
+			}
+
+			.head_div span {
+				float: left;
+				font-size: 18px;
+				height: 30px;
+				line-height: 30px;
+				color: black;
+				font-weight: 600;
+			}
+
+			h1 {
+				display: inline-block;
+				font-size: 24px;
+				line-height: 40px;
+				height: 45px;
+				float: left;
+				color: black;
+				font-weight: 600;
+			}
+
+			.input_text {
+				width: 130px;
+				height: 36px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px #cccccc;
+				text-align: center;
+				float: left;
+				padding: 0px;
+			}
+
+			.btn_model {
+				width: 70px;
+				height: 36px;
+				background: #e8e8e8;
+				float: left;
+				border: 1px #cccccc solid;
+			}
+
+			.btn_model p {
+				color: rgba(0, 0, 0, .5);
+				font-weight: 700;
+				text-align: center;
+				line-height: 36px;
+				font-size: 1em;
+				margin: 0;
+			}
+
+			.spinner_select option {
+				font-size: 18px;
+			}
+
+			.activity_name {
+				width: auto;
+				height: 30px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px rgb(169, 169, 169);
+				float: left;
+				text-align: center;
+			}
+
+			.div_award {
+				height: auto;
+				width: 470px;
+				margin-left: 90px;
+				float: left;
+			}
+
+			.award_p {
+				font-size: 24px;
+				display: inline-block;
+				height: 38px;
+				float: left;
+				margin: 0px;
+				line-height: 38px;
+                color: black;
+			}
+
+			.remove {
+				display: inline-block;
+				width: 20px;
+				height: 20px;
+				cursor: pointer;
+				float: left;
+				margin: 8px 10px 8px 18px;
+				background: url(/static/images/close_btn.png) no-repeat -220px -315px;
+			}
+
+			.activity_input {
+				width: auto;
+				height: 30px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px rgb(169, 169, 169);
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body style="line-height: 0.1em; overflow-x:auto; max-height: 900px;min-width: 1470px;">
+		<div class="body-div">
+			<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+				<tr>
+					<td width="25%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">活动管理 &gt;端午节活动</strong></td>
+					<td width="25%" align="left" valign="middle" bgcolor="#F5F5F5">
+					</td>
+					<td width="60%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+
+					</td>
+
+					<td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+{#						<a href="javascript:;" id="bn_btn_one">操作记录</a>#}
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: 1000px;">
+						<!--主要内容开始-->
+						<form action="" method="post" id="form_dragon_boat">
+                            {% csrf_token %}
+							<div style="height:45px; width:100%;margin-left: 20px;margin-top: 20px;">
+								<h1 style="width:auto">端午活动———
+                                    <a href="javascript:;" id="alter_dragon_boat" style="color: white;width: 112px; height: 35px; background:#1B9AF7;border-radius: 3px; float:right;margin-top: 4px;">确认更改</a>
+                                </h1>
+								<h1 style="width:268px;margin-left: 60px;">登录提示开关:
+                                    <div class="btn_fath clearfix off" onclick="dragon_switch(this)" id="dragon_switch" style="float: right;border-radius: 15px;width: 92px;margin-top: 5px;">
+		                                <div class="move" id="dragon_move" data-state="off" style="width: 30px; border-radius: 15px; height: 30px; left: 0px;"></div>
+		                                <div class="btnSwitch btn1" style="height: 32px;width:40px;"></div>
+		                                <div class="btnSwitch btn2 " style="height: 32px;width:40px;"></div>
+                           			</div>
+                                </h1>
+								<h1 style="width:350px;margin-left: 60px;">活动显示顺序:
+                                    <input type="text" class="activity_input" name="order" id="activity_order" value="{{ order }}"/>
+                                </h1>
+								<h1 style="width:350px;margin-left: 60px;">HOT:
+                                    <select style="width: 60px;height: 35px;margin-bottom: 4px;font-size: 17px;" name="hot" id="">
+                                        {% for new in hot_name%}
+                                             <option value="{{ new.vale }}" {% if hot == new.vale %} selected {% endif %} >{{ new.content}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </h1>
+							</div>
+							<div style="height: 80%;margin-bottom: 0;">
+								<div class="head_div" style="width: 100%;">
+									<span>活动周期：</span>
+									<div class="btn_model">
+										<p>开始时间</p>
+									</div>
+									<input placeholder="请输入日期" style="height: 34px;float: left;font-size: 16px;width: 210px;" id="start" class="laydate-icon" readonly="" value="{{ start }}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+									<div class="btn_model" style="margin-left: 30px;">
+										<p>结束时间</p>
+									</div>
+									<input placeholder="请输入日期" style="height: 34px;float: left;font-size: 16px;width: 210px;" id="end" class="laydate-icon" readonly="" value="{{ end }}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+                                    <div class="btn_model" style="width: 110px;margin-left: 30px;">
+										<p>活动页面关闭时间</p>
+									</div>
+									<input placeholder="请输入日期" style="height: 34px;float: left;font-size: 16px;width: 210px;" id="day_start" class="laydate-icon" readonly="" value="{{ show_end }}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="close_time">
+								</div>
+							</div>
+{#							<div class="head_div" style="margin-top: 5px">#}
+{#								<span style="margin-top: 15px;">开放渠道：</span>#}
+{#								<div style="margin-left: 90px; height:auto;width:87%;">#}
+{#                                    {% for channel in channel_list %}#}
+{#                                        <div style="float: left;margin: 10px;width: 215px;height: 40px;">#}
+{#                                            <select name="channel" class="props_list_sty" style="float: left;width:auto;height: 40px;">#}
+{#                                                {% for key,value in chanel_info.items %}#}
+{#                                                     <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>#}
+{#                                                {% endfor %}#}
+{#                                            </select>#}
+{#                                            <a onclick="$(this).parent().remove();" class="remove" id="close_channel"></a>#}
+{#                                        </div>#}
+{#                                    {% endfor %}#}
+{#									<button class="" id="add_channel" type="button" style="margin-top: 10px;width: 110px; height: 40px; font-size: 18px;background: #ff6600;color: white;border-radius: 3px;border: none;">添加渠道</button>#}
+{#								</div>#}
+{#							</div>#}
+							<div class="head_div">
+								<span>活动标题：</span>
+								<input type="text" class="activity_input" name="activity_title" id="activity_title" value="{{ name }}" />
+							</div>
+							<div class="head_div" style="height: 100px;">
+								<span>活动描述：</span>
+								<textarea cols="50" rows="15" id="led" name="activity_desc" placeholder="请输入活动描述" style="width:280px;height:130px;font-size: 16px;font-weight: 400;">{{ desc }}</textarea>
+							</div>
+
+							<div class="head_div">
+                                <span>粽子价格：</span>
+                                <div class="btn_model" style="width: 100px;">
+                                    <p>大枣粽</p>
+                                </div>
+                                <input type="text" class="input_text" name="price" id="price_A" value="{{ price.A }}" />
+                                <p class="award_p">鸟蛋</p>
+                                <div class="btn_model"style="margin-left: 30px;width: 100px;">
+                                    <p>红豆粽</p>
+                                </div>
+                                <input type="text" class="input_text" name="price" id="price_B" value="{{ price.B }}" />
+                                <p class="award_p">鸟蛋</p>
+							</div>
+							<div class="head_div">
+                                <div class="btn_model"style="margin-left: 90px;width: 100px;">
+                                    <p>蛋黄粽</p>
+                                </div>
+                                <input type="text" class="input_text" name="price" id="price_C" value="{{ price.C }}" />
+                                <p class="award_p">鸟蛋</p>
+                                <div class="btn_model"style="margin-left: 30px;width: 100px;">
+                                    <p>鲜肉粽</p>
+                                </div>
+                                <input type="text" class="input_text" name="price" id="price_D" value="{{ price.D }}" />
+                                <p class="award_p">鸟蛋</p>
+							</div>
+
+                            <div class="head_div">
+                                <span style="margin-top: 10px;">奖励配置：</span>
+                                <div style="height: auto;width: 90%; display: inline-block;" id="main">
+                                    {% for index,info in Dragon_list.items %}
+                                        <div style="display: inline-block;float: left;width: 95%; margin-bottom: 20px;">
+                                            <div style="width: 160px;height: auto;display: inline-block;float: left">
+                                                <div class="btn_model"><p>兑换所需</p></div>
+                                                <div class="input_text"style="width:80px;line-height: 36px;" >大枣粽</div>
+                                                <div class="btn_model"><p>数量</p></div>
+                                                <input type="text" class="input_text" name="A" value="{{ info.need.A }}" placeholder="" style="width:80px;">
+                                            </div>
+                                             <div style="width: 160px;height: auto;display: inline-block;float: left">
+                                                <div class="btn_model"><p>兑换所需</p></div>
+                                                <div class="input_text"style="width:80px;line-height: 36px;" >红豆粽</div>
+                                                <div class="btn_model"><p>数量</p></div>
+                                                <input type="text" class="input_text" name="B" value="{{ info.need.B }}" placeholder="" style="width:80px;">
+                                            </div>
+                                            <div style="width: 160px;height: auto;display: inline-block;float: left">
+                                                <div class="btn_model"><p>兑换所需</p></div>
+                                                <div class="input_text"style="width:80px;line-height: 36px;" >蛋黄粽</div>
+                                                <div class="btn_model"><p>数量</p></div>
+                                                <input type="text" class="input_text" name="C" value="{{ info.need.C }}" placeholder="" style="width:80px;">
+                                            </div>
+                                            <div style="width: 160px;height: auto;display: inline-block;float: left">
+                                                <div class="btn_model"><p>兑换所需</p></div>
+                                                <div class="input_text"style="width:80px;line-height: 36px;" >鲜肉粽</div>
+                                                <div class="btn_model"><p>数量</p></div>
+                                                <input type="text" class="input_text" name="D" value="{{ info.need.D }}" placeholder="" style="width:80px;">
+                                            </div>
+                                            <p class="award_p"style="height: 76px;line-height: 76px;">=</p>
+                                            {% for rewd in info.reward %}
+                                                <div style="width: 160px;height: auto;display: inline-block;float: left;margin-left: 5px;">
+                                                    <div class="btn_model"><p>奖励</p></div>
+                                                    <select style="width: 82px;height: 38px;float: left;" name="good_name">
+                                                        {% for data in give_reward %}
+                                                             <option value="{{ data.vale }}" {% if rewd.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <div class="btn_model"><p>数量</p></div>
+                                                    <input type="text" class="input_text" name="good_number" value="{{ rewd.value }}" placeholder="" style="width:80px;">
+                                                </div>
+                                            {% endfor %}
+                                            <div style="width: 160px;height: auto;display: inline-block;float: left;margin-left: 30px;">
+                                                <div class="btn_model"><p>总兑换限制</p></div>
+                                                <select style="width: 82px;height: 38px;float: left;" name="limit">
+                                                    {% if info.limit != "" %}
+                                                        <option value="1" selected>有限制</option>
+                                                        <option value="2">无限制</option>
+                                                    {% else %}
+                                                        <option value="1">有限制</option>
+                                                        <option value="2" selected>无限制</option>
+                                                    {% endif %}
+                                                </select>
+                                                <div class="btn_model"><p>次数</p></div>
+                                                <input type="text" class="input_text" name="limit_count" value="{{ info.limit }}" placeholder="" style="width:80px;">
+                                            </div>
+                                            <a class="remove" id="close_button"></a>
+                                        </div>
+                                    {% endfor %}
+                                    <button class="add_reward_info" id="add_reward_data" type="button" style="margin:10px; width: 110px; height: 40px; font-size: 18px;">添加新商品</button>
+                                </div>
+                            </div>
+
+		                </form>
+                        <!--主要内容结束-->
+                    </td>
+		        </tr>
+            </table>
+		</div>
+
+		<script type="text/javascript">
+			var CowCnt = 1;
+            $('#add_channel').click(function(){
+                var chanel_list = {{ chanel_list|safe }};
+                var stc_html = '';
+                stc_html += '<div style="float: left;margin: 10px;width: 215px;height: 40px;">';
+                stc_html += '<select name="channel" class="props_list_sty" style="float: left;width:auto;height: 40px;">';
+                for(m in chanel_list) {
+                    chanel = '<option value="'+m+'">'+chanel_list[m]+'</option>';
+                    stc_html += chanel
+                }
+                stc_html += '</select>';
+                stc_html += '<a class="remove" id="close_channel'+CowCnt+'"></a>';
+                stc_html += '</div>';
+
+                $('#add_channel').before(stc_html);
+                //删除内容
+                $("#close_channel"+CowCnt).click(function (){
+                    $(this).parent().remove();
+                });
+                CowCnt++;
+            });
+
+            var str_html = $($('#main').children("div").get(0)).html();
+            $('#add_reward_data').click(function () {
+                var str = '<div style="width: 100%;display: inline-block;margin-bottom: 20px;">';
+                str += str_html;
+                str += "</div>";
+                $('#add_reward_data').before(str);
+            });
+
+            $('#main').on('click', '.remove', function() {
+                $(this).parent().remove();
+            });
+
+            $(function(){
+                var error_desc = false;
+                var error_title = false;
+                var error_show_end = false;
+                var error_order = false;
+                var error_start = false;
+                var error_end = false;
+                var error_A = false;
+                var error_B = false;
+                var error_C = false;
+                var error_D = false;
+                $('#alter_dragon_boat').click(function(){
+
+                    var ele = $('#dragon_switch').children(".move");
+                    if(ele.attr("data-state") == "on"){
+                        show = 1
+                    }else if(ele.attr("data-state") == "off"){
+                        show = 0
+                    }
+                    check_time();
+                    check_name();
+                    check_order();
+                    check_price();
+                    check_desc();
+                    if (error_start == true && error_end == true && error_show_end == true && error_order == true && error_desc == true && error_title == true && error_A == true && error_B == true && error_C == true && error_D == true){
+                        var data_info = $.param({"show":show}) + "&" + $("#form_dragon_boat").serialize();
+                        if(confirm("您确定修改端午活动?")){
+                            $.post('/activity_manage/dragon_boat_alter/', data_info, function(date) {
+                                if ( date.code) {
+                                    alert(date.info);
+                                }
+                                else {
+                                    alert(date.info);
+                                }
+                            });
+                        }else {
+                            alert("您取消了修改端午活动");
+                        }
+                        return true;
+                    }else {
+                        return false;
+                    }
+                });
+
+                function check_order(){
+                    var len_order = $('#activity_order').val().length;
+                    if(len_order==0)
+                    {
+                        alert("请输入活动显示顺序!");
+                        error_order = false;
+                    }
+                    else
+                    {
+                        error_order = true;
+                    }
+                }
+
+                function check_name(){
+                    var len_name = $('#activity_title').val().length;
+                    if(len_name==0)
+                    {
+                        alert("请输入活动标题!");
+                        error_title = false;
+                    }
+                    else
+                    {
+                        error_title = true;
+                    }
+                }
+
+                function check_price(){
+                    var len_A = $('#price_A').val().length;
+                    var len_B = $('#price_B').val().length;
+                    var len_C = $('#price_C').val().length;
+                    var len_D = $('#price_D').val().length;
+                    if(len_A==0 || len_B==0 ||len_C==0 ||len_D==0)
+                    {
+                        alert("请输入粽子价值!");
+                        error_A = false;
+                        error_B = false;
+                        error_C = false;
+                        error_D = false;
+                    }
+                    else
+                    {
+                        error_A = true;
+                        error_B = true;
+                        error_C = true;
+                        error_D = true;
+                    }
+                }
+
+                function check_desc(){
+                    var len_led = $('#led').val().length;
+                    if(len_led==0)
+                    {
+                        alert("请输入活动描述!");
+                        error_desc = false;
+                    }
+                    else
+                    {
+                        error_desc = true;
+                    }
+                }
+
+                function check_time(){
+                    var len_start = $('#start').val().length;
+                    var len_end = $('#end').val().length;
+                    var show_end = $('#day_start').val().length;
+                    if(len_start==0 || len_end==0 ||show_end==0)
+                    {
+                        alert("请输入日期");
+                        error_start = false;
+                        error_end = false;
+                        error_show_end = false;
+                    }
+                    else
+                    {
+                        error_start = true;
+                        error_end = true;
+                        error_show_end = true;
+                    }
+                }
+
+                if({{ tips|default:0 }}==1){
+                    $('#dragon_switch').attr("data-state", "on");
+                    $('#dragon_move').animate({left: '60px'}, 300, function(){
+                        $(this).attr("data-state", "on");
+                    });
+                    $('#dragon_switch').removeClass("off").addClass("on");
+                }
+            });
+
+			function dragon_switch(th) {
+				var ele = $(th).children(".move");
+				if(ele.attr("data-state") == "on") {
+					ele.animate({
+						left: "0"
+					}, 300, function() {
+						ele.attr("data-state", "off");
+					});
+					$(th).removeClass("on").addClass("off");
+				} else if(ele.attr("data-state") == "off") {
+					ele.animate({
+						left: '60px'
+					}, 300, function() {
+						$(this).attr("data-state", "on");
+					});
+					$(th).removeClass("off").addClass("on");
+				}
+			}
+
+			!function(){
+            laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+            laydate({elem: '#demo'});//绑定元素
+            }();
+            //日期范围限制
+            var start = {
+                elem: '#start',
+                format: 'YYYY-MM-DD hh:mm:ss',
+                //min: laydate.now(), //设定最小日期为当前日期
+                max: '2099-06-16', //最大日期
+                istime: true,
+                istoday: false,
+                choose: function(datas){
+                     end.min = datas; //开始日选好后，重置结束日的最小日期
+                     end.start = datas //将结束日的初始值设定为开始日
+                }
+            };
+            var end = {
+                elem: '#end',
+                format: 'YYYY-MM-DD hh:mm:ss',
+                // min: laydate.now(),
+                max: '2099-06-16',
+                istime: true,
+                istoday: false,
+                choose: function(datas){
+                    start.max = datas; //结束日选好后，充值开始日的最大日期
+                }
+            };
+
+            var day_start = {
+                elem: '#day_start',
+                format: 'YYYY-MM-DD hh:mm:ss',
+                // min: laydate.now(),
+                max: '2099-06-16',
+                istime: true,
+                istoday: false,
+                choose: function(datas){
+                    day_end.min = datas; //开始日选好后，重置结束日的最小日期
+                     day_end.day_start = datas //将结束日的初始值设定为开始日
+                }
+            };
+
+            var day_end = {
+                elem: '#day_end',
+                format: 'YYYY-MM-DD hh:mm:ss',
+                // min: laydate.now(),
+                max: '2099-06-16',
+                istime: true,
+                istoday: false,
+                choose: function(datas){
+                    day_start.max = datas; //结束日选好后，充值开始日的最大日期
+                }
+            };
+
+            var valid = {
+                elem: '#valid',
+                format: 'YYYY-MM-DD hh:mm:ss',
+                // min: laydate.now(),
+                max: '2099-06-16',
+                istime: true,
+                istoday: false,
+                choose: function(datas){
+                    start.max = datas; //结束日选好后，充值开始日的最大日期
+                }
+            };
+            laydate(start); //valid
+            laydate(end);
+            laydate(day_start);
+            laydate(day_end);
+            laydate(valid);
+            //自定义日期格式
+            laydate({
+                elem: '#test1',
+                format: 'YYYY年MM月DD日',
+                festival: true, //显示节日
+                choose: function(datas){ //选择日期完毕的回调
+                    alert('得到：'+datas);
+                }
+            });
+            //日期范围限定在昨天到明天
+            laydate({
+                elem: '#hello3',
+                min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+                max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+            });
+
+		</script>
+	</body>
+</html>

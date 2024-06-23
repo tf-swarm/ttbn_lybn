@@ -1,0 +1,855 @@
+{% load extratags %}
+<html>
+<head>
+<title>商城管理 &gt; 限时商城</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+<link type="text/css" rel="stylesheet" href="/static/css/easyui.css">
+<link type="text/css" rel="stylesheet" href="/static/css/style.css">
+<link type="text/css" rel="stylesheet" href="/static/css/common.css"/>
+<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css"/>
+<link type="type/css" rel='stylesheet' href="/static/css/input.css">
+
+<script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+<script type="text/javascript" src="/static/js/base.js"></script>
+<script type="text/javascript" src="/static/js/fixed_header.js"></script>
+<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+<script type="type/javascript" src="/static/js/input.js"></script>
+
+<script>
+    var add_id;
+    function add_uploading(){
+        var channel = $("#channel_data").val();
+        var file_info = $('#add_picture')[0].files[0];
+        var form_data = new FormData();
+        form_data.append('picture',file_info);
+        form_data.append('sid', 1);
+        form_data.append('channel', channel);
+        if(confirm("您确定上传图片?")){
+            $.ajax({
+                url:"/limit_time_shop/deal_shop_picture/",
+                type:'POST',
+                data: form_data,
+                processData: false,
+                contentType: false,
+                headers:{"X-CSRFToken":$.cookie('csrftoken')},
+                success: function(result) {
+                    alert(result.msg);
+                    add_id = result.add_id;
+                    $("#add_img").attr("src", result.img_file);
+                },
+                error: function(result) {
+                    alert(result.msg);
+                }
+
+            });
+        }else {
+            alert("您取消了上传图片");
+        }
+    }
+
+    function uploading(){
+        var channel = $("#channel_data").val();
+        var pic_id = $("#gid").val();
+        var file_info = $('#picture')[0].files[0];
+        var form_data = new FormData();
+        form_data.append('picture',file_info);
+        form_data.append('pic_id',pic_id);
+        form_data.append('sid', 2);
+        form_data.append('channel', channel);
+        {#var reader = new FileReader();#}
+        {#reader.readAsDataURL(file_info);#}
+        {#$(".deal_img"+result.add_id).attr("src", result.img_file);#}
+        if(confirm("您确定上传图片?")){
+            $.ajax({
+                url:"/limit_time_shop/deal_shop_picture/",
+                type:'POST',
+                data: form_data,
+                processData: false,
+                contentType: false,
+                headers:{"X-CSRFToken":$.cookie('csrftoken')},
+                success: function(result) {
+                    alert(result.msg);
+                    $(".deal_img"+result.add_id).attr("src", result.img_file);
+                },
+                error: function(result) {
+                    alert(result.msg);
+                }
+
+            });
+        }else {
+            alert("您取消了上传图片");
+        }
+    }
+
+    $(function(){
+        $("#alter_shop_switch").click(function(){
+            shop_switch = $("#shop_switch").val();
+            var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":4,"shop_switch":shop_switch});
+            $.post('/limit_time_shop/deal_limit_shop/', data_info, function(data) {
+                 if (data.status){
+                     alert(data.msg);
+                     $("#shop_switch").val(data.switch).attr("selected", true);
+                }
+                else {
+                    alert(data.msg);
+                }
+            });
+
+        });
+
+        $('#update_shop_info').click(function () {
+            var channel = $("#channel_data").val();
+            var data_info = $.param({"pid":1,"channel":channel}) + "&" + $("#form_shop").serialize();
+            if(confirm("您确定更新数据?")){
+                $.post('/limit_time_shop/deal_limit_shop/', data_info, function(data) {
+                    if ( data.status) {
+                        alert(data.msg);
+
+                        $("#vip"+data.good_id).html(data.vip_limit);
+                        $("#num"+data.good_id).html(data.limit_num);
+                        $.each(data.good_list, function(index, info){
+                            if(info.vale==data.type){
+                                $("#type"+data.good_id).html(info.content);
+                            }
+                        });
+                        $("#name"+data.good_id).html(data.name);
+                        $("#price"+data.good_id).html(data.price);{# 鸟卷 #}
+                        $('#goods_cost'+data.good_id).html(data.cost){# 元 #}
+                        if(data.on==0){
+                            $("#line"+data.good_id).removeClass("yx");
+                            $("#line"+data.good_id).addClass("jz");
+                            $("#line"+data.good_id).html("未上线");
+                        }else {
+                            $("#line"+data.good_id).removeClass("jz");
+                            $("#line"+data.good_id).addClass("yx");
+                            $("#line"+data.good_id).html("上线中");
+                        }
+                        $("#update"+data.good_id).html(data.alter_time);
+                        $('#dialogBg').fadeOut(300,function(){
+                            $('#dialog').addClass('bounceOutUp').fadeOut();
+                        });
+
+                    }else {
+                        alert(data.msg);
+                    }
+                });
+            }else {
+                alert("您取消了更新数据");
+            }
+        });
+
+        $('#paging').click(function () {
+            var channel = $("#channel_data").val();
+            var pag = $('.pagination-num').val() ;
+            var URL= "/limit_time_shop/query_shop/?page=" + pag +"&channel="+ channel;
+            location.href=URL;
+        });
+
+        $("#channel_data").change(function(){
+            var channel = $(this).val();
+            var URL= "/limit_time_shop/query_shop/?channel="+channel;
+            location.href=URL;
+
+        })
+
+        //关闭更新弹窗
+        $('.returns').click(function(){
+                $('#dialogBg').fadeOut(300,function(){
+                $('#dialog').addClass('bounceOutUp').fadeOut();
+            });
+        });
+        //关闭添加弹窗
+        $('#cancel').click(function(){
+                $('#Dialog_give').fadeOut(300,function(){
+                $('#popup_give').addClass('bounceOutUp').fadeOut();
+            });
+        });
+
+        {#添加数据#}
+        $('#add_shop_info').click(function (){
+            var add_gid = add_id;
+            var channel = $("#channel_data option:selected").val();
+            var data_info = $.param({"good_id":add_gid, "channel":channel}) + "&" + $("#add_form_shop").serialize();
+            if(confirm("您确定添加新的数据?")){
+                $.post('/limit_time_shop/add_shop_good/', data_info, function(result) {
+                    if ( result.status) {
+                        alert(result.msg);
+                        location.href= "/limit_time_shop/query_shop/?channel="+ channel;
+                        $('#Dialog_give').fadeOut(300,function(){
+                            $('#popup_give').addClass('bounceOutUp').fadeOut();
+                        });
+
+                    }else {
+                        alert(result.msg);
+                    }
+                });
+            }else {
+                alert("您取消了添加新的数据");
+            }
+        });
+
+    });
+
+    function limit_record() {
+        var URL= "/limit_time_shop/shop_all_record/?pid=" +"limit_shop_record";
+        location.href=URL;
+    }
+
+	function good_update(gid) {
+        var channel = $("#channel_data").val();
+        var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":2,"good_id":gid, "channel":channel});
+        $.post('/limit_time_shop/deal_limit_shop/', data_info, function(data) {
+            if (data.status) {
+                $("#headline").html(data.name);
+                $("#gid").val(data.gid);
+                $("#goods_type").val(data.type).attr("selected", true);
+                $(":radio[name='extra_type'][value='" + data.extra_type + "']").prop("checked", "checked");
+
+                $("#one_limit_num").val(data.one_limit);
+                $("#all_limit_num").val(data.all_limit);
+                $("#good_coupon").val(data.price);
+                var cost = $('#goods_cost'+ gid).html();
+                $("#good_cost").val(cost);
+                $("#vip_limit").val(data.limit_type).attr("selected", true);
+                $("#line").val(data.on).attr("selected", true);
+                $('#images').attr("src", data.image);
+                $('#images').attr('class','deal_img'+data.id);
+                $('#hot').val(data.hot).attr("selected", true);
+                $('#money_type').val(data.buy_type).attr("selected", true);
+
+                if (data.extra_type == 3 || data.extra_type == 5) {
+                    $("#props_select").show();
+                    $("#props_select").attr("name","good_name");
+                    $("#props_in").attr("name","");
+                    $("#props_in").hide();
+                    $("#props_select").val(data.reward.option).attr("selected", true);
+                    $("#add_count").val(data.reward.value);
+                }
+                else {
+                    $("#props_in").attr("name","good_name");
+                    $("#props_in").show();
+                    $("#props_select").hide();
+                    $("#props_select").attr("name","");
+                    $("#props_in").val(data.name);
+                    $("#add_count").val(data.reward.value);
+                }
+
+                {#var index = gprice.lastIndexOf("鸟券");#}
+                {#var price = gprice.substr(0,index);#}
+
+                className = $(this).attr('class');
+                $('#dialogBg').fadeIn(300);
+                $('#dialog').removeAttr('class').addClass('animated '+className+'').fadeIn();
+
+            }else {
+                alert(data.msg);
+            }
+        });
+    };
+
+    function shop_add_good() {
+        //列表 i 为索引，item为遍历值
+        className = $(this).attr('class');
+        $('#Dialog_give').fadeIn(300);
+        $('#popup_give').removeAttr('class').addClass('animated '+className+'').fadeIn();
+    }
+
+    function select_good_type(data){
+        var name =data.options[data.selectedIndex].value;
+        if (name == "0") {
+            $("#new_name").show();
+            $("#new_type_name").attr("name","new_type_name");
+        }
+        else {
+            $("#new_name").hide();
+            $("#new_type_name").attr("name","");
+        }
+    }
+
+    function select_type(index){
+        if (index == "3") {
+            $("#good_select").show();
+            $("#good_select").attr("name","good_name");
+            $("#good_in").attr("name","");
+            $("#good_in").hide();
+        }
+        else {
+            $("#good_in").attr("name","good_name");
+            $("#good_in").show();
+            $("#good_select").hide();
+            $("#good_select").attr("name","");
+
+        }
+    }
+
+    function alter_type(index){
+        console.log(index);
+        if (index == "3") {
+            $("#props_select").show();
+            $("#props_select").attr("name","good_name");
+            $("#props_in").attr("name","");
+            $("#props_in").hide();
+        }
+        else {
+            $("#props_in").attr("name","good_name");
+            $("#props_in").show();
+            $("#props_select").hide();
+            $("#props_select").attr("name","");
+
+        }
+    }
+
+
+</script>
+
+<style>
+.w_update a#bn_btn_more{float:none;}
+#userlist td span{color:#FFF;}
+.addeds{display: block;background: #1B9AF7;width: 100px;height: 30px;line-height: 30px;border-radius: 3px;float: right;text-align: center;}
+
+</style>
+</head>
+    <body style="min-width:1048px;">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+            <tbody>
+                <tr>
+                    <td width="13%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:20px;">商城管理 &gt; 限时商城</strong></td>
+                    <td width="77%" align="left" valign="middle" bgcolor="#F5F5F5" class="tab_btns">
+                        渠道ID：
+                        <select name="channel" class="dowp_list_sty" id="channel_data">
+                            {% for channel_id,content in chanel_info.items%}
+                                 <option value="{{ channel_id }}" {% if channel == channel_id %} selected {% endif %} >{{ content}}</option>
+                            {% endfor %}
+                        </select>
+{#                        商品类别：#}
+{#                        <select name="qd" class="dowp_list_sty">#}
+{#                            {% for info in filter_name %}#}
+{#                                 <option value="{{ info.vale }}" {% if shop_info.goods_type == info.vale %} selected {% endif %} >{{ info.content }}</option>#}
+{#                            {% endfor %}#}
+{#                        </select>#}
+                        <a href="javascript:;" class="addeds" onclick="limit_record()" style="color: white">操作记录</a>
+                    </td>
+                    <td width="10%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+
+                         <a href="javascript:shop_add_good();" id="bn_btn_one" style="background-color: #1B9AF7">+ 新增</a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" valign="top" bgcolor="#FFFFFF">
+                        <!--主要内容开始-->
+                        <form method="post" action="" id="sort_form">
+                            <div class='table-cont' id='table-cont' style="margin-bottom: 0px;box-shadow: 3px 1px 3px 0px white;">
+                                <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:-1px auto 30px auto;" id="check_alls">
+                                    <thead>
+                                        <tr>
+{#                                                <th align="center" valign="middle" bgcolor="#EEEEEE">选择</th>#}
+                                            <th align="center" valign="middle" bgcolor="#EEEEEE">商品ID</th>
+                                            <th align="center" valign="middle" bgcolor="#EEEEEE">商品名称</th>
+                                            <th align="center" valign="middle" bgcolor="#EEEEEE">商品类别</th>
+                                            <th align="center" valign="middle" bgcolor="#EEEEEE">价格</th>
+                                            <th align="center" valign="middle" bgcolor="#EEEEEE">成本</th>
+                                            <th align="center" valign="middle" bgcolor="#EEEEEE">vip限制</th>
+{#                                                <th align="center" valign="middle" bgcolor="#EEEEEE">商品图片</th>#}
+                                            <th align="center" valign="middle" bgcolor="#EEEEEE">出售状态</th>
+                                            <th align="center" valign="middle" bgcolor="#EEEEEE">更新时间</th>
+                                            <th align="center" valign="middle" bgcolor="#EEEEEE">操作</th>
+                                        </tr>
+                                    </thead>
+                                <tbody>
+                                    {% for info  in page %}
+                                        <tr id="hover_tr" bgcolor="#FFFFFF">
+{#                                                <td align="center" valign="middle" class="gid"></td>#}
+                                            <td align="center" valign="middle" class="goods_id">{{info.gid}}</td>
+                                            <td align="center" valign="middle" id="name{{info.gid}}" class="goods_name">{{info.name}}</td>
+                                            <td align="center" valign="middle" id="name{{info.gid}}" class="goods_name">{{info.type |shop_name }}</td>
+                                            <td align="center" valign="middle" class="goods_price">
+                                                <span id="price{{info.id}}">{{info.price}}{{info.money |shop_money}}</span>
+                                            </td>
+
+                                            <td align="center" valign="middle" class="goods_price">
+                                                <span id="goods_cost{{info.gid}}">{{info.cost}}</span>元
+                                            </td>
+                                            <td align="center" valign="middle" class="vip_limit" id="vip{{info.gid}}">VIP{{info.limit_type}}</td>
+{#                                                <td align="center" valign="middle" class="goods_image"><img src="/static/images/{{info.id}}.png" id="imgs" width="97" height="67" border="0"></td>#}
+                                            <td align="center" valign="middle">
+                                                {% if info.on == 0 %}
+                                                    <span class="yx_jz_pub jz" id="line{{info.gid}}">未上线</span>
+                                                {% else %}
+                                                    <span class="yx_jz_pub yx" id="line{{info.gid}}" >上线中</span>
+                                                {% endif %}
+                                            </td>
+                                            <td align="center" valign="middle" id="update{{info.gid}}" class="update_time">{{info.update_time }}</td>
+                                            <td align="center" valign="middle" class="w_update">
+                                                <a href="javascript:good_update('{{info.gid}}');" class="bn_btn_more" id="bn_btn_more">更新</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                </table>
+                            </div>
+                            <div class="page" style="margin: 0px 27px  0px 10px;">
+                                <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF"style="margin:-1px auto 40px auto;">
+                                    <tr>
+                                        <!--<td align="center" bgcolor="#F9F9F9">-->
+                                            <!--<input type="checkbox" id="quick" value="">-->
+                                        <!--</td>-->
+                                        <td colspan="11" bgcolor="#F9F9F9">
+                                            <!--<input type="button" id="check_all" value="全选">&nbsp;-->
+                                            <!--<input type="button" id="fx" value="反选">&nbsp;-->
+                                            <!--<input type="button" id="qbx" value="全不选">&nbsp;-->
+                                            {% if ntype == 1 %}
+                                                <select name="shop_switch" class="shopping" id="shop_switch">
+                                                    {% for info in switch_info %}
+                                                         <option value="{{ info.vale }}" {% if switch == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <input id="alter_shop_switch" class="button" type="button" style="width: 100px;" value="修改">&nbsp;<span style="color:#F00">【PS：商城关闭与开启！】</span>
+                                            {% endif %}
+                                            <!--<a href="javascript:;"class="addeds" id="good_sort" style="color:white;margin-left: 10px;float: none; display: inline-block">确定排序</a>-->
+                                            <table cellspacing="0" cellpadding="0" border="0" style="float: right;">
+                                                <tbody>
+                                                    <tr>
+                                                        <!--<td>-->
+                                                            <!--<select class="pagination-page-list">-->
+                                                                <!--<option>10</option>-->
+                                                                <!--<option>20</option>-->
+                                                                <!--<option>30</option>-->
+                                                                <!--<option>40</option>-->
+                                                                <!--<option>50</option>-->
+                                                            <!--</select>-->
+                                                        <!--</td>-->
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        {% if page.has_previous %}
+                                                            <td>
+                                                                <a href="{{url_date}}?page=1&channel={{channel}}" class="l-btn l-btn-small l-btn-plain">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="{{url_date}}?page={{ page.number|add:-1 }}&channel={{channel}}" class="l-btn l-btn-small l-btn-plain">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% else %}
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% endif %}
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        <td>
+                                                            <span style="padding-left:6px;">Page</span>
+                                                        </td>
+                                                        <td>
+                                                            <input class="pagination-num" value="{{number}}" size="2" type="text">
+                                                        </td>
+
+                                                        <td>
+                                                            <span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+                                                        </td>
+
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        {% if page.has_next %}
+                                                            <td>
+                                                                <a href="{{url_date}}?page={{ page.number|add:1 }}&channel={{channel}}" class="l-btn l-btn-small l-btn-plain">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="{{url_date}}?page={{ page.paginator.num_pages }}&channel={{channel}}" class="l-btn l-btn-small l-btn-plain">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% else %}
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% endif %}
+
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        {% if page.has_next or page.has_previous %}
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" group="" id="paging">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% else %}
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled" group="">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% endif %}
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </form>
+                        <!--主要内容结束-->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="dialogBg"></div>
+        <div id="dialog" class="animated" style="margin: auto;position: fixed; left: 30%; top: 10%;width: 830px;height:auto;">
+            <form  id="form_shop" action="" method="post">
+                {% csrf_token %}
+                <input type="text" style="display: none;" id="ntype" name="n_type" value="1" />
+                <h5 style="margin:10px;">
+                    <div style="height: auto;width: auto;text-align: center;">
+                        <label id="headline" style="color:black;font-size: 18px; font-weight: 600;"></label >
+                    </div>
+                </h5>
+                <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:30px auto 30px auto;" id="user_list">
+                    <tbody>
+                        <tr>
+                            <td align="right" bgcolor="#F9F9F9">
+                                <strong><label>商品ID：</label></strong>
+                            </td>
+                            <td bgcolor="#F9F9F9">
+                                <input type="text" name="gid" id="gid" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                            </td>
+                             <td rowspan="12" align="center" valign="middle" bgcolor="#F9F9F9" style="width: auto;">
+                                <input type="image" id="images" class="deal_img" src="/static/images/default.jpg" style="width: 257px;height: 225px;" disabled="disabled">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label for="hots">商品热度：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                               <select name="hot" id="hot" style="width: 96px;height: 25px;">
+                                   {% for new in hot_list%}
+                                         <option value="{{ new.vale }}" {% if hot == new.vale %} selected {% endif %} >{{ new.content}}</option>
+                                   {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label for="goods_type">分类名称：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                               <select name="goods_type" id="goods_type">
+                                   {% for g_name in shop_icon %}
+                                       <option value="{{ g_name.vale }}">{{ g_name.content}}</option>
+                                   {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+
+                         <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>选择类型：</label></strong></td>
+                            <td width="1149" id="select_type" bgcolor="#F9F9F9">
+                                {% for g_name in product_list %}
+                                    <lable>
+                                        <i class='input_style radio_bg'>
+                                            <input type="radio" name="extra_type" onchange="alter_type({{ g_name.vale }})" value="{{ g_name.vale }}">
+                                        </i>
+                                        {{ g_name.content}}
+                                    </lable>
+                                {% endfor %}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>商品名称/数量：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="30" maxlength="30" id="props_in" placeholder="0~30个字符" class="text-box_normal" style="float:left;width: 226px;" name="" type="text" value="">
+                                <select name="" class="props_list_sty" id="props_select" style="float: left;width:auto;height: 28px;margin-right: 2px;display: none;">
+                                    {% for data in game_props %}
+                                         <option value="{{ data.vale }}">{{ data.content }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input size="10" maxlength="9" placeholder="数量" id="add_count" class="text-box_normal" style="float:left;width: 72px;" name="count" type="text" value="">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9">
+                                <strong>
+                                    <label for="have_num">个人兑换数量限制：</label>
+                                </strong>
+                            </td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="10" maxlength="9" class="text-box_normal" placeholder="个人兑换限制" name="one_num" id="one_limit_num" type="text" value="" style="width: 120px;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9">
+                                <strong>
+                                    <label for="have_num">全服兑换数量限制：</label>
+                                </strong>
+                            </td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="10" maxlength="9" class="text-box_normal" placeholder="全服兑换限制" name="all_num" id="all_limit_num" type="text" value="" style="width: 120px;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9">
+                                <strong><label for="good_coupon">商品单价：</label></strong>
+                            </td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="10" maxlength="9" id="good_coupon" placeholder="商品单价" class="text-box_normal" style="float:left;width: 72px;" name="good_coupon" type="text" value="">
+                                <select name="money_type" id="money_type" style="width: 72px;height: 28px;">
+                                    {% for data in money_list %}
+                                       <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9">
+                                <strong><label for="good_cost">商品成本：</label></strong>
+                            </td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="10" maxlength="9" id="good_cost" placeholder="商品成本" class="text-box_normal" style="float:left;width: 72px;" name="good_cost" type="text" value="">
+                                <select id="RMB" style="width: 72px;height: 28px;">
+                                    <option value="" selected="selected">元</option>
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>VIP等级限制：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <select name="vip_limit" id="vip_limit" style="width: 72px;">
+                                    {% for g_vip in vip_list %}
+                                       <option value="{{ g_vip.vale }}">{{ g_vip.content}}</option>
+                                   {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="191" align="right" bgcolor="#F9F9F9"><strong><label for="good_img">商品图片：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input type="file" name="picture" id="picture" multiple="" style="width: 220px;margin-top: 0px;">
+                                <input type="button" onclick="uploading()" value="上传" style="height: 29px;margin-top: 0px;"> <span style="color:#F00"> &nbsp;&nbsp;[图片格式：.png】</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td align="right" bgcolor="#F9F9F9">
+                                <strong><label for="is_online">出售状态：</label></strong>
+                            </td>
+                            <td bgcolor="#F9F9F9" class="cursor">
+                                <select name="line" id="line" style="height: 28px;width: 72px;">
+                                    <option value="0">未上线</option>
+                                    <option value="1">上线中</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="btn_select" style="height: 60px; margin-top: 30px;border-top: 1px dotted #ccc;">
+                    <input  type="button" class="returns" style="float: right;margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;margin-top: 15px;" value="返回" >
+                    <input id="update_shop_info" type="button" style="margin-right: 10px;float: right;margin-top: 15px;" value="确定更新" class="confirm">
+                </div>
+            </form>
+        </div>
+
+        <div id="Dialog_give"></div>
+        <div id="popup_give" class="animated" style="margin: auto;position: fixed; left: 30%; top: 10%;width: 850px;height:auto;">
+            <form  id="add_form_shop" action="" method="post">
+                {% csrf_token %}
+                <h5 style="margin:10px;">
+                    <div style="height: auto;width: auto;text-align: center;">
+                        <label id="headline" style="color:black;font-size: 18px; font-weight: 600;"></label>
+                    </div>
+                </h5>
+                <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:30px auto 30px auto;" id="userlist">
+                    <tbody>
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label for="hots">商品热度：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                               <select name="hot" id="add_hot" style="width: 96px;height: 25px;">
+                                   {% for new in hot_list%}
+                                         <option value="{{ new.vale }}" {% if hot == new.vale %} selected {% endif %} >{{ new.content}}</option>
+                                   {% endfor %}
+                                </select>
+                            </td>
+                            <td rowspan="12" align="right"  bgcolor="#F9F9F9" style="width: auto;">
+                                 <input type="image" id="add_img" src="/static/images/default.jpg" style="width: 257px;height: 225px;" disabled="disabled">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label for="good_type">分类名称：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                               <select name="good_type" id="good_type" onchange="select_good_type(this)" style="height: 25px;">
+                                   {% for data in shop_icon %}
+                                       <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                   {% endfor %}
+                                   <option value="0">添加商品类型</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr id="new_name" style="display: none">
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>新类型名称：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="30" maxlength="9" id="new_type_name" placeholder="新类型名称" class="text-box_normal" style="float:left;width: 150px;" name="" type="text" value="">
+                                <span style="color:#F00"> &nbsp;&nbsp;[请确认新类型名称】</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>选择类型：</label></strong></td>
+                            <td width="1149" id="add_select_type" bgcolor="#F9F9F9">
+                                {% for data in product_list %}
+                                    <lable>
+                                        <i class='input_style radio_bg'>
+                                            <input type="radio" name="add_extra_type" onchange="select_type({{ data.vale }})" value="{{ data.vale }}">
+                                        </i>
+                                        {{ data.content }}
+                                    </lable>
+                                {% endfor %}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>个人兑换数量限制：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="30" maxlength="9" id="add_one_limit" placeholder="个人兑换数量限制" class="text-box_normal" style="float:left;width: 150px;" name="one_limit_num" type="text" value="">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>全服兑换数量限制：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="30" maxlength="9" id="add_limit_num" placeholder="全服兑换数量限制" class="text-box_normal" style="float:left;width: 150px;" name="all_limit_num" type="text" value="">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>商品名称/数量：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="30" maxlength="30" id="good_in" placeholder="0~30个字符" class="text-box_normal" style="float:left;width: 226px;" name="" type="text" value="">
+                                <select name="" class="props_list_sty" id="good_select" style="float: left;width:auto;height: 28px;margin-right: 2px;display: none;">
+                                    {% for data in game_props %}
+                                         <option value="{{ data.vale }}">{{ data.content }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input size="10" maxlength="9" placeholder="数量" id="add_count" class="text-box_normal" style="float:left;width: 72px;" name="count" type="text" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9">
+                                <strong><label for="good_price">商品单价：</label></strong>
+                            </td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="10" maxlength="9" id="price" placeholder="数量" class="text-box_normal" style="float:left;width: 72px;" name="price" type="text" value="">
+                                <select name="money_type" id="add_money_type" style="height: 27px;width: 72px;">
+                                    {% for data in money_list %}
+                                       <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9">
+                                <strong><label for="good_cost">商品成本：</label></strong>
+                            </td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input size="10" maxlength="9" id="add_good_cost" placeholder="商品成本" class="text-box_normal" style="float:left;width: 72px;" name="good_cost" type="text" value="">
+                                <select id="add_RMB" style="width: 72px;height: 28px;">
+                                    <option value="" selected="selected">元</option>
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>VIP等级限制：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <select name="vip_limit" id="add_vip_limit" style="height: 25px;width: 72px;">
+                                    {% for data in vip_list %}
+                                         <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="191" align="right" bgcolor="#F9F9F9"><strong><label for="good_img">商品图片：</label></strong></td>
+                            <td width="1149" bgcolor="#F9F9F9">
+                                <input type="file" name="add_picture" id="add_picture" multiple="" style="width: 220px;margin-top: 0px;">
+                                <input type="button" onclick="add_uploading()" value="上传" style="height: 29px;margin-top: 0px;"> <span style="color:#F00"> &nbsp;&nbsp;[图片格式：.png】</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" bgcolor="#F9F9F9">
+                                <strong><label for="is_online">出售状态：</label></strong>
+                            </td>
+                            <td bgcolor="#F9F9F9" class="cursor">
+                                <select name="line" id="add_line" style="height: 28px;width: 72px;">
+                                    <option value="0">未上线</option>
+                                    <option value="1">上线中</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="btn_select" style="height: 60px; margin-top: 30px;border-top: 1px dotted #ccc;">
+                    <input  type="button" class="returns" id="cancel" style="float: right;margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;margin-top: 15px;" value="取消" >
+                    <input id="add_shop_info" type="button" style="margin-right: 10px;float: right;margin-top: 15px;" value="确定添加" class="confirm">
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

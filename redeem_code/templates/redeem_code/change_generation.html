@@ -1,0 +1,611 @@
+{% extends 'base.html' %}
+
+{% load extratags %}
+
+{% block head %}
+    <script src="/static/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/popup.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/default.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/icon.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/icons.css">
+    <script type="text/javascript" src="/static/js/semantic.min.js"></script>
+
+    <script>
+        $(function(){
+            $('#paging').click(function () {
+                var pag = $('.pagination-num').val() ;
+                var URL= "/exchange_code/count_code/?page=" + pag;
+                location.href=URL;
+            });
+        });
+
+        function add_cart(ver_info,page) {
+            if(confirm("您确定让这条记录失效吗？")){
+                $.post('/exchange_code/alter_cdkey/', {csrfmiddlewaretoken: '{{ csrf_token }}',"version":ver_info}, function(msg) {
+                    if ( msg.code==200 ) {
+                        var pag = $('.pagination-num').val() ;
+                        var URL= "/exchange_code/count_code/?page=" + pag;
+                        location.href=URL;
+                    }
+                });
+            }else {
+                alert("已经取消了失效操作");
+            }
+        }
+
+        function Load_data(){
+		    $.Load_data();
+            $("#form_search").submit();
+		}
+    </script>
+
+    <style>
+        .ui.primary.button.btn.btn-primary.btn-lg{
+            width: 100px;
+            height: 30px;
+            border-radius: 3px;
+            background-color: #009c95;
+            line-height: 12px;
+            font-size: 12px;
+        }
+        .teal.ui.button{
+            width: 100px;
+            height: 30px;
+            border-radius: 3px;
+            background-color: #009c95;
+            line-height: 12px;
+            font-size: 12px;
+        }
+        .ui.primary.button{
+            width: 100px;
+            height: 32px;
+            border-radius: 3px;
+            background-color: #1B9AF7;
+            line-height: 10px;
+            font-size: 15px;
+        }
+        .ui.button{
+            width: 100px;
+            height: 32px;
+            border-radius: 3px;
+            line-height: 10px;
+            font-size: 15px;
+        }
+    </style>
+
+{% endblock head %}
+
+{% block filter %}
+	 <form action="/exchange_code/query_count/" method="post" id="form_search">
+        {% csrf_token %}
+        <tr>
+            <td width="20%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">兑换码管理 &gt; 兑换码总览</strong></td>
+
+            <td width="65%" align="left" valign="middle" bgcolor="#F5F5F5">
+                渠道:
+                <select name="channel" class="dowp_list_sty" style="margin-right: 20px;">
+                    {% for key,value in chanel_info.items %}
+                         <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>
+                    {% endfor %}
+                </select>
+
+                <lable for="introduce" style="padding-left: 10px; font-size:12px;">时间:</lable>
+                    <input placeholder="请输入日期" id="start" class="laydate-icon" readonly="" value="{{start}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+                <lable for="introduce" style="padding-left: 10px; font-size:12px;">至:</lable>
+                    <input placeholder="请输入日期" id="end" class="laydate-icon" readonly="" value="{{end}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+                 <lable for="introduce" style="padding-left: 10px; font-size:12px;">礼包名称:</lable>
+                    <input placeholder="" class="gift_bag" name="gift_name" value="{{gift_name}}">
+                <input type="button" value="确认查询" id="query_date" class="button" style="margin-right: 20px;margin-left: 20px;" onclick="Load_data()">
+            </td>
+            <td width="5%" align="left" valign="middle" bgcolor="#F5F5F5">
+                <a href="javascript:;" class="ui primary button btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" id="add-btn">生成兑换码</a>
+            </td>
+            <td width="10%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                <a href="/exchange_code/record/" id="bn_btn_one">操作记录</a>
+            </td>
+        </tr>
+    </form>
+{% endblock filter %}
+
+{% block body %}
+    <tr>
+        <th width="90" align="center" bgcolor="#EEEEEE" style="height: 37px;">序号</th>
+        <th width="90" align="center" bgcolor="#EEEEEE">分类名称</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">类型</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">标识ID</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">渠道ID</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">生成总数</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">已使用</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">未使用</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">奖励类容</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">生成日期</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">有效期至</th>
+        <th width="110" align="center" bgcolor="#EEEEEE">投放额度</th>
+        <!--<th width="109" align="center" bgcolor="#EEEEEE">编辑数据</th>-->
+        <th width="109" align="center" bgcolor="#EEEEEE">导出</th>
+    </tr>
+    {% if show == 0 %}
+        {% for info  in page %}
+            <tr id="hover_tr" bgcolor="#FFFFFF">
+                <td align="center" valign="middle" style="height: 50px;">{{info.orid}}</td>
+                <td align="center" valign="middle" style="height: 50px;">{{info.describe}}</td>
+                <td align="center" valign="middle" style="height: 50px;">{{info.pool | pool_name }}</td>
+                <td align="center" id="version" valign="middle" style="height: 50px;">{{info.version}}</td>
+                <td align="center" valign="middle" style="height: 50px;">{{info.channel}}</td>
+                <td align="center" valign="middle" style="height: 50px;">{{info.count}}</td>
+                <td align="center" valign="middle" style="height: 50px;"><font color="#33CC33">{{info.used}}</font></td>
+                <td align="center" valign="middle" style="height: 50px;"><font color="#fd0202">{{info.unused}}</font></td>
+                <td align="center" valign="middle" style="height: 50px;">{{info.reward | convert_reward}}</td>
+                <td align="center" valign="middle" style="height: 50px;">{{info.creat_time}}</td>
+                <td align="center" valign="middle" style="height: 50px;">{{info.end_time}}</td>
+                <td align="center" valign="middle" style="height: 50px;"><font color="#33CC33">{{info.amount}}元</font></td>
+                <td align="center" valign="middle" class="w_update" style="width: 215px;">
+                    {% if info.end_time <= info.creat_time %}
+                        <a href="javascript:;" class="expiry_date" id="bn_btn_more" style="background-color: #8b8a8a">失效</a>
+                    {% else %}
+                        <a href="javascript:add_cart('{{info.version}}',{{number}});" class="expiry_date" id="bn_btn_more">失效</a>
+                    {% endif %}
+                    <a href="/exchange_code/excel/?version={{info.version}}" class="bn_btn_more" id="bn_btn_more_xls">导出xls</a>
+                </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+{% endblock body %}
+
+
+{% block endpage %}
+    <div class="datagrid-footer" style="width: 1810px;">
+    <div class="datagrid-footer-inner" style="display: none;"></div>
+    </div>
+
+    <table id="tb" style="display: none;" class="datagrid-f">
+
+    </table>
+     <style type="text/css" easyui="true">
+    .datagrid-cell-c1-name{width:9px}
+
+    .datagrid-cell-c1-typeN{width:9px}
+    .datagrid-cell-c1-used{width:9px}
+    .datagrid-cell-c1-total{width:9px}
+    .datagrid-cell-c1-add_time{width:9px}
+    .datagrid-cell-c1-end_time{width:9px}
+    .datagrid-cell-c1-prize{width:39px}
+    .datagrid-cell-c1-op{width:9px}
+    </style>
+
+    <!-- 扩展信息区 -->
+
+    <!-- 生成兑换码框（Modal） -->
+    <div class="modal fade" id="myModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 700px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                    </button>
+                    <div class="header" style="text-align: center;"><p style="display:inline-block; font-size: 1.42857143rem; margin: auto; margin-left: 16px;">兑换码生成 </p></div>
+                </div>
+                <form id="create-form">
+                    <div style="width:100%; height:133.8px;  border-bottom: 1px #e9e9e9  solid;">
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px; margin-top:20px;float:left; text-align:center; line-height:270%;">分类名称</div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left;text-align:center; line-height:270%;">类型</div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left;text-align:center; line-height:270%;">生成总数</div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left;text-align:center; line-height:270%;">渠道ID</div>
+                        <!--<div style="width:16%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left;text-align:center; line-height:300%;">vip经验</div>-->
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left">
+                            <input type="text" name="classify_name" style="width:100%; line-height: 190%;">
+                        </div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left">
+                            <select name="cdkey_type" class="ui dropdown" style="width:100%; height: 32px;">
+                                <option value="0">免费码</option>
+                                <option value="10">10元兑换码</option>
+                                <option value="20">20元兑换码</option>
+                                <option value="30">30元兑换码</option>
+                                <option value="40">40元兑换码</option>
+                                <option value="50">50元兑换码</option>
+                                <option value="100">100元兑换码</option>
+                                <option value="200">200元兑换码</option>
+                                <option value="500">500元兑换码</option>
+                                <option value="1000">1000元兑换码</option>
+                            </select>
+                        </div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left">
+                            <input type="text" name="count" style="width:100%; line-height: 190%;">
+                        </div>
+                       <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left">
+                           <input type="text" name="channel" style="width:100%; line-height: 190%;">
+                       </div>
+
+                        <!--<div style="width:16%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left">-->
+                            <!--<select name="vip_experience" class="ui dropdown" style="width:100%; height: 32px;">-->
+                                <!--<option value="1">加成</option>-->
+                                <!--<option value="0">不加成</option>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                    </div>
+                    <div class="column" style="margin: auto;">
+                        <h2 class="header" style="text-align: center; font-size: 1.42857143rem; margin-top: 20px;">奖励内容</h2>
+                    </div>
+                    <div style="width: 100%; display:block;overflow-y:auto; height:240px; overflow:scroll;overflow-x:hidden">
+                     <div class="column row" style="width: 100% !important;height: 55px; margin-left: 10px; margin-top: 20px;">
+                        <div class="four wide column" style="width: 30%; float: left;">
+                            <div class="ui labeled input">
+                                <a class="ui label">奖品类型</a>
+                                <select name="rewards_conf" class="ui dropdown">
+                                    <option value="chip">鸟蛋</option>
+                                    <option value="diamond">钻石</option>
+                                    <option value="coupon">鸟卷</option>
+                                    <option value="target">靶卷</option>
+                                    <option value="202">全屏冰冻</option>
+                                    <option value="203">狂暴无双</option>
+                                    <option value="204">超级武器</option>
+                                    <option value="205">赏金传送</option>
+                                    <option value="211">青铜宝箱</option>
+                                    <option value="212">白银宝箱</option>
+                                    <option value="213">黄金宝箱</option>
+                                    <option value="214">至尊宝箱</option>
+                                    <option value="215">绿灵石</option>
+                                    <option value="216">蓝魔石</option>
+                                    <option value="217">紫晶石</option>
+                                    <option value="218">血精石</option>
+                                    <option value="219">强化精华</option>
+                                    <option value="20001001">流沙之鳞1天</option>
+                                    <option value="20002001">冰翼猎手1天</option>
+                                    <option value="20003001">翡翠荆棘1天</option>
+                                    <option value="20004001">狂怒炎龙1天</option>
+                                    <option value="20005001">死亡之翼1天</option>
+                                    <option value="20006001">雷鸣宙斯1天</option>
+                                    <option value="20007001">暗夜魅影1天</option>
+                                    <option value="20008001">九五至尊1天</option>
+                                    <option value="20010001">恭贺新春1天</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="column" style="margin-left:18px; width: 40%;float: left;">
+                            <div class="ui labeled input" style="height: 38px;">
+                                <a class="ui label">奖品数量</a>
+                                <input name="input_date" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="column" id="add-prize-column" style="margin-left: 10px;">
+                        <button class="teal ui button" id="add-prize" type="button">添加新奖品</button>
+                         <p style="display: inline-block; margin: 0; margin-left: 9.8em; line-height: 2.5em;">有效期至：</p>
+                        <input style="font-size: 1em; margin-right: 1.4em;margin-top: 0.3em;" placeholder="请输入日期" id="valid" class="laydate-icon" readonly value="{{day_time}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+                    </div>
+                     </div>
+
+                    <div class="modal-footer">
+                         <div class="actions">
+                            <div class="ui primary button" id="modal-ok">确定</div>
+                            <div class="ui button" id="modal-cancle" data-dismiss="modal">取消</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 兑换码编辑（Modal） -->
+    <div class="modal fade" id="TFModal" tabindex="-1" role="dialog" aria-labelledby="TFModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 700px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                    </button>
+                    <div class="header" style="text-align: center;"><p style="display:inline-block; font-size: 1.42857143rem; margin: auto; margin-left: 16px;">兑换码生成 </p></div>
+                </div>
+                <form id="compile-form">
+                    <div style="width:100%; height:133.8px;  border-bottom: 1px #e9e9e9  solid;">
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px; margin-top:20px;float:left; text-align:center; line-height:300%;">分类名称</div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left;text-align:center; line-height:300%;">类型</div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left;text-align:center; line-height:300%;">生成总数</div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left;text-align:center; line-height:300%;">渠道ID</div>
+                        <!--<div style="width:16%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left;text-align:center; line-height:300%;">vip经验</div>-->
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left">
+                            <input type="text" name="classify_name" style="width:100%; line-height: 190%;">
+                        </div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left">
+                            <select name="cdkey_type" class="ui dropdown" style="width:100%; height: 32px;">
+                                <option value="0">免费码</option>
+                                <option value="10">10元兑换码</option>
+                                <option value="50">50兑换码</option>
+                                <option value="100">100兑换码</option>
+                                <option value="200">200兑换码</option>
+                            </select>
+                        </div>
+                        <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left">
+                            <input type="text" name="count" style="width:100%; line-height: 190%;">
+                        </div>
+                       <div style="width:21%;height:24%; background:#e9e9e9; margin:12px;margin-top:20px;float:left">
+                           <input type="text" name="channel" style="width:100%; line-height: 190%;">
+                       </div>
+
+                    </div>
+                    <div class="column" style="margin: auto;">
+                        <h2 class="header" style="text-align: center; font-size: 1.42857143rem; margin-top: 20px;">奖励内容</h2>
+                    </div>
+                    <div style="width: 100%; display:block;">
+                        <div id="xiaoshi-1">
+                     <div class="column row" style="width: 100% !important;height: 55px; margin-left: 10px; margin-top: 20px;">
+                        <div class="four wide column" style="width: 30%; float: left;">
+                            <div class="ui labeled input">
+                                <a class="ui label">奖品类型</a>
+                                <select name="rewards_conf" class="ui dropdown">
+                                    <option value="chip">鸟蛋</option>
+                                    <option value="diamond">钻石</option>
+                                    <option value="coupon">鸟卷</option>
+                                    <option value="target">靶卷</option>
+                                    <option value="202">全屏冰冻</option>
+                                    <option value="203">狂暴无双</option>
+                                    <option value="204">超级武器</option>
+                                    <option value="205">赏金传送</option>
+                                    <option value="211">青铜宝箱</option>
+                                    <option value="212">白银宝箱</option>
+                                    <option value="213">黄金宝箱</option>
+                                    <option value="214">至尊宝箱</option>
+                                    <option value="215">绿灵石</option>
+                                    <option value="216">蓝魔石</option>
+                                    <option value="217">紫晶石</option>
+                                    <option value="218">血精石</option>
+                                    <option value="219">强化精华</option>
+                                    <option value="20001001">流沙之鳞1天</option>
+                                    <option value="20002001">冰翼猎手1天</option>
+                                    <option value="20003001">翡翠荆棘1天</option>
+                                    <option value="20004001">狂怒炎龙1天</option>
+                                    <option value="20005001">死亡之翼1天</option>
+                                    <option value="20006001">雷鸣宙斯1天</option>
+                                    <option value="20007001">暗夜魅影1天</option>
+                                    <option value="20008001">九五至尊1天</option>
+                                    <option value="20010001">恭贺新春1天</option>
+                                </select>
+                            </div>
+                        </div>
+                            <div style="width: 40px; height: 40px;float: left;"><button type="button" style="font-size: 30px; color: red; background: white; border: 0px solid white; height: 37.8px; line-height: 37.8px;" onclick="yin()">×</button></div>
+
+                        <div class="column" style="margin-left:20px; width: 40%;float: left;">
+                            <div class="ui labeled input" style="height: 38px;">
+                                <a class="ui label">奖品数量</a>
+                                <input name="input_date" type="text">
+                            </div>
+                        </div>
+                    </div>
+                        </div>
+
+                        <div id="xiaoshi-2">
+                        <div class="column row" style="width: 100% !important;height: 55px; margin-left: 10px; margin-top: 20px;">
+                        <div class="four wide column" style="width: 30%; float: left;">
+                            <div class="ui labeled input">
+                                <a class="ui label">奖品类型</a>
+                                <select name="rewards_conf" class="ui dropdown">
+                                    <option value="chip">鸟蛋</option>
+                                    <option value="diamond">钻石</option>
+                                    <option value="coupon">鸟卷</option>
+                                    <option value="target">靶卷</option>
+                                    <option value="202">全屏冰冻</option>
+                                    <option value="203">狂暴无双</option>
+                                    <option value="204">超级武器</option>
+                                    <option value="205">赏金传送</option>
+                                    <option value="211">青铜宝箱</option>
+                                    <option value="212">白银宝箱</option>
+                                    <option value="213">黄金宝箱</option>
+                                    <option value="214">至尊宝箱</option>
+                                    <option value="215">绿灵石</option>
+                                    <option value="216">蓝魔石</option>
+                                    <option value="217">紫晶石</option>
+                                    <option value="218">血精石</option>
+                                    <option value="219">强化精华</option>
+                                    <option value="20001001">流沙之鳞1天</option>
+                                    <option value="20002001">冰翼猎手1天</option>
+                                    <option value="20003001">翡翠荆棘1天</option>
+                                    <option value="20004001">狂怒炎龙1天</option>
+                                    <option value="20005001">死亡之翼1天</option>
+                                    <option value="20006001">雷鸣宙斯1天</option>
+                                    <option value="20007001">暗夜魅影1天</option>
+                                    <option value="20008001">九五至尊1天</option>
+                                    <option value="20010001">恭贺新春1天</option>
+                                </select>
+                            </div>
+                        </div>
+                            <div style="width: 40px; height: 40px;float: left;"><button type="button" style="font-size: 30px; color: red; background: white; border: 0px solid white; height: 37.8px; line-height: 37.8px;" onclick="cang()">×</button></div>
+
+                        <div class="column" style="margin-left:20px; width: 40%;float: left;">
+                            <div class="ui labeled input" style="height: 38px;">
+                                <a class="ui label">奖品数量</a>
+                                <input name="input_date" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                            </div>
+
+                        <div id="xiaoshi-3">
+                            <div class="column row" style="width: 100% !important;height: 55px; margin-left: 10px; margin-top: 20px;">
+                        <div class="four wide column" style="width: 30%; float: left;">
+                            <div class="ui labeled input">
+                                <a class="ui label">奖品类型</a>
+                                <select name="rewards_conf" class="ui dropdown">
+                                    <option value="chip">鸟蛋</option>
+                                    <option value="diamond">钻石</option>
+                                    <option value="coupon">鸟卷</option>
+                                    <option value="target">靶卷</option>
+                                    <option value="202">全屏冰冻</option>
+                                    <option value="203">狂暴无双</option>
+                                    <option value="204">超级武器</option>
+                                    <option value="205">赏金传送</option>
+                                    <option value="211">青铜宝箱</option>
+                                    <option value="212">白银宝箱</option>
+                                    <option value="213">黄金宝箱</option>
+                                    <option value="214">至尊宝箱</option>
+                                    <option value="215">绿灵石</option>
+                                    <option value="216">蓝魔石</option>
+                                    <option value="217">紫晶石</option>
+                                    <option value="218">血精石</option>
+                                    <option value="219">强化精华</option>
+                                    <option value="20001001">流沙之鳞1天</option>
+                                    <option value="20002001">冰翼猎手1天</option>
+                                    <option value="20003001">翡翠荆棘1天</option>
+                                    <option value="20004001">狂怒炎龙1天</option>
+                                    <option value="20005001">死亡之翼1天</option>
+                                    <option value="20006001">雷鸣宙斯1天</option>
+                                    <option value="20007001">暗夜魅影1天</option>
+                                    <option value="20008001">九五至尊1天</option>
+                                    <option value="20010001">恭贺新春1天</option>
+                                </select>
+                            </div>
+                        </div>
+                            <div style="width: 40px; height: 40px;float: left;"><button type="button" style="font-size: 30px; color: red; background: white; border: 0px solid white; height: 37.8px; line-height: 37.8px;" onclick="ke()">×</button></div>
+
+                        <div class="column" style="margin-left:20px; width: 40%;float: left;">
+                            <div class="ui labeled input" style="height: 38px;">
+                                <a class="ui label">奖品数量</a>
+                                <input name="input_date" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                        </div>
+
+
+                        <div id="xiaoshi-4">
+
+                            <div class="column row" style="width: 100% !important;height: 55px; margin-left: 10px; margin-top: 20px;">
+                        <div class="four wide column" style="width: 30%; float: left;">
+                            <div class="ui labeled input">
+                                <a class="ui label">奖品类型</a>
+                                <select name="rewards_conf" class="ui dropdown">
+                                    <option value="chip">鸟蛋</option>
+                                    <option value="diamond">钻石</option>
+                                    <option value="coupon">鸟卷</option>
+                                    <option value="target">靶卷</option>
+                                    <option value="202">全屏冰冻</option>
+                                    <option value="203">狂暴无双</option>
+                                    <option value="204">超级武器</option>
+                                    <option value="205">赏金传送</option>
+                                    <option value="211">青铜宝箱</option>
+                                    <option value="212">白银宝箱</option>
+                                    <option value="213">黄金宝箱</option>
+                                    <option value="214">至尊宝箱</option>
+                                    <option value="215">绿灵石</option>
+                                    <option value="216">蓝魔石</option>
+                                    <option value="217">紫晶石</option>
+                                    <option value="218">血精石</option>
+                                    <option value="219">强化精华</option>
+                                    <option value="20001001">流沙之鳞1天</option>
+                                    <option value="20002001">冰翼猎手1天</option>
+                                    <option value="20003001">翡翠荆棘1天</option>
+                                    <option value="20004001">狂怒炎龙1天</option>
+                                    <option value="20005001">死亡之翼1天</option>
+                                    <option value="20006001">雷鸣宙斯1天</option>
+                                    <option value="20007001">暗夜魅影1天</option>
+                                    <option value="20008001">九五至尊1天</option>
+                                    <option value="20010001">恭贺新春1天</option>
+                                </select>
+                            </div>
+                        </div>
+                            <div style="width: 40px; height: 40px;float: left;"><button type="button" style="font-size: 30px; color: red; background: white; border: 0px solid white; height: 37.8px; line-height: 37.8px;" onclick="le()">×</button></div>
+
+                        <div class="column" style="margin-left:20px; width: 40%;float: left;">
+                            <div class="ui labeled input" style="height: 38px;">
+                                <a class="ui label">奖品数量</a>
+                                <input name="input_date" type="text">
+                            </div>
+                        </div>
+                    </div>
+                            </div>
+                     <div class="column" id="add-prize-compile" style="margin-left: 10px;">
+
+                         <p style="display: inline-block; margin: 0; margin-left: 16.8em; line-height: 2.5em;">有效期至：</p>
+                        <input style="font-size: 1em; margin-right: 1.4em;margin-top: 0.3em;" placeholder="请输入日期" id="compile" class="laydate-icon" readonly value="{{day_time}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+                    </div>
+                     </div>
+
+                    <div class="modal-footer">
+                         <div class="actions">
+                            <div class="ui primary button" id="modal-compile">确定</div>
+                            <div class="ui button" id="compile-cancle" data-dismiss="modal">取消</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+
+    $('#modal-ok').click(function() {
+        var params = $.param({csrfmiddlewaretoken: '{{ csrf_token }}'}) + "&" + $('#create-form').serialize();
+        $.post('/exchange_code/create_cdkey/', params, function(msg) {
+            if ( msg.code!=200 ) {
+                msgShow('系统提示', msg.err, 'warning');
+                return false;
+            }
+            msgShow('系统提示', msg.err, 'warning');
+            // $('#myModal').modal('hide');//隐藏modal
+        });
+    });
+
+    //style="width: 100% !important;height: 55px;margin-left: 10px;margin-top: 20px;"
+    var prizeRowCnt = 1;
+    $('#add-prize').click(function() {
+    var html = [
+            '<div class="column row" style="margin-bottom: 20px;">',
+            '<div class="four wide column" style="float:left;margin-left: 10px; margin-right: 52px;">',
+            '<div class="ui labeled input">',
+            '<a class="ui label">奖品类型</a>',
+            '<select name="rewards_conf" class="ui dropdown">',
+                '<option value="chip">鸟蛋</option>',
+                '<option value="diamond">钻石</option>',
+                '<option value="coupon">鸟卷</option>',
+                '<option value="target">靶卷</option>',
+                '<option value="202">全屏冰冻</option>',
+                '<option value="203">狂暴无双</option>',
+                '<option value="204">超级武器</option>',
+                '<option value="205">赏金传送</option>',
+                '<option value="211">青铜宝箱</option>',
+                '<option value="212">白银宝箱</option>',
+                '<option value="213">黄金宝箱</option>',
+                '<option value="214">至尊宝箱</option>',
+                '<option value="215">绿灵石</option>',
+                '<option value="216">蓝魔石</option>',
+                '<option value="217">紫晶石</option>',
+                '<option value="218">血精石</option>',
+                '<option value="219">强化精华</option>',
+                '<option value="20001001">流沙之鳞1天</option>',
+                '<option value="20002001">冰翼猎手1天</option>',
+                '<option value="20003001">翡翠荆棘1天</option>',
+                '<option value="20004001">狂怒炎龙1天</option>',
+                '<option value="20005001">死亡之翼1天</option>',
+                '<option value="20006001">雷鸣宙斯1天</option>',
+                '<option value="20007001">暗夜魅影1天</option>',
+                '<option value="20008001">九五至尊1天</option>',
+                '<option value="20010001">恭贺新春1天</option>',
+            '</select>',
+                    '</div>',
+                '</div>',
+                '<div class="column" style="margin-left:20px;">',
+                    '<div class="ui labeled input" style="height: 38px;">' +
+                    '<a class="ui label">奖品数量</a>' +
+                    '<input type="text" name="input_date">' +
+                    '</div>',
+                '</div>',
+            '</div>'
+        ].join('');
+
+    prizeRowCnt++;
+        $('#add-prize-column').before(html);
+    })
+    // 弹窗 End
+
+    $( function () {
+        $( '#search-btn' ).click( function (e) {
+            e.preventDefault();
+            $( '#tb-search' ).datagrid( 'loadData', [] );
+            $( '#tb-search' ).datagrid( 'reload' );
+        } );
+    } );
+
+    </script>
+{% endblock endpage %}

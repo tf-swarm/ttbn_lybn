@@ -1,0 +1,143 @@
+{% load extratags %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link type="text/css" rel="stylesheet" href="/static/css/red_popup.css" />
+    <link type="text/css" rel="stylesheet" href="/static/css/load.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/red_packet.css">
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/load-min.js"></script>
+    <script type="text/javascript" src="/static/js/vip_login_give.js"></script>
+    <script type="text/javascript" src="/static/js/fixed_header.js"></script>
+    <script type="text/javascript" src="/static/js/recharge_add_gift.js"></script>
+
+    <style type="text/css">
+          #popout{width:100%;height:100%;background-color:#000000;opacity:.8;filter:alpha(opacity=60);position:fixed;top:0;left:0;z-index:9999;display:none;}
+          #capacity{ width: 300px; height: 300px; margin: 0 auto; display: none; background-color: #ffffff; position: fixed; left: 38%; margin: -120px 0 0 -150px; z-index: 10000; border: 1px solid #ccc; border-radius: 10px; -webkit-border-radius: 10px; box-shadow: 3px 2px 4px rgba(0,0,0,0.2); -webkit-box-shadow: 3px 2px 4px rgba(0,0,0,0.2); }
+          .alter_data{ width: 112px;
+                height: 35px;
+                background: #1B9AF7;
+                border-radius: 3px;
+                float: right;
+                margin-top: 4px;
+          }
+    </style>
+    <script>
+        $(function(){
+			$('#alter_data').click(function(){
+                var params = $('#form_search').serialize();
+				if(confirm("您确定设置充值加赠?")){
+				    $.Load_data();
+					$.post('/run_manage/recharge_add_gift/', params, function(date) {
+						if ( date.code) {
+						    $.mask_close_all();
+							alert(date.msg);
+						}
+					});
+				}else {
+					alert("您取消了充值加赠设置");
+				}
+
+			});
+
+		});
+    </script>
+
+</head>
+<body style="min-width:1360px;">
+    <div class="body-div">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0" >
+            <form action="" method="post" id="form_search">
+                {% csrf_token %}
+                <tr>
+                    <td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5">
+                        <strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">运营管理&gt; 充值加赠</strong>
+                    </td>
+                    <td width="62%" align="right" valign="middle" bgcolor="#F5F5F5">
+                    	<input type="button" class="alter_data" id="alter_data" value="确认更改"  style="color: white;border: 0px; "/>
+                     </td>
+                    <td width="12%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="4" valign="top" bgcolor="#FFFFFF">
+                            <!--主要内容开始-->
+                        <div class='table-cont' id='table-cont'>
+                            <table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF"  style="margin-top: -1px;">
+                                <thead>
+                                    <tr>
+                                        <th align="center" bgcolor="#EEEEEE" style="height: 50px;">渠道名称</th>
+                                        <th align="center" bgcolor="#EEEEEE">微信加赠</th>
+                                        <th align="center" bgcolor="#EEEEEE">支付宝加赠</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for channel, value in info_dict.items %}
+                                        <tr>
+                                              <td align="center"bgcolor="#FFFFFF" style="height: 50px;">
+                                                  <input type="text" name="channel" id="channel" value="{{ channel|channel_name }}" readonly="readonly" style="border: 0px;width: auto;outline:medium;cursor: pointer;text-align: center;"/>
+                                              </td>
+                                              <td align="center" bgcolor="#FFFFFF" style="height: 50px;">
+                                                  <a href="javascript:weixin('{{ channel }}');">
+                                                      <input type="text" name="wechat" id="weixin{{ channel }}" value="{% widthratio value.weixin 1 100 %}" readonly="readonly" style="border: 0px;width: 30px;color: green;outline:medium;cursor: pointer;" />%
+                                                  </a>
+                                              </td>
+                                              <td align="center" bgcolor="#FFFFFF" style="height: 50px;">
+                                                  <a href="javascript:alipay('{{ channel }}');">
+                                                      <input type="text" name="alipay" id="alipay{{ channel }}" value="{% widthratio value.zhifubao 1 100 %}" readonly="readonly" style="border: 0px;width: 30px;color: #0000FF;outline:medium;cursor: pointer;"/>%
+                                                  </a>
+                                              </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </form>
+        </table>
+    </div>
+
+    <!--弹框1-->
+    <div id="dialogmag"></div>
+    <div id="dialohg" class="by_value" style="margin: auto; position: fixed; left: 35%; top: 10%; width: 300px; height: 210px;">
+        <p class="htt4" style="border-bottom: 1px #ccc solid;">
+                支付宝加赠
+        </p>
+        <form action="" method="post" id="add_form">
+            <div class="btn_model" style="float: left;margin: 30px 0px 30px 75px;">
+                <p>加赠%</p>
+            </div>
+                <input type="text" name="alipay" value="" id="alipay" style="width: 80px;margin-top: 30px;float: left;height:38px;text-align: center;border: solid #cccccc 1px;"/>
+                <div class="btn_select" style="margin: 0; height: 54px;">
+                    <a href="javascript:;" class="claseDialogBtn" id="add_cancel" style="float: right;margin: 10px;">取消</a>
+                    <a href="javascript:;" id="alert_alipay" style="float: left; margin: 10px;">确定</a>
+                </div>
+        </form>
+    </div>
+    <!--弹框1结束-->
+
+    <!--弹框2-->
+    <div id="popout"></div>
+    <div id="capacity" class="by_value" style="margin: auto; position: fixed; left: 35%; top: 10%; width: 300px; height: 210px;">
+        <p class="htt4" style="border-bottom: 1px #ccc solid;">
+                微信加赠
+        </p>
+
+        <form action="" method="post" id="add_form">
+            <div class="btn_model" style="float: left;margin: 30px 0px 30px 75px;">
+                <p>加赠%</p>
+            </div>
+                <input type="text" name="wechat" value="" id="wechat" style="width: 80px;margin-top: 30px;float: left;height:38px;text-align: center;border: solid #cccccc 1px;"/>
+                <div class="btn_select" style="margin: 0; height: 54px;">
+                    <a href="javascript:;" class="claseDialogBtn" id="add_cancel" style="float: right;margin: 10px;">取消</a>
+                    <a href="javascript:;" id="alert_wechat" style="float: left; margin: 10px;">确定</a>
+                </div>
+        </form>
+    </div>
+    <!--弹框2结束-->
+</body>
+</html>

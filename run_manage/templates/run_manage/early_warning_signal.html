@@ -1,0 +1,316 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link type="text/css" rel="stylesheet" href="/static/css/red_popup.css">
+	<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/tree.css">
+	<script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/hint.js"></script>
+    <script>
+        $(function(){
+            var look_uid = false;
+            $('#overlook').click(function(){
+                check_look_uid();
+                if(look_uid == true){
+                    user_id = $("#overlook_uid").val();
+                    var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":1,"o_id":user_id});
+                    $.post('/run_manage/early_warning/', data_info, function(data) {
+                        if ( data.status) {
+                            alert(data.msg);
+                            add_user(data.uid,data.leg);
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+                    return true;
+                }else {
+                    return false;
+                }
+
+            });
+
+            var look_count = 1;
+            function add_user(uid,leg){
+                var stc_html = '';
+                stc_html += '<div class="to__item">';
+                stc_html += '<span class="to__prefix">';
+                stc_html += '<img src="/static/images/header-icon.png">';
+                stc_html += '</span>';
+                stc_html += '<span class="to__name" id="render-0-1-0">'+uid+'</span>';
+                {#stc_html += '<div class="to__parentName">总鸟券：'+100+'（兑换鸟券:'+50+'）</div>';#}
+                stc_html += '<span class="to__close" id="remove'+uid+'"></span>';
+                stc_html += '</div>';
+                $('#overlook_Cont').append(stc_html);
+                //删除内容
+                $("#remove"+uid).click(function (){
+                    var del_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":2,"o_id":uid});
+                    $.post('/run_manage/early_warning/', del_info, function(data) {
+                        if ( data.status) {
+                            $("#remove"+uid).parent().remove();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+                });
+                look_count++;
+                $("#overlook_Num").html(leg)
+            }
+
+            function check_look_uid(){
+                var len_uid = $('#overlook_uid').val().length;
+                if(len_uid==0)
+                {
+                    $.MsgBox.Alert("消息", "请输入玩家ID!");
+                    look_uid = false;
+                }
+                else
+                {
+                    look_uid = true;
+                }
+            }
+
+            var for_uid = false;
+            $('#forbid').click(function(){
+                check_bid_uid();
+                if (for_uid == true){
+                    var forbid_id = $("#forbid_uid").val();
+                    var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":3,"f_id":forbid_id});
+                    $.post('/run_manage/early_warning/', data_info, function(data) {
+                        if ( data.status) {
+                            alert(data.msg);
+                            add_forbid(data.uid,data.leg);
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+                    return true;
+                }else {
+                    return false;
+                }
+            });
+
+            var for_count = 1;
+            function add_forbid(uid,leg){
+                var stc_html = '';
+                stc_html += '<div class="to__item">';
+                stc_html += '<span class="to__prefix">';
+                stc_html += '<img src="/static/images/header-icon.png">';
+                stc_html += '</span>';
+                stc_html += '<span class="to__name" id="render-0-1-0">'+uid+'</span>';
+                {#stc_html += '<div class="to__parentName">总鸟券：'+100+'（兑换鸟券:'+50+'）</div>';#}
+                stc_html += '<span class="to__close" id="remove'+uid+'"></span>';
+                stc_html += '</div>';
+                $('#forbid_Cont').append(stc_html);
+                //删除内容
+                $("#remove"+uid).click(function (){
+                    var del_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":4,"f_id":uid});
+                    $.post('/run_manage/early_warning/', del_info, function(data) {
+                        if ( data.status) {
+                            $("#remove"+uid).parent().remove();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+                });
+                for_count++;
+                $("#forbid_Num").html(leg)
+            }
+
+            function check_bid_uid(){
+                var f_uid = $('#forbid_uid').val().length;
+                if(f_uid==0)
+                {
+                    $.MsgBox.Alert("消息", "请输入玩家ID!");
+                    for_uid = false;
+                }
+                else
+                {
+                    for_uid = true;
+                }
+            }
+            // 添加玩家充值额度
+            $('#add_pay_total').click(function(){
+                var params = $.param({"pid":5 }) + "&" + $('#rob_form').serialize();
+                $.post('/run_manage/early_warning/', params, function(data) {
+                    if ( data.status) {
+                        alert(data.msg);
+                    }
+                    else {
+                        alert(data.msg);
+                    }
+                });
+
+            });
+
+            $('#set_pay_total').click(function(){
+                className = $(this).attr('class');
+                $('#service_mag').fadeIn(300);
+                $('#service_hg').removeAttr('class').addClass('by_value '+className+'').fadeIn();
+            });
+
+            //关闭弹窗
+            $('.close_pay_total').click(function(){
+                $('#service_mag').fadeOut(300,function(){
+                    $('#service_hg').addClass('bounceOutUp').fadeOut();
+                });
+            });
+
+        });
+
+        function remove_overlook(uid) {
+            if(confirm("您确定删除ID?")){
+                var del_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":2,"o_id":uid});
+                    $.post('/run_manage/early_warning/', del_info, function(data) {
+                        if ( data.status) {
+                            $("#overlook"+uid).parent().remove();
+                            $("#overlook_Num").html(data.leg);
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+            }else {
+                alert("已经取消了删除操作");
+            }
+        }
+
+        function remove_forbid(uid) {
+            if(confirm("您确定删除ID?")){
+                var del_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":4,"f_id":uid});
+                    $.post('/run_manage/early_warning/', del_info, function(data) {
+                        if ( data.status) {
+                            $("#forbid"+uid).parent().remove();
+                            $("#forbid_Num").html(data.leg);
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+            }else {
+                alert("已经取消了删除操作");
+            }
+        }
+
+        function early_record() {
+            var URL= "/run_manage/all_record/?pid=" +"early_record";
+            location.href=URL;
+        }
+
+    </script>
+</head>
+<body style="min-width:1890px;">
+    <div class="body-div">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0" >
+                <tr>
+                    <td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">运营管理&gt; 预警设置</strong></td>
+
+                    <td width="62%" align="middle" bgcolor="#F5F5F5">
+                        <input type="button" class="add_btn" value="设置充值额度" id="set_pay_total" style="float: left;border: 0px;;background: #1B9AF7;color: #FFF;width: 100px;height: 30px;line-height: 30px;border-radius: 3px;margin: 10px; "/>
+                    	<input type="button" class="add_btn" value="操作记录" onclick="early_record();" style="float: right;border: 0px;;background: #1B9AF7;color: #FFF;width: 100px;height: 30px;line-height: 30px;border-radius: 3px;margin: 10px; "/>
+                     </td>
+                    <td width="12%" align="center" valign="middle" bgcolor="#F5F5F5"></td>
+                </tr>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF">
+                    <!--主要内容开始-->
+                    <table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF"  style="margin-top: -1px;">
+                        <thead>
+                            <tr>
+                                <th  width="100%" height="600px" bgcolor="#fff">
+                                    <div class="to__block">
+                                        <div class="to__right">
+                                            <div style="width: 42%">
+                                                <span class="zySearch" id="zySearch">
+                                                    <b class="search-img" style="top: 0px; height: 0px;"></b>
+                                                    <input id="overlook_uid" class="search-input" name="overlook_uid" maxlength="7" value="" oninput="value=value.replace(/[^\d]/g,'')" style="color: #999;border: 1px solid #d0d0d0;height: 33px;line-height: 33px;margin-right: 5px;padding: 0 10px;width: 268px;" type="text" placeholder="添加预警忽略ID">
+                                                    <button class="" id="overlook" style="background: none repeat scroll 0 0 #f04243;border: 0;border-radius: 0;color: #fff;cursor: pointer;height: 35px;line-height: 33px;padding: 0;vertical-align: baseline!important;width: 76px;text-align: center;font-weight: 400;font-size: 14px">添加</button>
+                                                </span>
+                                            </div>
+                                            <div class="to__title">已添加（<span id="overlook_Num">{{ o_leg }}</span>）人</div>
+                                            <div class="to__content" id="overlook_Cont">
+                                                {% for o_id in o_list %}
+                                                    <div class="to__item">
+                                                        <span class="to__prefix">
+                                                            <img src="/static/images/header-icon.png">
+                                                        </span>
+                                                        <span class="to__name" id="render-0-1-0">{{o_id}}</span>
+{#                                                        <div class="to__parentName">总鸟券：100（兑换鸟券:50）</div>#}
+                                                        <span class="to__close" onclick="remove_overlook('{{o_id}}')" id="overlook{{o_id}}"></span>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="to__right">
+                                            <div style="width: 42%">
+                                                <span class="zySearch" id="zySearch">
+                                                    <b class="search-img" style="top: 0px; height: 0px;"></b>
+                                                    <input id="forbid_uid" class="search-input" name="forbid_uid" maxlength="7" value="" oninput="value=value.replace(/[^\d]/g,'')" style="color: #999;border: 1px solid #d0d0d0;height: 33px;line-height: 33px;margin-right: 5px;padding: 0 10px;width: 268px;" type="text" placeholder="添加禁止发货ID">
+                                                    <button class="search-btn btn" id="forbid" style="background: none repeat scroll 0 0 #f04243;border: 0;border-radius: 0;color: #fff;cursor: pointer;height: 35px;line-height: 33px;padding: 0;vertical-align: baseline!important;width: 76px;text-align: center;font-weight: 400;font-size: 14px">添加</button>
+                                                </span>
+                                            </div>
+                                            <div class="to__title">已添加（<span id="forbid_Num">{{ f_leg }}</span>）人</div>
+                                            <div class="to__content" id="forbid_Cont">
+                                                {% for f_id in f_list %}
+                                                    <div class="to__item">
+                                                        <span class="to__prefix">
+                                                            <img src="/static/images/header-icon.png">
+                                                        </span>
+                                                        <span class="to__name" id="render-0-1-0">{{f_id}}</span>
+{#                                                        <div class="to__parentName">总鸟券：160（兑换鸟券:80）</div>#}
+                                                        <span class="to__close" onclick="remove_forbid('{{f_id}}')" id="forbid{{f_id}}"><i></i></span>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </td>
+            </tr>
+        </table>
+  </div>
+  <div id="service_mag"></div>
+  <div id="service_hg" class="by_value" style="margin: auto;position: fixed; left: 25%; top: 10%;width: 660px;height:auto;">
+      <div class="dialogTophg" style="height: 50px;width: 100%;">
+            <p class="htt4">
+                添加充值额度
+            </p>
+      </div>
+      <form action="" method="post" id="rob_form">
+          {% csrf_token %}
+          <div style="float: left;margin: 15px 15px 15px 10px;">
+              <div class="btn_model">
+                  <p>玩家ID</p>
+              </div>
+              <select id="user_id" name="user_id" class="dowp_list_sty" style="float: left;height: 38px;">
+                  {% for f_id in f_list %}
+                      <option value="{{f_id}}" selected>{{f_id}}</option>
+                  {% endfor %}
+              </select>
+          </div>
+          <div style="float: left;margin: 15px 15px 15px 10px;">
+              <select id="status" name="status" class="dowp_list_sty" style="float: left;height: 38px;margin-right: 0px;">
+                    {% for info in pay_list %}
+                         <option value="{{ info.vale }}" {% if status == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                    {% endfor %}
+              </select>
+              <div class="btn_model">
+                    <p>额度</p>
+              </div>
+              <input type="text" name="point" id="point" value="" onkeyup="value=value.replace(/[^\d]/g,'')" style="width: 150px;height: 38px;"/>
+          </div>
+
+          <div class="btn_select">
+                <a href="javascript:;" class="close_pay_total" id="quxiao">取消</a>
+                <a href="javascript:;" id="add_pay_total">设置额度</a>
+          </div>
+      </form>
+  </div>
+</body>
+</html>

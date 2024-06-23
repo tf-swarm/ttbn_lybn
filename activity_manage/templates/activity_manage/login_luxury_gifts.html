@@ -1,0 +1,334 @@
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+		<script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+		<script type="text/javascript" src="/static/laydate.js"></script>
+        <script>
+			$(function() {
+				$('#alter_login_luxury').click(function() {
+					if(confirm("您确定修改登录豪礼？")) {
+						var params = $.param({"lib":1}) + "&" + $('#form_login').serialize();
+						$.post('/activity_manage/login_luxury_gifts/1', params, function(data) {
+							if(data.status) {
+								alert(data.info);
+							}else{
+							    alert(data.info);
+                            }
+						});
+					} else {
+						alert("已经取消了修改登录豪礼操作");
+					}
+				});
+
+				$("#change_month").change(function(){
+                    month = $(this).val();
+                    var url= "/activity_manage/login_luxury_gifts/1?month="+month;
+                    location.href=url;
+
+                });
+
+			});
+	</script>
+    <style>
+			.add_label {
+				background: #009c95;color: white;border-radius: 3px;border: none;cursor: pointer;
+			}
+			.head_div {
+                margin-left: 20px;width: 100%;height: auto;margin-top: 15px;display: inline-block;
+			}
+			.head_div span, span {
+				float: left;font-size: 18px;height: 30px;line-height: 30px;color: black;font-weight: 600;
+			}
+			.head_div select {
+				width: 100px;height: 36px;border: solid 1px #cccccc;font-size: 15px;;
+			}
+			select option {
+				font-size: 15px;;
+			}
+			h1 {
+				display: inline-block;font-size: 24px;line-height: 40px;height: 45px;float: left;color: black;font-weight: 600;
+			}
+			.input_text {
+				width: auto;height: 38px;margin: 0px;font-size: 16px;border: solid 1px #cccccc;text-align: center;padding: 0px;
+			}
+			.btn_model {
+				width: 70px;height: 36px;background: #e8e8e8;float: left;border: 1px #cccccc solid;
+			}
+			.btn_model p {
+				color: rgba(0, 0, 0, .5);font-weight: 700;text-align: center;line-height: 36px;font-size: 1em;margin: 0px;
+			}
+			.remove {
+				display: inline-block;width: 27px;height: 27px;cursor: pointer;float: left;
+                margin: 5px 10px 0px 4px;background: url(/static/images/icon-close.svg) no-repeat;
+                background-size: 96%;
+			}
+			.spinner_select option {
+				font-size: 18px;
+			}
+
+		</style>
+
+	</head>
+
+	<body style="line-height: 0.1em; overflow-x:auto; max-height: 900px;min-width: 1470px;">
+		<div class="body-div">
+			<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+				<tr>
+					<td width="25%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">活动管理 &gt;登录豪礼</strong></td>
+					<td width="25%" align="left" valign="middle" bgcolor="#F5F5F5">
+					</td>
+					<td width="60%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+					</td>
+					<td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+{#						<a href="javascript:;" id="bn_btn_one">操作记录</a>#}
+					</td>
+				</tr>
+
+				<tr>
+					<td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: 1000px;">
+						<!--主要内容开始-->
+						<form action="" method="post" id="form_login">
+                            {% csrf_token %}
+							<div style="height:45px; width:100%;margin-left: 20px;margin-top: 20px;">
+								<h1 style="width:auto;">登录有礼———
+  							        <a href="javascript:;" id="alter_login_luxury" style="color: white;width: 112px; height: 35px; background:#1B9AF7;border-radius: 3px; float:right;margin-top: 4px;">确认更改</a>
+                                </h1>
+                                <h1 style="width:350px;margin-left: 120px;">月份:
+                                    <select style="width: 60px;height: 35px;margin-bottom: 4px;font-size: 17px;" name="month" id="change_month">
+                                        {% for m_info in month_list %}
+                                            <option value="{{ m_info.vale }}" {% if month == m_info.vale %} selected {% endif %} >{{ m_info.content }}</option>
+                                        {% endfor %}
+                                    </select>
+                                 </h1>
+							</div>
+
+                            <div class="head_div" style="height: auto;width: 100%;">
+                                <div id="add_div" style="">
+                                	 <span style="width: 100%;">奖励配置：</span>
+                                    {% for info in login_reward %}
+                                        <div id="tf_div" style="margin-left: 85px;">
+                                            <div style="width: 735px;display:inline-block;float: left;">
+                                                <p style="width: 55px;margin-top: 7px;margin-bottom: 10px;float: left;height: 25px;line-height: 25px;font-size: 14px;">第{{ info.days }}天</p>
+                                                <div class="btn_model" style="">
+                                                     <p>奖励物品</p >
+                                                </div>
+                                                <select style="width: auto;height: 38px;float: left;" name="sign_name" id="">
+                                                     {% for data in give_reward %}
+                                                         {% if data.vale != "auto_shot" %}
+                                                             <option value="{{ data.vale }}" {% if info.reward.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                                         {% endif %}
+                                                     {% endfor %}
+                                                </select>
+                                                <div class="btn_model">
+                                                    <p>数量</p >
+                                                </div>
+                                                <input type="text" class="input_text" name="sign_number" value="{{ info.reward.value }}" placeholder="" style="float: left;width: 100px;">
+                                                <div id="add_vip" style="float: left;">
+                                                    <div style="display:inline-block;float: left;">
+                                                        <div class="btn_model">
+                                                             <p>VIP等级</p >
+                                                        </div>
+                                                        <select style="width: 87px;height: 38px;float: left;" name="sign_vip" id="">
+                                                            {% for v_info in vip_info %}
+                                                                <option value="{{ v_info.vale }}" {% if info.reward.vip == v_info.vale %} selected {% endif %} >{{ v_info.content }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <div class="btn_model">
+                                                            <p>倍数</p >
+                                                        </div>
+                                                        <input type="text" class="input_text" name="sign_multiple" value="{{ info.reward.multiple }}" placeholder="" style="float: left;width: 70px;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="head_div">
+                                <span style="width: 100%;">连续签到配置：</span>
+                                {% for s_info in series_list %}
+                                    <div style="margin-left: 85px; max-height:360px;width:85%;display: block;overflow: auto;margin-bottom: 15px;">
+                                        <div style="margin-left: 54px;width: 1550px;">
+                                            <div style="margin-bottom: 9px;margin-right: 20px;display: inline-block;float: left;height: 39px;">
+                                                <div class="btn_model">
+                                                     <p>连续天数</p>
+                                                 </div>
+                                                 <input type="text" class="input_text" name="series_day" value="{{s_info.days}}" placeholder="" style="float: left;width: 70px;">
+                                                 <div class="btn_model" style="margin-left:10px;">
+                                                     <p>奖励物品</p>
+                                                 </div>
+                                                <select style="width: auto;height: 38px;float: left;" name="series_name" id="">
+                                                    {% for data in give_reward %}
+                                                        <option value="{{ data.vale }}" {% if s_info.reward.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                 <div class="btn_model">
+                                                     <p>数量</p>
+                                                 </div>
+                                                 <input type="text" class="input_text" name="series_number" value="{{ s_info.reward.value }}" placeholder="" style="float: left;width: 100px;">
+                                            </div>
+                                            {% for info in s_info.add_vip %}
+                                                <div id="" style="float: left;margin-bottom: 10px;width: 355px;">
+                                                    <div style="float: left;">
+                                                        <div class="btn_model" style="">
+                                                            <p>VIP等级</p>
+                                                        </div>
+                                                        <select style="width: 87px;height: 38px;float: left;margin-right: 10px;" name="series_vip" id="">
+                                                            {% for v_info in vip_info %}
+                                                                <option value="{{ v_info.vale }}" {% if info.vip == v_info.vale %} selected {% endif %} >{{ v_info.content }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <div class="btn_model">
+                                                            <p>倍数</p>
+                                                        </div>
+                                                        <input type="text" class="input_text" name="series_multiple" value="{{ info.multiple }}" placeholder="" style="float: left;width: 70px;">
+                                                    </div>
+                                                    <a onclick="$(this).parent().remove();" class="remove" id="close_label"></a>
+                                                </div>
+                                            {% endfor %}
+                                            <button class="add_label" id="series_vip{{s_info.days}}" onclick="series_sign('{{s_info.days}}');" type="button" style="margin-left: 10px;margin-bottom: 10px;width: 70px;height: 36px; font-size: 15px;">添加VIP</button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <span style="width: 100%;">vip补签配置：</span>
+                                <div class="repair_sign" style="margin-left: 100px; max-height:360px;width:80%;display: block; overflow: auto;">
+                                    {% for vip_info in vip_range %}
+                                        <div style="height:auto;float: left;margin: 10px;">
+                                            <div class="btn_model">
+                                                <p>VIP范围</p>
+                                            </div>
+                                            <input type="text" class="input_text" name="repair_start" value="{{ vip_info.start }}" placeholder="" style="float: left;width:60px;">
+                                            <p style="font-size: 24px; display: inline-block; height: 38px;margin: 0px;line-height: 38px;float: left;">--</p>
+                                            <input type="text" class="input_text" name="repair_end" value="{{ vip_info.end }}" placeholder="" style="float: left;width:60px;">
+
+                                            <div class="btn_model">
+                                                <p>补签次数</p>
+                                            </div>
+                                            <input type="text" class="input_text" name="repair_number" value="{{ vip_info.number }}" placeholder="" style="float: left;width:70px;">
+                                            <a onclick="$(this).parent().remove();" class="remove" id="close_reward"></a>
+                                        </div>
+                                    {% endfor %}
+                                    <button class="add_label" id="repair_sign" type="button" style="margin-left: 10px;margin-top: 8px; width: 110px; height: 40px; font-size: 16px;">添加补签配置</button>
+								</div>
+						    </div>
+		                </form>
+		            </td>
+		        </tr>
+		    </table>
+		</div>
+
+    <script type="text/javascript">
+
+        function series_sign(days) {
+            var series_vip = 1;
+            var vip_list = {{ vip_list|safe }};
+            var stc_html = '';
+            stc_html += '<div id="" style="float: left;margin-bottom: 10px;">';
+            stc_html += '<div style="float: left;">';
+            stc_html += '<div class="btn_model" style="">';
+            stc_html += '<p>VIP等级</p>';
+            stc_html += '</div>';
+            stc_html += '<select style="width: 70px;height: 38px;float: left;margin-right: 10px;" name="series_vip" id="">';
+            for(v_info in vip_list) {
+                stc_html += '<option value="'+v_info+'">'+vip_list[v_info].content+'</option>';
+            }
+            stc_html += '</select>';
+            stc_html += '<div class="btn_model">';
+            stc_html += '<p>倍数</p>';
+            stc_html += '</div>';
+            stc_html += '<input type="text" class="input_text" name="series_multiple" value="" placeholder="" style="float: left;width: 70px;">';
+            stc_html += '</div>';
+            stc_html += '<a onclick="$(this).parent().remove();" class="remove" id="close_label'+series_vip+'"></a>';
+            stc_html += '</div>';
+            $("#series_vip"+days).before(stc_html);
+            series_vip++;
+        }
+
+        var repair_vip = 1;
+        $('#repair_sign').click(function() {
+            var stc_html = '';
+            stc_html += '<div style="height:auto;width:400px; float: left;margin: 10px;">';
+            stc_html += '<div class="btn_model">';
+            stc_html += '<p>VIP范围</p>';
+            stc_html += '</div>';
+            stc_html += '<input type="text" class="input_text" name="repair_start" value="" placeholder="" style="float: left;width:60px;">';
+            stc_html += '<p style="font-size: 24px; display: inline-block; height: 38px;margin: 0px;line-height: 38px;float: left;">--</p>';
+            stc_html += '<input type="text" class="input_text" name="repair_end" value="" placeholder="" style="float: left;width:60px;">';
+            stc_html += '<div class="btn_model">';
+            stc_html += '<p>补签次数</p>';
+            stc_html += '</div>';
+            stc_html += '<input type="text" class="input_text" name="repair_number" value="" placeholder="" style="float: left;width: 70px;">';
+            stc_html += '<a onclick="$(this).parent().remove();" class="remove" id="close_label'+repair_vip+'"></a>';
+            stc_html += '</div>';
+            $("#repair_sign").before(stc_html);
+            repair_vip++;
+        });
+
+        !function(){
+            laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+            laydate({elem: '#demo'});//绑定元素
+            }();
+            //日期范围限制
+            var start = {
+                elem: '#start',
+                format: 'YYYY-MM-DD hh:mm:ss',
+                //min: laydate.now(), //设定最小日期为当前日期
+                max: '2099-06-16', //最大日期
+                istime: true,
+                istoday: false,
+                choose: function(datas){
+                     end.min = datas; //开始日选好后，重置结束日的最小日期
+                     end.start = datas //将结束日的初始值设定为开始日
+                }
+            };
+            var end = {
+                elem: '#end',
+                format: 'YYYY-MM-DD hh:mm:ss',
+                // min: laydate.now(),
+                max: '2099-06-16',
+                istime: true,
+                istoday: false,
+                choose: function(datas){
+                    start.max = datas; //结束日选好后，充值开始日的最大日期
+                }
+            };
+
+            var valid = {
+                elem: '#valid',
+                format: 'YYYY-MM-DD hh:mm:ss',
+                // min: laydate.now(),
+                max: '2099-06-16',
+                istime: true,
+                istoday: false,
+                choose: function(datas){
+                    start.max = datas; //结束日选好后，充值开始日的最大日期
+                }
+            };
+            laydate(start); //valid
+            laydate(end);
+            laydate(valid);
+            //自定义日期格式
+            laydate({
+                elem: '#test1',
+                format: 'YYYY年MM月DD日',
+                festival: true, //显示节日
+                choose: function(datas){ //选择日期完毕的回调
+                    alert('得到：'+datas);
+                }
+            });
+            //日期范围限定在昨天到明天
+            laydate({
+                elem: '#hello3',
+                min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+                max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+            });
+    </script>
+	</body>
+</html>

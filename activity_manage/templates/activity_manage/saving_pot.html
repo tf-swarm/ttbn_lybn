@@ -1,0 +1,232 @@
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="/static/css/account_manage.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/common.css" />
+		<link rel="stylesheet" type="text/css" href="/static/css/default.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+		<script type="text/javascript" src="/static/laydate.js"></script>
+		<script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+{#		<script type="text/javascript" src="/static/js/account_manage.js"></script>#}
+		<script type="text/javascript" src="/static/js/semantic.min.js"></script>
+		<script type="text/javascript" src="/static/js/vip_login_give.js"></script>
+
+		<style>
+			.head_div span{float: left;  font-size: 18px;  height: 30px; line-height: 30px;color: black;font-weight: 600;}
+
+			.spinner_select option {
+				font-size: 18px;
+			}
+
+			.pool_chip {
+				border: 1px #C0C1C2 solid;
+				text-align: center;
+				height: 30px;
+				width: 80px;
+			}
+
+			h1 {
+				display: block;
+				font-size: 24px;
+				line-height: 40px;
+				height: 45px;
+				float: left;
+				color: black;
+				font-weight: 600;
+			}
+			h2 {
+				display: block;
+				font-size: 18px;
+				line-height: 40px;
+				height: 45px;
+				float: left;
+				color: black;
+				font-weight: 600;
+				margin-left: 30px;
+			}
+
+			h1 a {
+				color: white;
+				width: 112px;
+				height: 35px;
+				background: #1B9AF7;
+				border-radius: 3px;
+				float: right;
+				margin-top: 4px;
+			}
+
+		</style>
+
+
+	</head>
+
+	<body style="line-height: 0.1em; overflow-x:auto;">
+		<div class="body-div">
+			<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+				<tr>
+					<td width="25%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">活动管理 &gt;存钱窝</strong></td>
+					<td width="25%" align="left" valign="middle" bgcolor="#F5F5F5"></td>
+					<td width="60%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update"></td>
+					<td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+						<a href="javascript:;" id="bn_btn_one" onclick="saving_pot_record()">操作记录</a>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4" valign="top" bgcolor="#FFFFFF">
+						<!--主要内容开始-->
+						<form action="" method="post" id="saving_pot">
+                            {% csrf_token %}
+							<div style="height: 40px; width:100%;margin-left: 30px;margin-top: 20px;">
+								<h1 style="width:228px;">存钱窝——
+                                    <a href="javascript:;" id="alter_saving_pot">确认更改</a>
+                                </h1>
+                                <div style="height: auto; width: auto; display: inline-block;margin-left: 150px;margin-top: 7px;">
+                                    <span style="margin-left: 50px; font-size:16px;color: #000000;font-weight: 600;">开始时间：</span>
+                                        <input placeholder="请输入日期" style="height: 32px;font-size: 16px;width: 240px; " id="start" class="laydate-icon" readonly="" value="{{start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+									<span style="margin-left: 50px; font-size:16px;color: #000000;font-weight: 600;">结束时间：</span>
+                                        <input placeholder="请输入日期" style="height: 32px;font-size: 16px;width: 240px;margin-left: 20px;" id="end" class="laydate-icon" readonly="" value="{{end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+								   </div>
+                            </div>
+
+
+                            <div style="height: 60px; width:100%;margin-top: 30px;border-top: 1px #C2C2C2 solid">
+								<h2 style="width:350px;margin-top: 9px;">每消耗N鸟蛋存1鸟蛋
+                                   <input type="text" name="save" id="day_chip" value="{{save_chip}}" class="pool_chip" />
+                                </h2>
+                                <div style="height: auto; width: auto; display: inline-block;margin-left: 150px;margin-top: 7px;">
+
+								</div>
+                            </div>
+
+
+						    <div style="height:auto;width: 100%; height:auto;border-top: 1px #C2C2C2 solid">
+								<table width="97%" align="center" cellspacing="0" bgcolor="#DFDFDF" style="margin:30px auto 30px auto;" id="userlist">
+									<tbody id="hover_tf">
+										<tr>
+                                            <th  align="center" bgcolor="#FFFFFF" style="height: 37px;width: 100px; font-size: 17px;"></th>
+											{% for info in vip_info %}
+											    <th width="100" align="center" bgcolor="#FFFFFF" style="height: 37px; font-size: 17px;">VIP{{info.grade}}</th>
+											{% endfor %}
+										</tr>
+
+										<tr bgcolor="#FFFFFF">
+                                            <td style="font-size: 18px;width: 100px;color: #000000;font-weight: 600;">鸟蛋上限</td>
+											{% for info in vip_info %}
+                                                <td align="center" valign="middle" style="height: 50px;">
+                                                    <input type="text" name="chip_limit" id="login_chip{{info.grade}}" value="{{info.chip}}" class="pool_chip" />
+                                                </td>
+											{% endfor %}
+										</tr>
+										<tr bgcolor="#FFFFFF">
+                                            <td style="font-size: 18px;width: 100px;color: #000000;font-weight: 600;">每日领取次数</td>
+											{% for info in vip_info %}
+                                                <td align="center" valign="middle" class="pupot" style="height: 50px;">
+                                                    <input type="text" name="get_number" value="{{info.day_time}}" class="pool_chip"/>
+                                                </td>
+											{% endfor %}
+										</tr>
+									</tbody>
+								</table>
+						    </div>
+                        </form>
+						<!--主要内容结束-->
+					</td>
+				</tr>
+			</table>
+		</div>
+
+
+		<script type="text/javascript">
+			$(function() {
+				$('#alter_saving_pot').click(function() {
+					var data_info = $("#saving_pot").serialize();
+					if(confirm("您确定修改存钱窝?")) {
+						$.post('/activity_manage/saving_pot/', data_info, function(date) {
+							if(date.code) {
+								alert(date.info);
+							} else {
+								alert(date.info);
+							}
+						});
+					} else {
+						alert("您取消了修改存钱窝");
+					}
+
+				});
+			});
+
+			function saving_pot_record() {
+			    var URL= "/activity_manage/all_record/?pid=" +"saving_pot_record";
+				location.href = URL;
+			}
+
+			! function() {
+				laydate.skin('molv'); //切换皮肤，请查看skins下面皮肤库
+				laydate({
+					elem: '#demo'
+				}); //绑定元素
+			}();
+			//日期范围限制
+			var start = {
+				elem: '#start',
+				format: 'YYYY-MM-DD hh:mm:ss',
+				//min: laydate.now(), //设定最小日期为当前日期
+				max: '2099-06-16', //最大日期
+				istime: true,
+				istoday: false,
+				choose: function(datas) {
+					end.min = datas; //开始日选好后，重置结束日的最小日期
+					end.start = datas //将结束日的初始值设定为开始日
+				}
+			};
+			var end = {
+				elem: '#end',
+				format: 'YYYY-MM-DD hh:mm:ss',
+				// min: laydate.now(),
+				max: '2099-06-16',
+				istime: true,
+				istoday: false,
+				choose: function(datas) {
+					start.max = datas; //结束日选好后，充值开始日的最大日期
+				}
+			};
+
+			var valid = {
+				elem: '#valid',
+				format: 'YYYY-MM-DD hh:mm:ss',
+				// min: laydate.now(),
+				max: '2099-06-16',
+				istime: true,
+				istoday: false,
+				choose: function(datas) {
+					start.max = datas; //结束日选好后，充值开始日的最大日期
+				}
+			};
+			laydate(start); //valid
+			laydate(end);
+			laydate(valid);
+			//自定义日期格式
+			laydate({
+				elem: '#test1',
+				format: 'YYYY年MM月DD日',
+				festival: true, //显示节日
+				choose: function(datas) { //选择日期完毕的回调
+					alert('得到：' + datas);
+				}
+			});
+			//日期范围限定在昨天到明天
+			laydate({
+				elem: '#hello3',
+				min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+				max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+			});
+
+		</script>
+
+	</body>
+
+</html>

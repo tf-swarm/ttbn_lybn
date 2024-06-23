@@ -1,0 +1,1343 @@
+{% load extratags %}
+<html>
+<head>
+<title>礼包商城管理 &gt; 礼包商城</title>
+<link type="text/css" rel="stylesheet" href="/static/css/style.css" />
+<link type="text/css" rel="stylesheet" href="/static/css/red_popup.css"/>
+<link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+<link type="text/css" rel="stylesheet" href="/static/css/load.css">
+<link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+<script type="text/javascript" src="/static/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript"  src="/static/laydate.js"></script>
+<script type="text/javascript" src="/static/js/hint.js"></script>
+{#<script type="text/javascript" src="/static/js/fixed_header.js"></script>#}
+<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+
+
+<script>
+    $(function(){
+        $('#paging').click(function () {
+            var pag = $('.pagination-num').val() ;
+            var URL= "/gift_bag_shop/gift_bag_shop/?page=" + pag;
+            location.href=URL;
+        });
+
+        //关闭更新弹窗
+        $('.returns').click(function(){
+                $('#dialogBg').fadeOut(300,function(){
+                $('#dialog').addClass('bounceOutUp').fadeOut();
+            });
+        });
+
+        //关闭更新弹窗
+        $('#cancel').click(function(){
+                $('#dialogmag').fadeOut(300,function(){
+                $('#dialohg').addClass('bounceOutUp').fadeOut();
+            });
+        });
+
+        $('#alter_gift_info').click(function () {
+            var data_info = $.param({"pid":1}) + "&" + $("#update_form_gift").serialize();
+            if(confirm("您确定更新礼包数据?")){
+                $.post('/gift_bag_shop/gift_shop/', data_info, function(data) {
+                    if ( data.status) {
+                        alert(data.show);
+
+                        $('#dialogBg').fadeOut(300,function(){
+                            $('#dialog').addClass('bounceOutUp').fadeOut();
+                        });
+                        var pag = $('.pagination-num').val() ;
+                        var URL= "/gift_bag_shop/gift_shop/?page=" + pag;
+                        location.href=URL;
+
+                    }else {
+                        alert(data.show);
+                    }
+                });
+            }else {
+                alert("您取消了更新数据");
+            }
+        });
+        var error_start = false;
+        var error_end = false;
+        var error_price = false;
+        var error_worth = false;
+        var error_name = false;
+        var error_limit = false;
+
+        $('#add_gift_info').click(function (){
+            check_limit();
+            check_prcie();
+            check_time();
+            if(error_name == true &&  error_price == true && error_worth == true && error_start == true && error_end == true  && error_limit == true)
+            {
+                var data_info = $.param({"pid":2}) + "&" + $("#add_form_gift").serialize();
+                if(confirm("您确定添加新的礼包?")){
+                    $.post('/gift_bag_shop/gift_shop/', data_info, function(data) {
+                        if ( data.status) {
+                            alert(data.info);
+                            $('#dialogmag').fadeOut(300,function(){
+                                $('#dialohg').addClass('bounceOutUp').fadeOut();
+                            });
+                            var pag = $('.pagination-num').val() ;
+                            var URL= "/gift_bag_shop/gift_shop/?page=" + pag;
+                            location.href=URL;
+
+                        }else {
+                            alert(data.info);
+                        }
+                    });
+                }else {
+                    alert("您取消了添加新的礼包");
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        });
+
+        function check_time(){
+            var len_start = $('#start').val().length;
+            var len_end = $('#end').val().length;
+            if(len_start==0 || len_end==0)
+            {
+                $.MsgBox.Alert("消息", "请输入日期!");
+                error_start = false;
+                error_end = false;
+            }
+            else
+            {
+                error_start = true;
+                error_end = true;
+            }
+        }
+
+        function check_prcie(){
+            var len_price = $('#add_price').val().length;
+            var len_worth = $('#add_worth').val().length;
+            if(len_price==0 || len_worth==0)
+            {
+                $.MsgBox.Alert("消息", "请输入礼包的价格或价值!");
+                error_price = false;
+                error_worth = false;
+            }
+            else
+            {
+                error_price = true;
+                error_worth = true;
+            }
+        }
+
+        function check_limit(){
+            var len_name = $('#add_gift_name').val().length;
+            var len_limit = $('#add_limit_num').val().length;
+            if(len_name==0 || len_limit==0)
+            {
+                $.MsgBox.Alert("消息", "请输入礼包的名称或限制数量!");
+                error_name = false;
+                error_limit = false;
+            }
+            else
+            {
+                error_name = true;
+                error_limit = true;
+            }
+        }
+
+        $('#up_online').click(function (){
+            var data_info = $.param({"pid":4}) + "&" + $("#gift_form").serialize();
+            if(confirm("您确定选中的礼包上线?")){
+                $.post('/gift_bag_shop/gift_shop/', data_info, function(data) {
+                    if ( data.status) {
+                        alert(data.info);
+                        $('#dialogmag').fadeOut(300,function(){
+                            $('#dialohg').addClass('bounceOutUp').fadeOut();
+                        });
+                        var pag = $('.pagination-num').val() ;
+                        var URL= "/gift_bag_shop/gift_shop/?page=" + pag;
+                        location.href=URL;
+
+                    }else {
+                        alert(data.info);
+                    }
+                });
+            }else {
+                alert("您取消了选中的礼包上线");
+            }
+        });
+
+        $('#down_online').click(function (){
+            var data_info = $.param({"pid":5}) + "&" + $("#gift_form").serialize();
+            if(confirm("您确定选中的礼包下线?")){
+                $.post('/gift_bag_shop/gift_shop/', data_info, function(data) {
+                    if ( data.status) {
+                        alert(data.info);
+                        $('#dialogmag').fadeOut(300,function(){
+                            $('#dialohg').addClass('bounceOutUp').fadeOut();
+                        });
+                        var pag = $('.pagination-num').val() ;
+                        var URL= "/gift_bag_shop/gift_shop/?page=" + pag;
+                        location.href=URL;
+
+                    }else {
+                        alert(data.info);
+                    }
+                });
+            }else {
+                alert("您取消了选中的礼包下线");
+            }
+        });
+
+    });
+
+    //显示更新弹框
+	function update_gift_info(gift_id){
+        $.post('/gift_bag_shop/gift_shop/', {csrfmiddlewaretoken: '{{ csrf_token }}',"pid":3, "gift_id":gift_id}, function(data) {
+            if ( data.status) {
+                $("#gift_id").val(data.gift_id);
+                $("#headline").html(data.gift_name);
+                $("#hot").val(data.hot).attr("selected", true);
+                $("#index").val(data.index);
+                $("#gift_name").val(data.gift_name);
+                $("#icon_type").val(data.icon_type);
+                $("#price").val(data.price);
+                $("#worth").val(data.worth);
+                $("#open_type").val(data.open_type).attr("selected", true);
+                $("#limit_num").val(data.limit_num);
+                $("#day_start").val(data.start_time);
+                $("#day_end").val(data.end_time);
+                $("#vip_level").val(data.vip_type).attr("selected", true);
+                if (data.vip_type == "1"){
+                    $("#two_vip_grade").hide();
+                    $("#two_vip_grade").attr("name","");
+
+                    $("#one_vip_grade").show();
+                    $("#one_vip_grade").val(data.vip_level[0]).attr("selected", true);
+                }else {
+                    $("#one_vip_grade").hide();
+                    $("#one_vip_grade").attr("name","");
+                    $("#two_vip_grade").show();
+                    $.each(data.vip_level, function (index, number) {
+                        $(".vip_grade"+number).val(number).attr("checked", true);
+                     });
+                }
+
+                $.each(data.channel_list, function (index, channel) {
+                    $(".channel_"+channel).val(channel).attr("checked", true);
+                 });
+
+                if (data.open_type == "5"){
+                    $("#limit_num").attr("readonly","readonly");
+                    $("#extra").show();
+                    $("#cut-off").css("height", "242px");
+                    for(var index=0;index <3;index++){
+                        $("#extra_name"+index).attr("name","extra_name");
+                        $("#extra_number"+index).attr("name","extra_number");
+                    }
+                    $("#update_time").attr("name","add_time");
+
+                    $.each(data.add_reward, function (index, num) {
+                        $("#extra_name"+index).val(num.option).attr("selected", true);
+                        $("#extra_number"+index).val(num.value);
+                    });
+                    $("#update_time").val(data.add_time);
+
+                }else {
+                    $("#limit_num").removeAttr("readonly");
+                    $("#extra").hide();
+                    $("#cut-off").css("height", "252px");
+                    for(var index=0;index <3;index++){
+                        $("#extra_name"+index).attr("name","");
+                        $("#extra_number"+index).attr("name","");
+                    }
+                    $("#update_time").attr("name","");
+                }
+
+                var version_id = parseInt(data.version_id);
+                if(version_id > 1000){
+                    $("#gift_data").val("1").attr("selected", true);
+                }else {
+                    $("#gift_data").val("0").attr("selected", true);
+                }
+
+                $("#gift_online").val(data.online_state).attr("selected", true);
+                $("#detail_1").val(data.detail_1);
+                $("#detail_2").val(data.detail_2);
+                $("#detail_3").val(data.detail_3);
+                $("#skip").val(data.skip);
+
+                $.each(data.reward, function (index, num) {
+                    $("#good_name"+index).val(num.option).attr("selected", true);
+                    $("#good_number"+index).val(num.value);
+                });
+
+                className = $(this).attr('class');
+                $('#dialogBg').fadeIn(300);
+                $('#dialog').removeAttr('class').addClass('animated '+className+'').fadeIn();
+
+            }else {
+                alert(data.show);
+            }
+        });
+    };
+
+
+    function add_gift() {
+        //列表 i 为索引，item为遍历值
+        className = $(this).attr('class');
+        $('#dialogmag').fadeIn(300);
+        $('#dialohg').removeAttr('class').addClass('animated '+className+'').fadeIn();
+    }
+
+    function vip_type(obj){
+        var docurl =obj.options[obj.selectedIndex].value;
+        if (docurl == "1") {
+            $("#one_vip_grade").show();
+            $("#two_vip_grade").hide();
+        }
+        else {
+            $("#one_vip_grade").hide();
+            $("#two_vip_grade").show();
+        }
+    }
+
+    function add_vip_type(obj){
+        var docurl =obj.options[obj.selectedIndex].value;
+        if (docurl == "1") {
+            $("#add_one_vip_grade").show();
+            $("#add_two_vip_grade").hide();
+        }
+        else {
+            $("#add_one_vip_grade").hide();
+            $("#add_two_vip_grade").show();
+        }
+    }
+
+    function extra_reward(data){
+        var extra =data.options[data.selectedIndex].value;
+        if (extra == "5") {
+            $("#extra").show();
+            $("#cut-off").css("height", "105px");
+            for(var index=0;index <3;index++){
+                $("#extra_name"+index).attr("name","extra_name");
+                $("#extra_number"+index).attr("name","extra_number");
+            }
+            $("#update_time").attr("name","add_time");
+
+            $("#limit_num").val(2);
+            $("#limit_num").attr("readonly","readonly");
+        }
+        else {
+            $("#extra").hide();
+            $("#cut-off").css("height", "252px");
+            for(var index=0;index <3;index++){
+                $("#extra_name"+index).attr("name","");
+                $("#extra_number"+index).attr("name","");
+            }
+            $("#update_time").attr("name","");
+
+            $("#limit_num").val("");
+            $("#limit_num").removeAttr("readonly");
+        }
+    }
+
+    function add_extra_reward(data){
+        var extra =data.options[data.selectedIndex].value;
+        if (extra == "5") {
+            $("#add_extra").show();
+            $("#add_cut-off").css("height", "23px");
+            for(var index=0;index <3;index++){
+                $("#add_extra_name"+index).attr("name","extra_name");
+                $("#add_extra_number"+index).attr("name","extra_number");
+            }
+            $("#add_update_time").attr("name","add_time");
+
+            $("#add_limit_num").val(2);
+            $("#add_limit_num").attr("readonly","readonly");
+        }
+        else {
+            $("#add_extra").hide();
+            $("#add_cut-off").css("height", "262px");
+            for(var index=0;index <3;index++){
+                $("#add_extra_name"+index).attr("name","");
+                $("#add_extra_number"+index).attr("name","");
+            }
+            $("#add_update_time").attr("name","");
+            $("#add_limit_num").val("");
+            $("#add_limit_num").removeAttr("readonly");
+        }
+    }
+
+</script>
+
+<script>
+  $(function() {
+    //表格点击高亮事件
+    $(document).on('click', '#table-content .content-table > tbody > tr', function() {
+      if($(this).hasClass("showColor") == false){
+        $(this).addClass('showColor').css("background-color", "#f5f5f5");
+        $(this).siblings().removeClass('showColor').css("background-color", "white");
+      }
+    });
+    //置顶
+    var $top = $(".top");
+    $top.click(function() {
+      var flag = false;
+      $('#table-content .content-table > tbody').find('tr').each(function(){
+        if($(this).hasClass('showColor')){
+          flag = true;
+          if($(this).index() == 0){
+            alert('已经是最顶部了！');
+            return;
+          }
+          $(".content-table").prepend($(this));
+          $(this).css("background-color", "#d5d5d5");
+          $(this).siblings().css("background-color", "white");
+          return false;
+        }
+      });
+      if(flag == false){
+        alert('请选择一行数据！');
+        return;
+      }
+    });
+    //上移
+    var $up = $(".up")
+    $up.click(function() {
+        var flag = false;
+        $('#table-content .content-table > tbody').find('tr').each(function(){
+              if($(this).hasClass('showColor')){
+                  flag = true;
+                  if($(this).index() == 0){
+                      alert('已经是第一个了！');
+                      return;
+                  }else {
+                      var oneself = $(this).attr('class').substring(0, 7);
+                      alert(oneself);
+                      var up = $(this).prev().attr('class');
+                      alert(up);
+                      var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":5,"label":1,"oneself":oneself,"up":up});
+                      $.post('/gift_bag_shop/gift_shop/', data_info, function(data) {
+                          if ( data.status) {
+                              alert(data.info);
+
+                          }else {
+                              alert("上移失败!");
+                          }
+                      });
+                  }
+
+                  $(this).prev().before($(this));
+                  $(this).css("background-color", "#d5d5d5");
+                  $(this).siblings().css("background-color", "white");
+                  return false;
+              }
+          });
+          if(flag == false){
+              alert('请选择一行数据！');
+              return;
+          }
+    });
+    //下移
+    var trLen=$('#table-content .content-table > tbody > tr').length;
+    var $down = $(".down");
+    $down.click(function() {
+      var flag = false;
+      $('#table-content .content-table > tbody').find('tr').each(function(){
+        if($(this).hasClass('showColor')){
+          flag = true;
+          if($(this).index() == trLen - 1){
+            alert('已经是最后一个了！');
+            return;
+          }
+          $(this).next().after($(this));
+          $(this).css("background-color", "#d5d5d5");
+          $(this).siblings().css("background-color", "white");
+          return false;
+        }
+      });
+      if(flag == false){
+        alert('请选择一行数据！');
+        return;
+      }
+    });
+    //置底
+    var $bottom = $(".bottom");
+    $bottom.click(function() {
+      var flag = false;
+      $('#table-content .content-table > tbody').find('tr').each(function(){
+        if($(this).hasClass('showColor')){
+          flag = true;
+          if($(this).index() == trLen - 1){
+            alert('已经是最底部了！');
+            return;
+          }
+          $(this).fadeOut().fadeIn();
+          $(".content-table").append($(this));
+          $(this).css("background-color", "#d5d5d5");
+          $(this).siblings().css("background-color", "white");
+          return false;
+        }
+      });
+      if(flag == false){
+        alert('请选择一行数据！');
+        return;
+      }
+    });
+
+  });
+</script>
+
+<style>
+.btn_model {
+    width: 70px;
+    height: 36px;
+    background: #e8e8e8;
+    float: left;
+    border: 1px #cccccc solid;
+}
+.btn_model p {
+    color: rgba(0, 0, 0, .5);
+    font-weight: 700;
+    text-align: center;
+    line-height: 36px;
+    font-size: 1em;
+    margin: 0;
+}
+</style>
+</head>
+    <body style="min-width:1048px;">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+            <tbody>
+                <tr>
+                    <td width="13%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:20px;">礼包商城管理 &gt; 礼包商城</strong></td>
+                    <td width="77%" align="left" valign="middle" bgcolor="#F5F5F5" class="tab_btns">
+                    </td>
+                    <td width="10%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                        <a href="javascript:add_gift();" id="bn_btn_one" style="background-color: #1B9AF7">+ 新增礼包</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" valign="top" bgcolor="#FFFFFF">
+                        <form method="post" action="" id="gift_form">
+                            {% csrf_token %}
+                            <div class='table-cont' style="margin-bottom: 0px;box-shadow: 3px 1px 3px 0px white;" id="table-content">
+                                <table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF" id="order_title" style="margin-top: -1px;">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">选择</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">礼包序号</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">礼包ID</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">礼包名称</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">价格</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">价值</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">开放类型</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">限制数量</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">开启/结束时间</th>
+                                            <th width="100px" align="center" valign="middle" bgcolor="#EEEEEE">VIP限制等级</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">VIP限制类型</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">出售状态</th>
+                                            <th width="200px" align="center" valign="middle" bgcolor="#EEEEEE">奖励内容</th>
+                                            <th width="200px" align="center" valign="middle" bgcolor="#EEEEEE">额外奖励内容</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">限制时间</th>
+                                            <th width="50px" align="center" valign="middle" bgcolor="#EEEEEE">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for info  in page %}
+                                            <tr id="hover_tr" class="{{info.gift_id}}" bgcolor="#FFFFFF">
+                                                <td align="center" valign="middle">
+                                                    <input type="checkbox" name="gift_id" id="check{{info.gift_id}}" value="{{info.gift_id}}">
+                                                </td>
+                                                <td align="center" valign="middle" class="gift_id" id="gift{{info.gift_id}}">{{info.index}}</td>
+                                                <td align="center" valign="middle" class="gift_id" id="gift{{info.gift_id}}">{{info.gift_id}}</td>
+                                                <td align="center" valign="middle" class="gift_name" id="name{{info.gift_id}}">{{info.gift_name}}</td>
+                                                <td align="center" valign="middle" class="gift_price" id="price{{info.gift_id}}">{{info.price}}</td>
+                                                <td align="center" valign="middle" class="gift_worth" id="worth{{info.gift_id}}">{{info.worth}}</td>
+
+                                                {% for data in gift_shop_type %}
+                                                    {% if info.open_type == data.vale  %}
+                                                        <td align="center" valign="middle" class="open_type">{{ data.content }}</td>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <td align="center" valign="middle" class="limit_num" id="limit_num{{info.gift_id}}">{{info.limit_num}}</td>
+                                                <td align="center" valign="middle" class="gift_time" id="gift_time{{info.gift_id}}">{{info.start_time |date:"Y-m-d H:i:s"}}-{{info.end_time |date:"Y-m-d H:i:s"}}</td>
+                                                <td align="center" valign="middle" class="vip_level" id="vip_level{{info.gift_id}}">{{info.vip_level|vip_name}}</td>
+
+                                                {% if info.vip_type == "1" %}
+                                                    <td align="center" valign="middle" class="vip_type" id="vip_type{{info.gift_id}}">选中vip等级以上购买</td>
+                                                {% else %}
+                                                    <td align="center" valign="middle" class="vip_type" id="vip_type{{info.gift_id}}">选中的vip购买</td>
+                                                {% endif %}
+
+                                                <td align="center" valign="middle">
+                                                    {% if info.online_state == 2 %}
+                                                        <span class="yx_jz_pub jz" id="line{{info.gift_id}}">未上线</span>
+                                                    {% else %}
+                                                        <span class="yx_jz_pub yx" id="line{{info.gift_id}}">上线中</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td align="center" valign="middle" id="reward{{info.gift_id}}" class="reward">{{info.reward| convert_reward}}</td>
+
+                                                {% if info.open_type == "5" %}
+                                                    <td align="center" valign="middle" id="add_reward{{info.gift_id}}" class="reward">{{info.add_reward| convert_reward}}</td>
+                                                    <td align="center" valign="middle" class="add_time" id="add_time{{info.gift_id}}">{{info.add_time}}</td>
+                                                {% else %}
+                                                    <td align="center" valign="middle" id="" class="reward"></td>
+                                                    <td align="center" valign="middle" class="add_time" id=""></td>
+                                                {% endif %}
+
+                                                <td align="center" valign="middle" class="w_update">
+                                                    <div style="height: 17px; width: 70px;">
+                                                        <a href="javascript:update_gift_info('{{info.gift_id}}');" class="bn_btn_more" style="margin: 2px; width: 50px;">更新</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="page" style="margin:0px 1px 0px -16px;">
+                                <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:-1px auto 40px auto;">
+                                    <tr>
+{#                                        <td align="center" bgcolor="#F9F9F9">#}
+{#                                            <input type="checkbox" id="quick" value="">#}
+{#                                        </td>#}
+                                        <td colspan="11" bgcolor="#F9F9F9">
+                                            {% if page.paginator.num_pages %}
+                                                <input type="button" id="check_all" style="width: 70px;height: 30px;background: #01BCFF;color: #fff;border-radius: 3px;" value="全选">&nbsp;
+{#                                                <input type="button" id="Inverse" style="width: 70px;height: 30px;background: #01BCFF;color: #fff;border-radius: 3px;" value="反选">&nbsp;#}
+                                                <input type="button" id="clear_all" style="width: 70px;height: 30px;background: #01BCFF;color: #fff;border-radius: 3px;" value="全不选">&nbsp;
+                                                <input type="button" id="up_online" style="width: 70px;height: 30px;background: #1bb556;color: #fff;border-radius: 3px;" value="上架">&nbsp;
+                                                <input type="button" id="down_online" style="width: 70px;height: 30px;background: #ff4f0f;color: #fff;border-radius: 3px;" value="下架">&nbsp;
+{#                                                <a href="javascript:void(0);" class="top bn_btn_more" style="width: 70px;height: 30px;background: #01BCFF;color: #fff;border-radius: 3px;">置顶</a>#}
+{#                                                <a href="javascript:void(0);" class="up bn_btn_more" style="width: 70px;height: 30px;background: #01BCFF;color: #fff;border-radius: 3px;">上移</a>#}
+{#                                                <a href="javascript:void(0);" class="down bn_btn_more" style="width: 70px;height: 30px;background: #01BCFF;color: #fff;border-radius: 3px;">下移</a>#}
+{#                                                <a href="javascript:void(0);" class="bottom bn_btn_more" style="width: 70px;height: 30px;background: #01BCFF;color: #fff;border-radius: 3px;">置底</a>#}
+                                            {% else %}
+                                                <input type="button" id="" style="width: 70px;height: 30px;background: #888888;color: #fff;border-radius: 3px;" value="全选">&nbsp;
+{#                                                <input type="button" id="" style="width: 70px;height: 30px;background: #888888;color: #fff;border-radius: 3px;" value="反选">&nbsp;#}
+                                                <input type="button" id="" style="width: 70px;height: 30px;background: #888888;color: #fff;border-radius: 3px;" value="全不选">&nbsp;
+                                                <input type="button" id="" style="width: 70px;height: 30px;background: #888888;color: #fff;border-radius: 3px;" value="上架">&nbsp;
+                                                <input type="button" id="" style="width: 70px;height: 30px;background: #888888;color: #fff;border-radius: 3px;" value="下架">&nbsp;
+                                            {% endif %}
+
+                                            <table cellspacing="0" cellpadding="0" border="0" style="float: right;">
+                                                <tbody>
+                                                    <tr>
+                                                        <!--<td>-->
+                                                            <!--<select class="pagination-page-list">-->
+                                                                <!--<option>10</option>-->
+                                                                <!--<option>20</option>-->
+                                                                <!--<option>30</option>-->
+                                                                <!--<option>40</option>-->
+                                                                <!--<option>50</option>-->
+                                                            <!--</select>-->
+                                                        <!--</td>-->
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        {% if page.has_previous %}
+                                                            <td>
+                                                                <a href="{{url_date}}?page=1" class="l-btn l-btn-small l-btn-plain">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="{{url_date}}?page={{ page.number|add:-1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% else %}
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% endif %}
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        <td>
+                                                            <span style="padding-left:6px;">Page</span>
+                                                        </td>
+                                                        <td>
+                                                            <input class="pagination-num" value="{{number}}" size="2" type="text">
+                                                        </td>
+
+                                                        <td>
+                                                            <span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+                                                        </td>
+
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        {% if page.has_next %}
+                                                            <td>
+                                                                <a href="{{url_date}}?page={{ page.number|add:1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="{{url_date}}?page={{ page.paginator.num_pages }}" class="l-btn l-btn-small l-btn-plain">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% else %}
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% endif %}
+
+                                                        <td>
+                                                            <div class="pagination-btn-separator"></div>
+                                                        </td>
+                                                        {% if page.has_next or page.has_previous %}
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" group="" id="paging">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% else %}
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled" group="">
+                                                                    <span class="l-btn-left l-btn-icon-left">
+                                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                                        <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                        {% endif %}
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+        </tbody>
+    </table>
+
+    <div id="dialogBg"></div>
+    <div id="dialog" class="animated" style="margin: auto;position: fixed; left: 26%; top: 0%;width: 890px;height:auto;background: #F9F9F9;">
+        <form  id="update_form_gift" action="" method="post">
+            {% csrf_token %}
+            <input type="text" style="display: none;" id="gift_id" name="gift_id" value="" />
+            <h5 style="margin:1px;">
+                <div style="height: auto;width: auto;text-align: center;">
+                    <label id="headline" style="color:black;font-size: 18px; font-weight: 600;"></label>
+                </div>
+            </h5>
+            <div style="display: inline-block;margin:6px 10px 0px 0px;float: left;">
+                 <div class="btn_model" style="height: 54px;">
+                     <p style="line-height: 56px;">选择渠道：</p >
+                 </div>
+                 <div id="channel_info" style="width:790px;height: auto;overflow-y: auto;">
+                     {% for key,value in channel_list.items %}
+                         <input type="checkbox" name="channel" class="channel_{{ key }}" value="{{ key }}" style="margin-left: 10px;">{{ value }}
+                     {% endfor %}
+                 </div>
+            </div>
+            <table width="55%" border="0" align="left" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:5px auto 30px auto;" id="userlist">
+                <tbody>
+                    <tr>
+                        <td align="right" bgcolor="#F9F9F9">
+                            <strong><label>礼包序号：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="10" maxlength="9" id="index" placeholder="请输入礼包序号" class="text-box_normal" style="float:left;width: 275px;" name="index" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" bgcolor="#F9F9F9">
+                            <strong><label>礼包热度：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                           <select name="hot" id="hot"  style="height: 25px;width: 100px;">
+                               {% for new in hot_name%}
+                                     <option value="{{ new.vale }}" {% if hot == new.vale %} selected {% endif %} >{{ new.content}}</option>
+                               {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" bgcolor="#F9F9F9">
+                            <strong><label>礼包名称：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="9" id="gift_name" placeholder="请输入礼包名称" class="text-box_normal" style="float:left;width: 275px;" name="gift_name" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>icon类型：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                           <select name="icon_type" id="icon_type"  style="height: 25px;width: 100px;">
+                                 <option value="1" >免费礼包</option>
+                                 <option value="2" >付费礼包</option>
+                                 <option value="3" >土豪礼包</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>价格：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="9" id="price" placeholder="请输入礼包价格" class="text-box_normal" style="float:left;width: 275px;" name="price" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>价值：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="9" id="worth" placeholder="请输入礼包价值" class="text-box_normal" style="float:left;width: 275px;" name="worth" type="text" value="">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>开放类型：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                           <select name="open_type" id="open_type" onchange="extra_reward(this)" style="height: 25px;width: 100px;">
+                               {% for data in gift_shop_type %}
+                                   <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                               {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>限制数量：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="9" id="limit_num" placeholder="请输入礼包限制数量" class="text-box_normal" style="float:left;width: 275px;" name="limit_num" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>开启时间：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input style="width: 275px;margin-top: 0px;" placeholder="请输入日期" id="day_start" class="laydate-icon" readonly value="{{start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>结束时间：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input style="width: 275px;margin-top: 0px;" placeholder="请输入日期" id="day_end" class="laydate-icon" readonly value="{{end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9">
+                            <strong><label>礼包数据：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <select name="gift_data" id="gift_data" style="height: 25px;width: 100px;">
+                                <option value="0">保留礼包数据</option>
+                                <option value="1">删除礼包数据</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9">
+                            <strong><label for="goods_price_type">VIP类型：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <select name="vip_level" id="vip_level" onchange="vip_type(this)" style="height: 25px;width: 145px;">
+                                <option value="1">选中vip等级以上购买</option>
+                                <option value="2">选中的vip购买</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9">
+                            <strong><label>VIP限制等级：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <select name="vip_grade" id="one_vip_grade" style="height: 25px;width:100px;" >
+                                {% for data in vip_level %}
+                                     <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                {% endfor %}
+                            </select>
+                            <div id="two_vip_grade" style="width: 100%;height: auto;overflow-y: auto;display: none;">
+                                {% for data in vip_level %}
+                                    <input type="checkbox" name="vip_grade" class="vip_grade{{ data.vale }}" value="{{ data.vale }}"{% if info.option == data.vale %} checked {% endif %} style="margin-left: 20px;"/>{{ data.content }}
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>明细1：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="15" id="detail_1" placeholder="请输入礼包明细" class="text-box_normal" style="float:left;width: 275px;" name="detail_1" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>明细2：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="15" id="detail_2" placeholder="请输入礼包明细" class="text-box_normal" style="float:left;width: 275px;" name="detail_2" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>明细3：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="15" id="detail_3" placeholder="请输入礼包明细" class="text-box_normal" style="float:left;width: 275px;" name="detail_3" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9">
+                            <strong><label>出售状态：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <select name="gift_online" id="gift_online" style="height: 25px;width: 100px;">
+                                <option value="1">上架</option>
+                                <option value="2">下架</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>跳转设置：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="15" id="skip" placeholder="跳转序号" class="text-box_normal" style="float:left;width: 275px;" name="skip" type="text" value="">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            {% for index in range_list %}
+                <div style="display: inline-block;margin:5px 10px 0px 0px;float: left;">
+                     <div class="btn_model" style="margin-left:20px;">
+                         <p>奖励物品</p >
+                     </div>
+                         <select style="width: 100px;height: 38px;float: left;" name="good_name" id="good_name{{ index }}">
+                            {% for data in give_reward %}
+                                 <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                            {% endfor %}
+                        </select>
+                     <div class="btn_model">
+                      <p>数量</p >
+                     </div>
+                     <input type="text" class="input_text" name="good_number" id="good_number{{ index }}" value="" placeholder="" style="float: left;width: 100px;height: 38px;border: 1px solid #E2E2E2;text-align: center;">
+                </div>
+            {% endfor %}
+
+            <div id="extra" style="display: none;">
+                <div class="header" style="text-align: center;">
+                    <p style="display:inline-block; font-size: 17px; margin-top: 24px;">额外奖励: </p>
+                </div>
+
+                {% for index in extra_list %}
+                    <div style="display: inline-block;margin:10px 10px 0px 0px;float: left;">
+                         <div class="btn_model" style="margin-left:20px;">
+                             <p>奖励物品</p >
+                         </div>
+                             <select style="width: 100px;height: 38px;float: left;" name="" id="extra_name{{ index }}">
+                                {% for data in give_reward %}
+                                     <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                {% endfor %}
+                            </select>
+                         <div class="btn_model">
+                          <p>数量</p >
+                         </div>
+                         <input type="text" class="input_text" name="" id="extra_number{{ index }}" value="" placeholder="" style="float: left;width: 100px;height: 38px;border: 1px solid #E2E2E2;text-align: center;">
+                    </div>
+                {% endfor %}
+
+                <div style="display: inline-block;margin:10px 10px 0px 0px;float: left;">
+                     <div class="btn_model" style="margin-left:20px;">
+                         <p>限制时间</p>
+                     </div>
+                     <input type="text" class="input_text" name="" id="update_time" value="" maxlength="8" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入限制时间" style="float: left;width: 175px;height: 38px;border: 1px solid #E2E2E2;text-align: center;">
+                    <div style="float: left;margin-top: 10px;margin-left: 10px;">
+                        <span style="color:#F00">(分钟)</span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="cut-off" style="display: inline-block;float: left;height: 115px;width:40%;margin-left: 10px;"></div>
+            <div class="btn_select" style="height: 60px;border-top: 1px solid #ccc;width: 45%;float:right;">
+                <input type="button" class="returns" style="float: right;margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;margin-top: 15px;" value="取消">
+                <input id="alter_gift_info" type="button" style="margin-right: 10px;float: right;margin-top: 15px;" value="确定更新" class="confirm">
+            </div>
+        </form>
+    </div>
+
+    <div id="dialogmag"></div>
+    <div id="dialohg" class="animated" style="margin: auto;position: fixed; left: 26%; top: 3%;width: 890px;height:auto;background: #F9F9F9;">
+        <form  id="add_form_gift" action="" method="post">
+            {% csrf_token %}
+            <h5 style="margin:10px;">
+                <div style="height: auto;width: auto;text-align: center;">
+                    <label id="headline" style="color:black;font-size: 18px; font-weight: 600;">添加礼包</label>
+                </div>
+            </h5>
+            <div style="display: inline-block;margin:6px 10px 0px 0px;float: left;">
+                 <div class="btn_model" style="height: 54px;">
+                     <p style="line-height: 56px;">选择渠道：</p >
+                 </div>
+                 <div id="add_channel_info" style="width:790px;height: auto;overflow-y: auto;">
+                     {% for key,value in channel_list.items %}
+                         <input type="checkbox" name="add_channel" class="channel_{{ key }}" value="{{ key }}" style="margin-left: 10px;">{{ value }}
+                     {% endfor %}
+                 </div>
+            </div>
+            <table width="55%" border="0" align="left" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:6px auto 30px auto;" id="userlist">
+                <tbody>
+                    <tr>
+                        <td align="right" bgcolor="#F9F9F9">
+                            <strong><label>礼包序号：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="10" maxlength="9" id="add_index" placeholder="请输入礼包序号" class="text-box_normal" style="float:left;width: 275px;" name="add_index" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" bgcolor="#F9F9F9">
+                            <strong><label>礼包热度：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                           <select name="add_hot" id="add_hot"  style="height: 25px;width: 100px;">
+                               {% for new in hot_name%}
+                                   <option value="{{ new.vale }}" {% if hot == new.vale %} selected {% endif %} >{{ new.content}}</option>
+                               {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" bgcolor="#F9F9F9">
+                            <strong><label>礼包名称：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="9" id="add_gift_name" placeholder="请输入礼包名称" class="text-box_normal" style="float:left;width: 275px;" name="add_gift_name" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>icon类型：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                           <select name="add_icon_type" id="add_icon_type"  style="height: 25px;width: 100px;">
+                                 <option value="1" >免费礼包</option>
+                                 <option value="2" >付费礼包</option>
+                                 <option value="3" >土豪礼包</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>价格：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="9" id="add_price" placeholder="请输入礼包价格" class="text-box_normal" style="float:left;width: 275px;" name="add_price" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>价值：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="9" id="add_worth" placeholder="请输入礼包价值" class="text-box_normal" style="float:left;width: 275px;" name="add_worth" type="text" value="">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>开放类型：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                           <select name="add_open_type" id="add_open_type" onchange="add_extra_reward(this)" style="height: 25px;width: 100px;">
+                               {% for data in gift_shop_type %}
+                                   <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                               {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>限制数量：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="9" id="add_limit_num" placeholder="请输入礼包限制数量" class="text-box_normal" style="float:left;width: 275px;" name="add_limit_num" type="text" value="">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>开启时间：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input style="width: 275px;margin-top: 0px;" placeholder="请输入日期" id="start" class="laydate-icon" readonly value="{{start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>结束时间：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input style="width: 275px;margin-top: 0px;" placeholder="请输入日期" id="end" class="laydate-icon" readonly value="{{end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9">
+                            <strong><label>VIP类型：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <select name="add_vip_level" id="add_vip_level" onchange="add_vip_type(this)" style="height: 25px;width: 145px;">
+                                <option value="1">选中vip等级以上购买</option>
+                                <option value="2">选中的vip购买</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9">
+                            <strong><label>VIP等级：</label></strong>
+                        </td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <select name="add_vip_grade" id="add_one_vip_grade" style="height: 25px;width: 100px;" >
+                                {% for data in vip_level %}
+                                     <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                {% endfor %}
+                            </select>
+                            <div id="add_two_vip_grade" style="width: 100%;height: auto;overflow-y: auto;display: none;">
+                                {% for data in vip_level %}
+                                    <input type="checkbox" name="add_vip_grade" value="{{ data.vale }}"{% if info.option == data.vale %} checked {% endif %} style="margin-left: 20px;"/>{{ data.content }}
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>明细1：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="15" id="add_detail_1" placeholder="请输入礼包明细" class="text-box_normal" style="float:left;width: 275px;" name="detail_1" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>明细2：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="15" id="add_detail_2" placeholder="请输入礼包明细" class="text-box_normal" style="float:left;width: 275px;" name="detail_2" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>明细3：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="15" id="add_detail_3" placeholder="请输入礼包明细" class="text-box_normal" style="float:left;width: 275px;" name="detail_3" type="text" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="600" align="right" bgcolor="#F9F9F9"><strong><label>跳转设置：</label></strong></td>
+                        <td width="1149" bgcolor="#F9F9F9">
+                            <input size="30" maxlength="15" id="add_skip" placeholder="跳转序号" class="text-box_normal" style="float:left;width: 275px;" name="add_skip" type="text" value="">
+                        </td>
+                    </tr>
+{#                    <tr>#}
+{#                        <td width="600" align="right" bgcolor="#F9F9F9">#}
+{#                            <strong><label>是否上线出售：</label></strong>#}
+{#                        </td>#}
+{#                        <td width="1149" bgcolor="#F9F9F9">#}
+{#                            <select name="add_gift_data" id="add_gift_data" style="height: 28px;width: auto;">#}
+{#                                <option value="1">上架</option>#}
+{#                                <option value="2">下架</option>#}
+{#                            </select>#}
+{#                        </td>#}
+{#                    </tr>#}
+                </tbody>
+            </table>
+            {% for index in range_list %}
+                <div style="display: inline-block;margin:6px 10px 0px 0px;float: left;">
+                     <div class="btn_model" style="margin-left:20px;">
+                         <p>奖励物品</p >
+                     </div>
+                         <select style="width: 100px;height: 38px;float: left;" name="add_good_name" id="add_good_name{{ index }}">
+                            {% for data in give_reward %}
+                                 <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                            {% endfor %}
+                        </select>
+                     <div class="btn_model">
+                      <p>数量</p >
+                     </div>
+                     <input type="text" class="input_text" name="add_number" id="add_number{{ index }}" value="" placeholder="" style="float: left;width: 100px;height: 38px;border: 1px solid #E2E2E2;text-align: center;">
+                </div>
+            {% endfor %}
+
+            <div id="add_extra" style="display: none;">
+                <div class="header" style="text-align: center;">
+                    <p style="display:inline-block; font-size: 17px; margin-top: 24px;">额外奖励: </p>
+                </div>
+
+                {% for index in extra_list %}
+                    <div style="display: inline-block;margin:10px 10px 0px 0px;float: left;">
+                         <div class="btn_model" style="margin-left:20px;">
+                             <p>奖励物品</p >
+                         </div>
+                             <select style="width: 100px;height: 38px;float: left;" name="" id="add_extra_name{{ index }}">
+                                {% for data in give_reward %}
+                                     <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                {% endfor %}
+                            </select>
+                         <div class="btn_model">
+                          <p>数量</p >
+                         </div>
+                         <input type="text" class="input_text" name="" id="add_extra_number{{ index }}" value="" placeholder="" style="float: left;width: 100px;height: 38px;border: 1px solid #E2E2E2;text-align: center;">
+                    </div>
+                {% endfor %}
+                <div style="display: inline-block;margin:10px 10px 0px 0px;float: left;">
+                     <div class="btn_model" style="margin-left:20px;">
+                         <p>限制时间</p>
+                     </div>
+                     <input type="text" class="input_text" name="" id="add_update_time" value="" maxlength="8" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入限制时间" style="float: left;width: 175px;height: 38px;border: 1px solid #E2E2E2;text-align: center;">
+                    <div style="float: left;margin-top: 10px;margin-left: 10px;">
+                        <span style="color:#F00">(分钟)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="add_cut-off" style="display: inline-block;float: left;height: 252px;width:40%;margin-left: 10px;"></div>
+            <div class="btn_select" style="height: 60px;border-top: 1px solid #ccc;width: 45%;float:right;">
+                <input type="button" class="returns" id="cancel" style="float: right;margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;margin-top: 15px;" value="取消">
+                <input id="add_gift_info" type="button" style="margin-right: 10px;float: right;margin-top: 15px;" value="添加礼包" class="confirm">
+            </div>
+        </form>
+    </div>
+
+<script>
+    !function(){
+    laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+    laydate({elem: '#demo'});//绑定元素
+    }();
+    //日期范围限制
+    var start = {
+        elem: '#start',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        //min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+             end.min = datas; //开始日选好后，重置结束日的最小日期
+             end.start = datas //将结束日的初始值设定为开始日
+        }
+    };
+    var end = {
+        elem: '#end',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+
+    var day_start = {
+        elem: '#day_start',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            day_start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+
+    var day_end = {
+        elem: '#day_end',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            day_start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+
+    var valid = {
+        elem: '#valid',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+    laydate(start); //valid
+    laydate(end);
+    laydate(day_start);
+    laydate(day_end);
+    laydate(valid);
+    //自定义日期格式
+    laydate({
+        elem: '#test1',
+        format: 'YYYY年MM月DD日',
+        festival: true, //显示节日
+        choose: function(datas){ //选择日期完毕的回调
+            alert('得到：'+datas);
+        }
+    });
+    //日期范围限定在昨天到明天
+    laydate({
+        elem: '#hello3',
+        min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+        max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+    });
+
+
+	$(function(){
+		//全选
+         $('#check_all').click(function(){
+             $("input").attr("checked", true);
+         });
+         //不选
+         $("#clear_all").click(function() {
+             $("input").attr("checked", false);
+         });
+
+         //反选
+         $("#Inverse").click(function(){
+             $("input").each(function() {
+                 $(this).attr("checked", !$(this).attr("checked"));
+             })
+         });
+	});
+
+</script>
+    </body>
+</html>

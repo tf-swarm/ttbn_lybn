@@ -1,0 +1,27 @@
+body {overflow-y:scroll; margin: 0; padding: 0; line-height: 2em;}
+.bn_btn_one{display:block;background:#00EE00;color:#FFF;width:100px;height:30px;line-height:30px;border-radius:3px;margin:10px;}
+.bn_btn_code{display:block;background:#00EE00;width:100px;height:30px;line-height:30px;border-radius:3px;margin:10px;}
+.ui.input{margin-top: 20px;}
+.ui.dropdown{width:90px}
+.ui.label{width:70px;height: 38px;line-height: 20px;text-align: center;}
+.rawding{width:90px}
+.four.wide.column{height: 58px;}
+.table-cont,.table-rolling{
+  /**make table can scroll**/
+  max-height: 439px;
+  overflow-y: auto;
+  overflow-x: auto;
+  /** add some style**/
+  /*padding: 2px;*/
+  background: white;
+  margin: 30px 10px;
+  box-shadow: 3px 1px 3px 0px #ddd;
+  padding: 0px;
+
+}
+thead{
+  background-color: #ddd;
+
+}
+#thead-2{background-color: #ddd;}
+.ttitle{color:#A0A0A0;padding-left:9%;white-space:nowrap;}

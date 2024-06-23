@@ -1,0 +1,454 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="/static/css/account_manage.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/css/default.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/red_popup.css" />
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+        <link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+        <script type="text/javascript" src="/static/laydate.js"></script>
+	    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+	    <script type="text/javascript" src="/static/js/semantic.min.js"></script>
+
+		<style>
+			.head_div {
+				margin-left: 20px;
+				width: 85%;
+				height: auto;
+				margin-top: 15px;
+				display: inline-block;
+			}
+			.head_div span{float: left;  font-size: 18px;  height: 36px; line-height: 36px;color: black;font-weight: 600;}
+
+			.spinner_select option {
+				font-size: 18px;
+			}
+
+			h1 {
+				display: block;
+				font-size: 24px;
+				line-height: 40px;
+				height: 45px;
+				float: left;
+				color: black;
+				font-weight: 600;
+			}
+
+			h1 a {
+				color: white;
+				width: 112px;
+				height: 35px;
+				background: #1B9AF7;
+				border-radius: 3px;
+				float: right;
+				margin-top: 4px;
+			}
+            .elapsed_time{
+				width: 70px;
+				height: 32px;
+				line-height: 32px;
+				background: #e8e8e8;
+				border-radius: 3px 0px 0px 3px;
+				float: left;
+				font-size: 14px;
+				text-align: center;
+				font-weight: 600;
+			}
+			.input_text {
+				width: auto;
+				height: 36px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px #cccccc;
+				text-align: center;
+			}
+
+			.spinner_select option{font-size: 18px;}
+			.remove{
+				display:inline-block;
+				width: 20px;
+				height: 20px;
+				cursor: pointer;
+				float: left;
+				margin: 8px 10px 8px 18px;
+				background: url(/static/images/close_btn.png) no-repeat -220px -315px;
+			}
+            .btn_model{
+                width: 70px;
+                height: 36px;
+                border: 0;
+                background: #e8e8e8;
+                border-radius: 4px 0px 0px 4px;
+                float: left;
+            }
+            .btn_model p{
+                color: rgba(0,0,0,.5);
+                font-weight: 700;
+                text-align: center;
+                line-height: 36px;
+                font-size: 1em;
+                margin: 0;
+            }
+           .btn_model select{
+	           	width: 100px;
+			     height: 36px;
+			     border: solid 1px #cccccc;
+			     font-size: 17px;
+			}
+			.select_gift{font-size: 24px;margin-top: 4px;}
+			.select_gift option{font-size: 24px;}
+		</style>
+        <script>
+            $(function(){
+                $("#gift_name").change(function(){
+                    gift = $(this).val();
+                    var URL= "/activity_manage/activity_gift_bag/?model="+gift;
+                    location.href=URL;
+                });
+            });
+        </script>
+	</head>
+
+	<body style="line-height: 0.1em; overflow:auto;">
+		<div class="body-div">
+			<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+				<tr>
+					<td width="25%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">活动管理 &gt; 活动礼包</strong></td>
+					<td width="25%" align="left" valign="middle" bgcolor="#F5F5F5"></td>
+					<td width="60%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update"></td>
+					<td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+						<a href="javascript:;" id="bn_btn_one" onclick="" style="background-color: #888888">操作记录</a>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4" valign="top" bgcolor="#FFFFFF">
+						<!--主要内容开始-->
+						<form action="" method="post" id="form_gift">
+                            {% csrf_token %}
+							<div style="height: 40px; width:100%;margin-left: 30px;margin-top: 20px;">
+								<h1 style="width:278px;">
+									<select class="select_gift" id="gift_name" >
+                                        {% for gift in gift_name%}
+                                             <option value="{{ gift.vale }}" {% if model == gift.vale %} selected {% endif %} >{{ gift.content}}</option>
+                                        {% endfor %}
+									</select>
+                                    <a href="javascript:;" id="alter_gift_name" >确认更改</a>
+                                </h1>
+                                <h1 style="width:265px;margin-left: 60px;">登录提示开关:
+                                    <div class="btn_fath clearfix off" onclick="gift_switch(this)" id="gift_switch" style="float: right;border-radius: 15px;width: 92px;margin-top: 5px;">
+		                                <div class="move" id="move_gift"  data-state="off" style="width:30px;border-radius: 15px;height: 30px;"></div>
+		                                <div class="btnSwitch btn1" style="height: 32px;width:40px;"></div>
+		                                <div class="btnSwitch btn2 " style="height: 32px;width:40px;"></div>
+                           			</div>
+                                </h1>
+							</div>
+							<div style="height: 80%; margin: 10px;">
+								<div class="head_div" style="width: 100%;">
+				                    <span>活动标题：</span>
+									<input type="text" class="input_text" name="activity_name" id="gift_title" value="{{ name }}" placeholder="请输入活动名称" style="float: left;margin-left: 10px;" />
+									<span style="margin-left: 50px;">活动排序：</span>
+									<input type="text" class="input_text" maxlength="3" id="activity_order" onkeyup="value=value.replace(/[^\d]/g,'')" name="order" value="{{ order }}" placeholder="活动顺序" style="margin-left: 10px;float: left; width: 120px;" />
+                                    <span style="margin-left: 50px;">Hot</span>
+                                    <select style="width: 60px;height: 35px;margin-left: 10px;" name="hot" id="">
+                                        {% for new in hot_name%}
+                                             <option value="{{ new.vale }}" {% if hot == new.vale %} selected {% endif %} >{{ new.content}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+								<div class="head_div">
+									<span>活动描述：</span>
+									<textarea cols="50" rows="15" id="led" name="activity_desc" placeholder="请输入活动描述" style="margin-left: 10px;width:310px;height:135px;font-size: 16px;font-weight: 400;">{{ desc }}</textarea>
+								</div>
+                                <div class="head_div" style="margin-top: 5px">
+									<span style="margin-top: 15px;">开放渠道：</span>
+									<div style="margin-left: 90px; height:auto;width:94%;" >
+                                        {% for channel in channel_list %}
+                                            <div style="float: left;margin: 10px;width: 195px;height: 40px;">
+                                                <select name="channel" class="props_list_sty" style="float: left;width:auto;height: 40px;">
+                                                    {% for key,value in chanel_info.items %}
+                                                         <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <a onclick="$(this).parent().remove();" class="remove" id="close_channel"></a>
+                                            </div>
+                                        {% endfor %}
+                                        <button class="add_channel" id="add-prize" type="button" style="margin-top: 10px;width: 110px; height: 40px; font-size: 18px;background: #ff6600;color: white;border-radius: 3px;border: none;">添加渠道</button>
+                                    </div>
+								</div>
+                                <div class="head_div" style="margin-top: 40px;">
+									<span>活动周期：</span>
+									<span class="elapsed_time" style="font-size: 14px;height: 32px;line-height: 32px;">开始时间</span>
+									<input placeholder="请输入日期" style="float: left;height: 32px;font-size: 16px;width: 240px;" id="start" class="laydate-icon" readonly="" value="{{ start }}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+									<span class="elapsed_time" style="font-size: 14px;height: 32px;margin-left: 40px;line-height: 32px;">结束时间</span>
+									<input placeholder="请输入日期" style="height: 32px;font-size: 16px;width: 240px;" id="end" class="laydate-icon" readonly="" value="{{ end }}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+								</div>
+                                <div class="head_div" style="margin-top: 50px;">
+                                    <span>活动设置：</span>
+									<span class="elapsed_time" style="font-size: 14px;height: 36px;">充值金额</span>
+									<input type="text" class="input_text" name="pay_money" id="price" value="{{ price }}" placeholder="" readonly="readonly" style="float: left;width: 85px;background-color: #cccccc;" />
+                                    <p style="font-size:20px;line-height:40px;height:40px;float:left;">元</p>
+                                    <span class="elapsed_time" style="margin-left: 20px;font-size: 14px;height: 36px;">折扣力度</span>
+									<input type="text" class="input_text" name="discount" id="discount" value="{{ discount }}" placeholder="" style="float: left;width: 85px;" />
+                                    <p style="font-size:20px;line-height:40px;height:40px;float:left;">折</p>
+								</div>
+                                <div class="" style="margin-left: 100px; max-height:360px;width:85%;display: block; overflow: auto;">
+                                    {% for info in reward_list %}
+                                        <div style="height:auto;width: 210px; float: left;margin: 10px;">
+                                            <div class="btn_model">
+                                                <p>礼包商品</p>
+                                            </div>
+                                            <select name="good_name" style="float: left;width: 8rem;height: 36px;border: solid 1px #cccccc;font-size: 17px;">
+                                                {% for data in give_reward %}
+                                                     <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                                {% endfor %}
+                                            </select>
+{#                                            <a onclick="$(this).parent().remove();" class="remove" id="close_button"></a>#}
+                                            <div class="btn_model" style="margin-top: 1.2rem;">
+                                                <p>商品数量</p>
+                                            </div>
+                                            <input type="text" class="input_text" name="good_number" value="{{ info.value }}" placeholder="" style="float: left;width: 8rem;margin-top: 1.2rem;">
+                                        </div>
+                                    {% endfor %}
+{#                                    <button class="edit_permission" id="pdd-prize" type="button" style="margin:10px; width: 110px; height: 40px; font-size: 18px;">添加新商品</button>#}
+								</div>
+							</div>
+						</form>
+						<!--主要内容结束-->
+					</td>
+				</tr>
+			</table>
+		</div>
+
+<script type="text/javascript">
+
+    var CowCnt = 1;
+    $('#add-prize').click(function(){
+        var chanel_list = {{ chanel_list|safe }};
+        var stc_html = '';
+        stc_html += '<div style="float: left;margin: 10px;width: 195px;height: 40px;">';
+        stc_html += '<select name="channel" class="props_list_sty" style="float: left;width:auto;height: 40px;">';
+        for(m in chanel_list) {
+            chanel = '<option value="'+m+'">'+chanel_list[m]+'</option>';
+            stc_html += chanel
+        }
+        stc_html += '</select>';
+        stc_html += '<a class="remove" id="close_channel'+CowCnt+'"></a>';
+        stc_html += '</div>';
+
+        $('#add-prize').before(stc_html);
+        //删除内容
+        $("#close_channel"+CowCnt).click(function (){
+            $(this).parent().remove();
+        });
+        CowCnt++;
+    });
+
+    $(function(){
+        var error_desc = false;
+        var error_name = false;
+        var error_discount = false;
+        var error_price = false;
+	    var error_order = false;
+	    var error_start = false;
+        var error_end = false;
+        $('#alter_gift_name').click(function(){
+			var ele = $('#gift_switch').children(".move");
+			if(ele.attr("data-state") == "on"){
+				show = 1
+			}else if(ele.attr("data-state") == "off"){
+				show = 0
+            }
+            check_time();
+			check_name();
+			check_order();
+			check_price();
+			check_discount();
+			if (error_start == true && error_end == true && error_order == true && error_price == true && error_discount == true && error_name == true){
+			    var model = $('#gift_name option:selected').val();
+			    var data_info = $.param({"show":show,"model":model}) + "&" + $("#form_gift").serialize();
+
+                if(confirm("您确定修改活动礼包"+model+"?")){
+                    $.post('/activity_manage/activity_gift_bag/', data_info, function(date) {
+                        if ( date.code) {
+                            alert(date.info);
+                        }
+                        else {
+                            alert(date.info);
+                        }
+                    });
+                }else {
+                    alert("您取消了修改活动礼包"+model);
+                }
+                return true;
+            }else {
+			    return false;
+            }
+		});
+
+        function check_order(){
+            var len_order = $('#activity_order').val().length;
+            if(len_order==0)
+            {
+                alert("请输入活动显示顺序!");
+                error_order = false;
+            }
+            else
+            {
+                error_order = true;
+            }
+        }
+
+        function check_name(){
+            var len_name = $('#gift_title').val().length;
+            if(len_name==0)
+            {
+                alert("请输入礼包标题!");
+                error_name = false;
+            }
+            else
+            {
+                error_name = true;
+            }
+        }
+
+        function check_price(){
+            var len_price = $('#price').val().length;
+            if(len_price==0)
+            {
+                alert("请输入充值金额!");
+                error_price = false;
+            }
+            else
+            {
+                error_price = true;
+            }
+        }
+
+        function check_discount(){
+            var len_count = $('#discount').val().length;
+            if(len_count==0)
+            {
+                alert("请输入折扣力度!");
+                error_discount = false;
+            }
+            else
+            {
+                error_discount = true;
+            }
+        }
+
+        function check_time(){
+            var len_start = $('#start').val().length;
+            var len_end = $('#end').val().length;
+            if(len_start==0 || len_end==0)
+            {
+                alert("请输入日期");
+                error_start = false;
+                error_end = false;
+            }
+            else
+            {
+                error_start = true;
+                error_end = true;
+            }
+        }
+    });
+
+    function The_gift() {
+        var URL= "/activity_manage/The_novice_gift_record/";
+        location.href=URL;
+    }
+
+    !function(){
+    laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+    laydate({elem: '#demo'});//绑定元素
+    }();
+    //日期范围限制
+    var start = {
+        elem: '#start',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        //min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+             end.min = datas; //开始日选好后，重置结束日的最小日期
+             end.start = datas //将结束日的初始值设定为开始日
+        }
+    };
+    var end = {
+        elem: '#end',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+
+    var valid = {
+        elem: '#valid',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        // min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+    laydate(start); //valid
+    laydate(end);
+    laydate(valid);
+    //自定义日期格式
+    laydate({
+        elem: '#test1',
+        format: 'YYYY年MM月DD日',
+        festival: true, //显示节日
+        choose: function(datas){ //选择日期完毕的回调
+            alert('得到：'+datas);
+        }
+    });
+    //日期范围限定在昨天到明天
+    laydate({
+        elem: '#hello3',
+        min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+        max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+    });
+
+    function gift_switch(th){
+		var ele = $(th).children(".move");
+		if(ele.attr("data-state") == "on"){
+			ele.animate({left: "0"}, 300, function(){
+			ele.attr("data-state", "off");
+		});
+		$(th).removeClass("on").addClass("off");
+		}else if(ele.attr("data-state") == "off"){
+			ele.animate({left: '60px'}, 300, function(){
+				$(this).attr("data-state", "on");
+			});
+			$(th).removeClass("off").addClass("on");
+		}
+	}
+
+    $(function () {
+		if({{ tips|default:0 }}==1){
+			$('#gift_switch').attr("data-state", "on");
+			$('#move_gift').animate({left: '60px'}, 300, function(){
+				$(this).attr("data-state", "on");
+			});
+			$('#gift_switch').removeClass("off").addClass("on");
+		}
+
+		if({{ reward_len|default:0 }} >=5){
+		    $("#pdd-prize").hide();
+		}
+	});
+    </script>
+    </body>
+</html>

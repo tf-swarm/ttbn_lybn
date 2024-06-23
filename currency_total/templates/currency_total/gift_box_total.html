@@ -1,0 +1,488 @@
+{% load extratags %}
+<html>
+	<head>
+		<title>货币统计 &gt; 礼盒数据统计</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+        <link type="text/css" rel="stylesheet" href="/static/css/load.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/style.css" />
+        <link type="text/css" rel="stylesheet" href="/static/css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/css/jquery-ui.css" />
+        <link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+        <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+		<script type="text/javascript" src="/static/laydate.js"></script>
+        <script type="text/javascript" src="/static/js/load-min.js"></script>
+        <script type="text/javascript" src="/static/js/common.js"></script>
+        <script type="text/javascript" src="/static/js/jquery.easyui.min.js"></script>
+        <script type="text/javascript"  src="/static/js/fixed_header.js"></script>
+
+	</head>
+    <script>
+        $(function(){
+            $('#paging').click(function () {
+                var pag = $('.pagination-num').val() ;
+                var URL= "/coin_total/total?page=" + pag;
+                location.href=URL;
+            });
+
+            $('#export_data').click(function () {
+                var URL= "/coin_total/total_xls/";
+                location.href=URL;
+            });
+
+            var error_start = false;
+            var error_end = false;
+            $('#query_data').click(function(){
+                check_time();
+                if(error_start == true && error_end == true)
+                {
+                    $.Load_data();
+                    $("#form_search").submit();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            });
+
+            function check_time(){
+                var len_start = $('#start').val().length;
+                var len_end = $('#end').val().length;
+                if(len_start==0 || len_end==0)
+                {
+                    msgShow('系统提示', "请输入日期", 'warning');
+                    error_start = false;
+                    error_end = false;
+                }
+                else
+                {
+                    error_start = true;
+                    error_end = true;
+                }
+            }
+
+            $('.popup').click(function(event) { //点击a标签
+                if($(this).find(".item-desc").is(':hidden')) { //如果当前隐藏
+                    $(this).parents().find(".item-desc").hide()
+                    $(this).find(".item-desc").show(); //那么就显示div
+                    $(this).find(".item-desc").css("left", document.body.scrollLeft + event.clientX + 20);
+			        $(this).find(".item-desc").css("top", document.body.scrollLeft + event.clientY + -140);
+
+                } else { //否则
+                    $(".item-desc").hide(); //就隐藏div
+
+                }
+            })
+            $(document).click(function() {
+                $(".item-desc").hide();
+
+            });
+            $(".popup").click(function(event) {
+                event.stopPropagation();
+            });
+
+        });
+
+    </script>
+
+	<body style="min-width:1010px;">
+		<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+			<form action="/currency_total/gift_box_total/" method="post" id="form_search">
+                {% csrf_token %}
+			<tr>
+			  	<td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">货币统计 &gt; 礼盒数据统计</strong></td>
+
+		      	<td width="74%" align="left" valign="top" bgcolor="#F5F5F5" style="padding-top:10px;">
+                    <input placeholder="请输入日期" id="start" class="laydate-icon" readonly value="{{start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time">
+                    <input placeholder="请输入日期" id="end" class="laydate-icon" readonly value="{{end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time">
+			  		<select name="channel" class="dowp_list_sty">
+						{% for key,value in chanel_info.items %}
+                             <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>
+                        {% endfor %}
+	  		  		</select>
+
+                    <input type="button" value="确认查询" id="query_data" class="button"/>
+                    <!--{% if page.paginator.num_pages %}-->
+                        <!--<input type="button" value="导出xls" class="button_color" id="export_data" style="margin-left: 20px;"/>-->
+                    <!--{% else %}-->
+                        <!--<input type="button" value="导出xls" class="button_color"  style="margin-left: 20px;background-color: #8b8a8a"/>-->
+                    <!--{% endif %}-->
+                </td>
+
+		      	<td width="10%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+
+	      	  </tr>
+			</form>
+
+			<tr>
+				<td colspan="3" valign="top" bgcolor="#FFFFFF">
+					<!--主要内容开始-->
+                    <div class='table-cont' id='table-cont'>
+                        <table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF"  id="order_title" style="margin-top: -1px;">
+                            <thead>
+                                <tr>
+                                    <th align="center" bgcolor="#EEEEEE">日期</th>
+                                    <th align="center" bgcolor="#EEEEEE">渠道</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日充值</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日产出比率</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日礼盒产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日礼盒消耗</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日捕鸟宝箱产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日捕鸟宝箱消耗</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日粽子产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日粽子消耗</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日福袋产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日福袋消耗</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日蓝色宝箱产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日蓝色宝箱消耗</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日紫色宝箱产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日紫色宝箱消耗</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日钻石宝箱产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当日钻石宝箱消耗</th>
+                                    <th align="center" bgcolor="#EEEEEE">当天话费券产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当天冰龙蛋产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当天火龙蛋产出</th>
+                                    <th align="center" bgcolor="#EEEEEE">当天圣龙蛋产出</th>
+                                </tr>
+                            </thead>
+                            {% for info in page %}
+                                <tr id="hover_tr" bgcolor="#FFFFFF">
+                                    <td align="center">{{info.day_time}}</td>
+                                    <td align="center" class="popup">
+                                        <span>{{ info.channel | channel_name }}</span>
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{ info.day_pay_total}}</span>
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{ info.in_gift_rate}}</span>
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_1305}}</span>
+                                        {% if info.in_props_1305_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_1305 in info.in_props_1305_pop %}
+                                                    <label>{{props_1305}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                    <td align="center" class="popup">
+                                        <span>{{ info.out_props_1305}}</span>
+                                    </td>
+
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_1327}}</span>
+                                        {% if info.in_props_1327_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_1327 in info.in_props_1327_pop %}
+                                                    <label>{{props_1327}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                    <td align="center" class="popup">
+                                        <span>{{ info.out_props_1327}}</span>
+                                    </td>
+
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_1321}}</span>
+                                        {% if info.in_props_1321_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_1321 in info.in_props_1321_pop %}
+                                                    <label>{{props_1321}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                    <td align="center" class="popup">
+                                        <span>{{ info.out_props_1321}}</span>
+                                    </td>
+
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_1302}}</span>
+                                        {% if info.in_props_1302_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_1302 in info.in_props_1302_pop %}
+                                                    <label>{{props_1302}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                    <td align="center" class="popup">
+                                        <span>{{ info.out_props_1302}}</span>
+                                    </td>
+
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_601}}</span>
+                                        {% if info.in_props_601_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_601 in info.in_props_601_pop %}
+                                                    <label>{{props_601}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                    <td align="center" class="popup">
+                                        <span>{{ info.out_props_601}}</span>
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_602}}</span>
+                                        {% if info.in_props_602_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_602 in info.in_props_602_pop %}
+                                                    <label>{{props_602}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{ info.out_props_602}}</span>
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_603}}</span>
+                                        {% if info.in_props_603_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_603 in info.in_props_603_pop %}
+                                                    <label>{{props_603}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{ info.out_props_603}}</span>
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_silver_coupon}}</span>
+                                        {% if info.in_silver_coupon_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for in_silver_coupon in info.in_silver_coupon_pop %}
+                                                    <label>{{in_silver_coupon}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_702}}</span>
+                                        {% if info.in_props_702_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_702 in info.in_props_702_pop %}
+                                                    <label>{{props_702}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_703}}</span>
+                                        {% if info.in_props_703_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_703 in info.in_props_703_pop %}
+                                                    <label>{{props_703}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td align="center" class="popup">
+                                        <span>{{info.in_props_704}}</span>
+                                        {% if info.in_props_704_pop|length > 0 %}
+                                            <div class="item-desc" style="max-height: 600px; overflow-y: auto">
+                                                {% for props_704 in info.in_props_704_pop %}
+                                                    <label>{{props_704}}</label><br/>
+                                                {%endfor%}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                  	    </table>
+                    </div>
+					<!--主要内容结束-->
+					<div class="datagrid-pager pagination">
+                        <table cellspacing="0" cellpadding="0" border="0">
+                            <tbody>
+                                <tr>
+                                    <!--<td>-->
+                                        <!--<select class="pagination-page-list">-->
+                                            <!--<option>10</option>-->
+                                            <!--<option>20</option>-->
+                                            <!--<option>30</option>-->
+                                            <!--<option>40</option>-->
+                                            <!--<option>50</option>-->
+                                        <!--</select>-->
+                                    <!--</td>-->
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_previous %}
+                                        <td>
+                                            <a href="{{url_date}}?page=1" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.number|add:-1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    <td>
+                                        <span style="padding-left:6px;">Page</span>
+                                    </td>
+                                    <td>
+                                        <input class="pagination-num" value="{{number}}" size="2" type="text">
+                                    </td>
+                                    <td>
+                                        <span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+                                    </td>
+
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_next %}
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.number|add:1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{url_date}}?page={{ page.paginator.num_pages }}" class="l-btn l-btn-small l-btn-plain">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    <td>
+                                        <div class="pagination-btn-separator"></div>
+                                    </td>
+                                    {% if page.has_next or page.has_previous %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" id="paging">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                <span class="l-btn-left l-btn-icon-left">
+                                                    <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                    <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+			</tr>
+		</table>
+
+<script>
+!function(){
+laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+laydate({elem: '#demo'});//绑定元素
+}();
+//日期范围限制
+var start = {
+    elem: '#start',
+    format: 'YYYY-MM-DD hh:mm:ss',
+    //min: laydate.now(), //设定最小日期为当前日期
+    max: '2099-06-16', //最大日期
+    istime: true,
+    istoday: false,
+    choose: function(datas){
+         end.min = datas; //开始日选好后，重置结束日的最小日期
+         end.start = datas //将结束日的初始值设定为开始日
+    }
+};
+var end = {
+    elem: '#end',
+    format: 'YYYY-MM-DD hh:mm:ss',
+    // min: laydate.now(),
+    max: '2099-06-16',
+    istime: true,
+    istoday: false,
+    choose: function(datas){
+        start.max = datas; //结束日选好后，充值开始日的最大日期
+    }
+};
+laydate(start);
+laydate(end);
+//自定义日期格式
+laydate({
+    elem: '#test1',
+    format: 'YYYY年MM月DD日',
+    festival: true, //显示节日
+    choose: function(datas){ //选择日期完毕的回调
+        alert('得到：'+datas);
+    }
+});
+//日期范围限定在昨天到明天
+laydate({
+    elem: '#hello3',
+    min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+    max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+});
+</script>
+</body>
+</html>

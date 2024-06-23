@@ -1,0 +1,92 @@
+{% load extratags %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link type="text/css" rel="stylesheet" href="/static/css/red_popup.css" />
+    <link type="text/css" rel="stylesheet" href="/static/css/load.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/red_packet.css">
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/load-min.js"></script>
+    <script type="text/javascript" src="/static/js/fixed_header.js"></script>
+
+  <style type="text/css">
+      .alter_data{ width: 112px;
+            height: 35px;
+            background: #1B9AF7;
+            border-radius: 3px;
+            float: right;
+            margin-top: 4px;
+      }
+  </style>
+  <script>
+      $(function(){
+          $('.alter_data').click(function(){
+            var params = $('#form_search').serialize();
+            if(confirm("您确定设置兑换详情?")){
+                $.Load_data();
+                $.post('/limit_time_shop/exchange_details/', params, function(date) {
+                    if ( date.code) {
+                        $.mask_close_all();
+                        alert(date.msg);
+                    }
+                });
+            }else {
+                alert("您取消了设置兑换详情");
+            }
+
+        });
+
+    });
+  </script>
+
+
+</head>
+<body style="min-width:1360px;">
+    <div class="body-div">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0" >
+            <form action="" method="post" id="form_search">
+                {% csrf_token %}
+                <tr>
+                    <td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">商城管理&gt; 兑换详情</strong></td>
+
+                    <td width="62%" align="right" valign="middle" bgcolor="#F5F5F5">
+                    	<input type="button" class="alter_data" value="确认更改"  style="color: white;border: 0px; "/>
+                     </td>
+                    <td width="12%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="4" valign="top" bgcolor="#FFFFFF">
+                            <!--主要内容开始-->
+                        <div class='table-cont' id='table-cont'>
+                            <table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF"  style="margin-top: -1px;">
+                                <thead>
+                                    <tr>
+                                        <th align="center" bgcolor="#EEEEEE" style="height: 50px;">渠道名称</th>
+                                        <th align="center" bgcolor="#EEEEEE">详情说明</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for channel, value in info_dict.items %}
+                                        <tr>
+                                              <td align="center" bgcolor="#FFFFFF" style="height: 50px;">
+                                                <input type="text" name="channel" id="channel" value="{{ channel | channel_name }}" readonly="readonly" style="border: 0px;width: auto;outline:medium;cursor: pointer;text-align: center;"/>
+                                              </td>
+                                              <td align="center" bgcolor="#FFFFFF" style="height: 50px;">
+                                                <textarea id="" name="in_data" style="width:680px;height:280px;float: left;font-size: 15px;margin-top: 10px;">{{ value }}</textarea>
+                                              </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </form>
+        </table>
+  </div>
+</body>
+</html>

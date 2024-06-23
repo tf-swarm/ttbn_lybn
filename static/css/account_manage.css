@@ -1,0 +1,29 @@
+.vised{height: 400px;border-top: 1px dotted #ccc;}
+.data_display{width: 100%; display:block;overflow-y:auto; height:400px; overflow:scroll;overflow-x:hidden;margin-top: 30px;}
+.new_management{width: 152px; height: 100%;margin-left: 50px; float: left;}
+.btn_model{width: 150px;height: 40px; background:#cacbcd;border: solid 1px #5E5E55;}
+.btn_model p{color: rgba(0,0,0,.5);font-weight: 800; text-align: center;line-height: 40px; font-size: 20px;}
+.new_management input{width: 150px; height: 40px;border: solid 1px #5E5E55; margin-top: 20px;font-size: 22px;text-align: center;}
+.new_management select{width: 152px; height: 44px;border: solid 1px #5E5E55; margin-top: 20px;font-size: 22px;}
+.new_management select option{font-size: 22px;}
+.headline{font-size: 30px;font-weight: 800; display: inline-block; line-height: 80px; margin-right: 200px;}
+.goued{width: 100%; margin-top: 15px;}
+.goued label{margin-left: 20px;display: inline-block;height: 30px; font-size: 16px; line-height: 30px; width: 102px;}
+.label_end {float:left;margin-left: 20px; margin-right: 20px; margin-top: 15px;margin-bottom: 20px;}
+.label_end a{cursor:pointer;}
+.btn_select{height: 40px; margin-top: 30px;border-top: 1px dotted #ccc;}
+.btn_select a{display: inline-block;background: #09F;
+		color: #FFF; float: right;width: 100px;
+		text-align: center;line-height: 32px;font-weight: 600;
+		border-radius: 3px;
+		border: none;
+		cursor: pointer;
+		font-size: 15px;
+		margin-top: 15px;
+		margin-right: 20px;}
+#edit_cancel{float: right; margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;}
+#add_cancel{float: right; margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;}
+#give_cancel{float: right; margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;}
+#ratio_cancel{float: right; margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;}
+.edit_permission{margin-top: 10px; margin-left: 20px;margin-bottom: 10px;background: #009c95;color: white;border-radius: 3px;border: none;cursor:pointer;height: 30px; width: 80px;}
+.add_permission{margin-top: 10px; margin-left: 20px;margin-bottom: 10px;background: #009c95;color: white;border-radius: 3px;border: none;cursor:pointer;height: 30px; width: 80px;}

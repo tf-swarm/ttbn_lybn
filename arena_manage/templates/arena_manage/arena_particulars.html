@@ -1,0 +1,404 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link rel="stylesheet"  href="/static/css/popup.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/default.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/load.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/semantic.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/load-min.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.easyui.min.js"></script>
+    <script type="text/javascript"  src="/static/laydate.js"></script>
+    <script type="text/javascript"  src="/static/js/fixed_header.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+
+    <script>
+        $(function(){
+            $('#paging').click(function () {
+                var pag = $('.pagination-num').val() ;
+                var URL= "/arena_manage/Garticular?page=" + pag;
+                location.href=URL;
+            });
+
+            $('#exports').click(function () {
+                var URL= "/arena_manage/collect_xls/";
+                location.href=URL;
+            });
+
+            var error_start = false;
+            var error_end = false;
+
+            $('#form_search').submit(function(){
+                check_time();
+
+                if(error_start == true && error_end == true)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            });
+
+            function check_time(){
+                var len_start = $('#start').val().length;
+                var len_end = $('#end').val().length;
+                if(len_start==0 || len_end==0)
+                {
+                    msgShow('系统提示', "请输入日期", 'warning');
+                    error_start = false;
+                    error_end = false;
+                }
+                else
+                {
+                    error_start = true;
+                    error_end = true;
+                }
+            }
+
+            $('.popup').click(function(event) { //点击a标签
+                if($(this).find(".item-desc").is(':hidden')) { //如果当前隐藏
+                    $(this).parents().find(".item-desc").hide()
+                    $(this).find(".item-desc").show(); //那么就显示div
+					$(".item-desc").css("left", document.body.scrollLeft + event.clientX + -700);
+					$(".item-desc").css("top", document.body.scrollLeft + event.clientY + -100);
+
+                } else { //否则
+                    $(".item-desc").hide(); //就隐藏div
+
+                }
+            })
+            $(document).click(function() {
+                $(".item-desc").hide();
+
+            });
+            $(".popup").click(function(event) {
+                event.stopPropagation();
+            });
+        });
+
+        //加载层-全屏
+		function Load_data(){
+		    $.Load_data();
+            $("#form_search").submit();
+		}
+    </script>
+
+
+</head>
+<body>
+    <div class="body-div">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0" id="all_data" >
+            <form action="/arena_manage/Particular/" method="post" id="form_search">
+                {% csrf_token %}
+                <tr>
+                    <td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">竞技场管理&gt; 竞技场详情</strong></td>
+                    <td width="62%" align="left" valign="middle" bgcolor="#F5F5F5">
+                    	<lable for="introduce" style="padding-left: 10px; font-size:12px;">筛选:</lable>
+                    	 <select name="games" class="dowp_list_sty" style="margin-right: 20px;margin-left: 5px;" id="game_type">
+                             {% for info in arena_type %}
+                                 <option value="{{ info.vale }}" {% if games == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                             {% endfor %}
+                        </select>
+                        <lable for="introduce" style="padding-left: 10px; font-size:12px;">时间:</lable>
+                            <input placeholder="请输入日期" id="start" class="laydate-icon" readonly="" value="{{default_time.start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time" style="margin-right: 5px;margin-left: 5px;">
+                        <lable for="introduce" style="padding-left: 10px; font-size:12px;">至:</lable>
+                            <input placeholder="请输入日期" id="end" class="laydate-icon"  readonly="" value="{{default_time.end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time" style="margin-right: 20px;margin-left: 5px;">
+
+                       <lable for="introduce" style="padding-left: 10px; font-size:12px;">用户ID:</lable>
+                        <input type="text" class="text-box_normal" value="" placeholder="" name="uid" size="30" maxlength="20" style="width: 135px;" id="user_id">
+                        <input type="button" value="确认查询" id="query_data" class="button" onclick="Load_data()">
+                     </td>
+
+                    <td width="12%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+{#                        <input type="button" value="导出xls" class="button_color"  style="margin-left: 20px;background-color: #8b8a8a"/>#}
+                    </td>
+                </tr>
+            </form>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF">
+                        <!--主要内容开始-->
+                    <div class='table-cont' id='table-cont'>
+                        <table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF"  id="order_title" style="margin-top: -1px;">
+                            <thead>
+                                <tr>
+                                    <th align="center" bgcolor="#EEEEEE" style="height: 50px;">序号</th>
+									<th align="center" bgcolor="#EEEEEE">日期</th>
+                                    <th align="center" bgcolor="#EEEEEE">开赛时间</th>
+									<th align="center" bgcolor="#EEEEEE">项目</th>
+                                    <th align="center" bgcolor="#EEEEEE">场次</th>
+									<th align="center" bgcolor="#EEEEEE">详情</th>
+                                </tr>
+                            </thead>
+                   			<tbody>
+                                {% for info in page %}
+                                    <tr id="hover_tr" bgcolor="#FFFFFF">
+                                        <td align="center" class="popup" style="height: 50px;">
+                                            <span>{{ info.orid }}</span>
+                                        </td>
+                                        <td align="center" class="popup" style="height: 50px;">
+                                            <span>{{ info.day_time }}</span>
+                                        </td>
+                                        <td align="center" class="popup" style="height: 50px;">
+                                            <span>{{ info.kick_off_time }}</span>
+                                        </td>
+
+                                        <td align="center" class="popup" style="height: 50px;">
+                                            {% if info.type %}
+                                                <span>快速赛</span>
+                                            {% else %}
+                                                <span>大炮赛</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td align="center" class="popup" style="height: 50px;">
+                                            {% if info.g == 1 %}
+                                                <span>初级场</span>
+                                            {% endif %}
+                                            {% if info.g == 2 %}
+                                                <span>中级场</span>
+                                            {% endif %}
+                                            {% if info.g == 3 %}
+                                                <span>高级场</span>
+                                            {% endif %}
+                                        </td>
+                                        <td align="center" class="popup" style="height: 50px;">
+                                            <a style="cursor: pointer;">详情</a>
+                                            <div class="item-desc">
+                                                <div class="table-smalls" id="table-smalls">
+                                                   <table width="100%" border="0" align="center" cellpadding="12"cellspacing="10">
+                                                       <thead>
+                                                           <tr>
+                                                                <th bgcolor="#A8D7FD" style="height: 20px;">ID</th>
+                                                                <th bgcolor="#A8D7FD">分数</th>
+                                                                <th bgcolor="#A8D7FD">奖励</th>
+                                                           </tr>
+                                                       </thead>
+                                                       {% for data in info.play_data %}
+                                                            <tr>
+                                                                <td align="center">{{ data.uid }}</td>
+                                                                <td align="center">{{ data.score }}</td>
+                                                                <td align="center">{{ data.award }}</td>
+                                                            </tr>
+                                                       {% endfor %}
+                                                   </table>
+                                                </div>
+                                            </div>
+                                        </td>
+                                     </tr>
+                                {% endfor %}
+                            </tbody>
+				        </table>
+                    </div>
+                    <!--主要内容结束-->
+                    <div class="datagrid-pager pagination">
+                        <table cellspacing="0" cellpadding="0" border="0">
+                                <tbody>
+                                    <tr>
+                                        <!--<td>-->
+                                            <!--<select class="pagination-page-list">-->
+                                                <!--<option>10</option>-->
+                                                <!--<option>20</option>-->
+                                                <!--<option>30</option>-->
+                                                <!--<option>40</option>-->
+                                                <!--<option>50</option>-->
+                                            <!--</select>-->
+                                        <!--</td>-->
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        {% if page.has_previous %}
+                                            <td>
+                                                <a href="{{url_date}}?page=1" class="l-btn l-btn-small l-btn-plain">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{{url_date}}?page={{ page.number|add:-1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        {% endif %}
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        <td>
+                                            <span style="padding-left:6px;">Page</span>
+                                        </td>
+                                        <td>
+                                            <input class="pagination-num" value="{{number}}" size="2" type="text">
+                                        </td>
+
+                                        <td>
+                                            <span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+                                        </td>
+
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        {% if page.has_next %}
+                                            <td>
+                                                <a href="{{url_date}}?page={{ page.number|add:1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{{url_date}}?page={{ page.paginator.num_pages }}" class="l-btn l-btn-small l-btn-plain">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        {% endif %}
+
+                                        <td>
+                                            <div class="pagination-btn-separator"></div>
+                                        </td>
+                                        {% if page.has_next or page.has_previous %}
+                                            <td>
+                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" group="" id="paging">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled" group="">
+                                                    <span class="l-btn-left l-btn-icon-left">
+                                                        <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                        <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        !function(){
+        laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+        laydate({elem: '#demo'});//绑定元素
+        }();
+        //日期范围限制
+        var start = {
+            elem: '#start',
+            format: 'YYYY-MM-DD hh:mm:ss',
+            //min: laydate.now(), //设定最小日期为当前日期
+            max: '2099-06-16', //最大日期
+            istime: true,
+            istoday: false,
+            choose: function(datas){
+                 end.min = datas; //开始日选好后，重置结束日的最小日期
+                 end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+        var end = {
+            elem: '#end',
+            format: 'YYYY-MM-DD hh:mm:ss',
+            // min: laydate.now(),
+            max: '2099-06-16',
+            istime: true,
+            istoday: false,
+            choose: function(datas){
+                start.max = datas; //结束日选好后，充值开始日的最大日期
+            }
+        };
+
+        var valid = {
+            elem: '#valid',
+            format: 'YYYY-MM-DD hh:mm:ss',
+            // min: laydate.now(),
+            max: '2099-06-16',
+            istime: true,
+            istoday: false,
+            choose: function(datas){
+                start.max = datas; //结束日选好后，充值开始日的最大日期
+            }
+        };
+        laydate(start); //valid
+        laydate(end);
+        laydate(valid);
+        //自定义日期格式
+        laydate({
+            elem: '#test1',
+            format: 'YYYY年MM月DD日',
+            festival: true, //显示节日
+            choose: function(datas){ //选择日期完毕的回调
+                alert('得到：'+datas);
+            }
+        });
+        //日期范围限定在昨天到明天
+        laydate({
+            elem: '#hello3',
+            min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+            max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+        });
+    </script>
+
+
+</body>
+</html>

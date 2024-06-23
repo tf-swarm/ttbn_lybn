@@ -1,0 +1,442 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>后台系统 - 主体 - 左侧</title>
+<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css" />
+
+<script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+<style>
+.fontsty0{color:#006600;}
+.active{color:#FFF;font-weight:bold;background:-webkit-linear-gradient(top,#FF9233,#B55300);background:-moz-linear-gradient(top,#FF9233,#B55300);}
+#which_menu{width:168px;height:30px;margin:0 auto;padding:0;margin-bottom:10px;}
+#which_menu ul{margin:0 auto;padding:0;}
+#which_menu ul,li{list-style:none;}
+#which_menu li{width:82px;float:left;text-align:center;height:28px;line-height:28px;border:1px #F60 solid;border-radius:15px 0 0 15px;cursor:pointer;box-shadow: 2px 3px 0px 0px #ababab;}
+#which_menu li:last-child{width:83px;border-left:none;border-radius:0 15px 15px 0;}
+</style>
+<script>
+window.onload=function(){
+	/* 切换捕鸟与小游戏菜单显示与隐藏 - ON */
+	var oTd  = document.getElementById('left_td');
+	var oDiv = document.getElementById('which_menu');
+	var aBtn = oDiv.getElementsByTagName('li');
+	var aDiv = document.getElementsByClassName('container');
+
+	for(var i = 0; i < aBtn.length; i++){
+		aBtn[i].index = i;// 给每个按钮加上序号
+		aBtn[i].onclick = function(){
+			for(var i = 0; i < aBtn.length; i++){// 初始化，条件，自增
+				aBtn[i].className = '';
+				aDiv[i].style.display = 'none';
+			}
+			this.className = 'active';
+			aDiv[this.index].style.display = 'block';// aDiv[点击的按钮序号] 功能等于：点击第0个按钮，那么第0个DIV就显示
+		}
+	}
+	/* 切换捕鸟与小游戏菜单显示与隐藏 - OFF */
+
+	/* 捕鸟菜单展开与收起 - ON */
+	$(function(){
+		$(".type").click(function(){
+			$(this).toggleClass("currentDd").siblings(".type").removeClass("currentDd");
+			$(this).toggleClass("currentDt").siblings(".type").removeClass("currentDt");
+			$(this).next(".content").slideToggle(300).siblings(".content").slideUp(500);
+		})
+	})
+	/* 捕鸟菜单展开与收起 - OFF */
+
+	/* 小游戏菜单展开与收起 - ON */
+	$(function(){
+		$(".type1").click(function(){
+			$(this).toggleClass("currentDd").siblings(".type1").removeClass("currentDd");
+			$(this).toggleClass("currentDt").siblings(".type1").removeClass("currentDt");
+			$(this).next(".content1").slideToggle(300).siblings(".content1").slideUp(500);
+		})
+	})
+	/* 小游戏菜单展开与收起 - OFF */
+}
+</script>
+</head>
+<body>
+<table width="100%" height="280" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td valign="top" id="left_td">
+			<!-- 顶部选择菜单 ON -->
+			<div id="which_menu">
+				<ul>
+					<li class="active">捕鸟</li>
+					<li>小游戏</li>
+				</ul>
+			</div>
+			<!-- 顶部选择菜单 OFF -->
+
+			<!-- 捕鸟 ON -->
+			<div class="container" id="bGame" style="display:block;overflow-y:auto; height:720px; overflow:scroll;overflow-x:hidden">
+                {% if "1" in control or "2" in control or "3" in control or "4" in control or "5" in control or "6" in control or "7" in control or "8" in control or "10" in control or "11" in control or "12" in control or "13" in control %}
+                    <h1 class="type"><a href="javascript:void(0)">== 运营管理 ==</a></h1>
+                    <div class="content" style="display:block;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>
+                            </tr>
+                        </table>
+                        <ul class="MM">
+                            {% if "1" in control %}
+                                <li><a href="/run_manage/game_data_collect/" target="rightFrame">游戏数据汇总</a></li>
+                            {% endif %}
+
+                            {% if "2" in control %}
+                                <li><a href="/run_manage/run_data_collect/" target="rightFrame">运营数据汇总</a></li>
+                            {% endif %}
+
+                            {% if "11" in control %}
+                                <li><a href="/run_manage/retention_rate/" target="rightFrame">留存汇总</a></li>
+                            {% endif %}
+
+                            {% if "12" in control %}
+                                <li><a href="/run_manage/ltv_collect/" target="rightFrame">LTV汇总</a></li>
+                            {% endif %}
+
+                            {% if "10" in control %}
+                                <li><a href="/run_manage/hardcore_channels/" target="rightFrame">硬核和CPS渠道</a></li>
+                            {% endif %}
+
+                            {% if "3" in control %}
+                                <li><a href="/run_manage/order_query/" target="rightFrame">订单查询</a></li>
+                            {% endif %}
+
+                            {% if "4" in control %}
+                                <li><a href="/run_manage/query_mail_info/" target="rightFrame">邮件总览</a></li>
+                            {% endif %}
+
+                            {% if "5" in control %}
+                                <li><a href="/run_manage/coin_energy_config/" target="rightFrame">金币和鸟蛋炮倍配置</a></li>
+                            {% endif %}
+
+                            {% if "13" in control %}
+                                <li><a href="/run_manage/room_control_config/" target="rightFrame">鸟蛋场房间池控制</a></li>
+                            {% endif %}
+
+                            {% if "6" in control %}
+                                <li><a href="/run_manage/query_broadcast/" target="rightFrame">广播总览</a></li>
+                            {% endif %}
+
+                            {% if "7" in control %}
+                                <li><a href="/run_manage/deal_proclamation/" target="rightFrame">公告总览</a></li>
+                            {% endif %}
+
+                            {% if "8" in control %}
+                                <li><a href="/run_manage/early_warning/" target="rightFrame">异常预警</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                {% if "100" in control or "101" in control or "102" in control or "103" in control %}
+                    <h1 class="type"><a href="javascript:void(0)">== 货币统计 ==</a></h1>
+                    <div class="content" style="display:block;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>
+                            </tr>
+                        </table>
+                        <ul class="MM">
+                            {% if "100" in control %}
+                                <li><a href="/currency_total/channel_total/" target="rightFrame">渠道数据统计</a></li>
+                            {% endif %}
+                            {% if "101" in control %}
+                                <li><a href="/currency_total/pay_total/" target="rightFrame">付费数据统计</a></li>
+                            {% endif %}
+                            {% if "102" in control %}
+                                <li><a href="/currency_total/times_total/" target="rightFrame">时段统计</a></li>
+                            {% endif %}
+                            {% if "103" in control %}
+                                <li><a href="/currency_total/gift_box_total/" target="rightFrame">礼盒数据统计</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+				{% if "200" in control or "201" in control or "203" in control or "208" in control or "209" in control or "210" in control or "211" in control or "214" in control or "215" in control %}
+                    <h1 class="type"><a href="javascript:void(0)">== 用户管理 ==</a></h1>
+                    <div class="content" style="display:block;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>
+                            </tr>
+                        </table>
+                        <ul class="MM">
+                            {% if "200" in control %}
+                                <li><a href="/users_manage/relax_overview/" target="rightFrame">金币玩家总览</a></li>
+                            {% endif %}
+                            {% if "201" in control %}
+                                <li><a href="/users_manage/power_overview/" target="rightFrame">鸟蛋玩家总览</a></li>
+                            {% endif %}
+
+                            {% if "208" in control %}
+                                <li><a href="/users_manage/strong_box/" target="rightFrame">保险箱详情</a></li>
+                            {% endif %}
+                            {% if "209" in control %}
+                                <li><a href="/users_manage/championship/" target="rightFrame">魂王争霸赛</a></li>
+                            {% endif %}
+                            {% if "210" in control %}
+                                <li><a href="/users_manage/stop_service/" target="rightFrame">停服维护</a></li>
+                            {% endif %}
+                            {% if "211" in control %}
+                                <li><a href="/users_manage/strong_box_list/" target="rightFrame">保险箱禁用</a></li>
+                            {% endif %}
+                            {% if "214" in control %}
+                                <li><a href="/users_manage/query_unlock_info/" target="rightFrame">玩家解锁</a></li>
+                            {% endif %}
+                            {% if "215" in control %}
+                                <li><a href="/users_manage/user_give/" target="rightFrame">用户赠送详情</a></li>
+                            {% endif %}
+
+                            {% if "203" in control %}
+                                <li><a href="/users_manage/user_period_data/" target="rightFrame">(新)玩家期间数据统计</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+{#				{% if user_info.arena_general == 1 or user_info.arena_particulars == 1 %}#}
+{#					<h1 class="type"><a href="javascript:void(0)">== 竞技场管理 ==</a></h1>#}
+{#					<div class="content" style="display:none;">#}
+{#						<table width="100%" border="0" cellspacing="先去0" cellpadding="0">#}
+{#							<tr>#}
+{#								<td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>#}
+{#							</tr>#}
+{#						</table>#}
+{#						<ul class="MM">#}
+{#							{% if user_info.arena_general == 1 %}#}
+{#								<li><a href="/arena_manage/arena_general/" target="rightFrame">竞技场总览</a></li>#}
+{#							{% endif %}#}
+{#							{% if user_info.arena_particulars == 1 %}#}
+{#								<li><a href="/arena_manage/arena_details/" target="rightFrame">竞技场详情</a></li>#}
+{#							{% endif %}#}
+{#						</ul>#}
+{#					</div>#}
+{#				{% endif %}#}
+
+{#				{% if "700" in control or "701" in control or "702" in control or "703" in control or "704" in control %}#}
+{#					<h1 class="type"><a href="javascript:void(0)">== 小游戏管理 ==</a></h1>#}
+{#					<div class="content" style="display:none;">#}
+{#						<table width="100%" border="0" cellspacing="0" cellpadding="0">#}
+{#							<tr>#}
+{#								<td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>#}
+{#							</tr>#}
+{#						</table>#}
+{#						<ul class="MM">#}
+{#							{% if "700" in control %}#}
+{#								<li><a href="/mini_game/game_general/" target="rightFrame">小游戏总览</a></li>#}
+{#							{% endif %}#}
+{#							{% if "701" in control %}#}
+{#                                <li><a href="/mini_game/game_particulars2/" target="rightFrame">靶场详情</a></li>#}
+{#                            {% endif %}#}
+{#                            {% if "702" in control %}#}
+{#								<li><a href="/mini_game/game_particulars1/" target="rightFrame">翻翻乐详情</a></li>#}
+{#                            {% endif %}#}
+{#                            {% if "703" in control %}#}
+{#                                <li><a href="/mini_game/game_particulars3/" target="rightFrame">大富翁详情</a></li>#}
+{#                            {% endif %}#}
+{#                            {% if "704" in control %}#}
+{#                                <li><a href="/mini_game/game_particulars4/" target="rightFrame">斗地主详情</a></li>#}
+{#							{% endif %}#}
+{#						</ul>#}
+{#					</div>#}
+{#				{% endif %}#}
+
+                {% if "300" in control or "301" in control or "302" in control or "303" in control %}
+                    <h1 class="type"><a href="javascript:void(0)">== 商城管理 ==</a></h1>
+					<div class="content" style="display:block;">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tr>
+								<td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>
+							</tr>
+						</table>
+						<ul class="MM">
+                            {% if "300" in control %}
+                                <li><a href="/limit_time_shop/query_shop/" target="rightFrame">限时商城</a></li>
+                            {% endif %}
+
+                            {% if "301" in control %}
+                                <li><a href="/limit_time_shop/shop_exchange_info/" target="rightFrame">兑换记录</a></li>
+                            {% endif %}
+
+                            {% if "302" in control %}
+                                <li><a href="/limit_time_shop/card_secret/" target="rightFrame">卡密设置</a></li>
+                            {% endif %}
+
+                            {% if "303" in control %}
+                                <li><a href="/limit_time_shop/exchange_details/" target="rightFrame">兑换详情</a></li>
+                            {% endif %}
+						</ul>
+					</div>
+                {% endif %}
+
+{#                {% if user_info.integral_shop == 1 or user_info.integral_for_record == 1 %}#}
+{#					<h1 class="type"><a href="javascript:void(0)">== 积分商城管理 ==</a></h1>#}
+{#					<div class="content" style="display:none;">#}
+{#						<table width="100%" border="0" cellspacing="0" cellpadding="0">#}
+{#							<tr>#}
+{#								<td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>#}
+{#							</tr>#}
+{#						</table>#}
+{#						<ul class="MM">#}
+{#							{% if user_info.integral_shop == 1 %}#}
+{#								<li><a href="/integral_shop_manage/Integral_shop/" target="rightFrame">积分商城</a></li>#}
+{#							{% endif %}#}
+{#							{% if user_info.integral_for_record == 1 %}#}
+{#								<li><a href="/integral_shop_manage/G_exchange_record/" target="rightFrame">积分商城兑换记录</a></li>#}
+{#							{% endif %}#}
+{#						</ul>#}
+{#					</div>#}
+{#				{% endif %}#}
+                {% if "400" in control %}
+					<h1 class="type"><a href="javascript:void(0)">== 礼包商城管理 ==</a></h1>
+					<div class="content" style="display:none;">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tr>
+								<td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>
+							</tr>
+						</table>
+						<ul class="MM">
+                            {% if "400" in control %}
+                                <li><a href="/gift_bag_shop/gift_shop/" target="rightFrame">礼包商城</a></li>
+                            {% endif %}
+						</ul>
+					</div>
+                {% endif %}
+
+				{% if "600" in control or "601" in control%}
+					<h1 class="type"><a href="javascript:void(0)">== 兑换码管理 ==</a></h1>
+					<div class="content" style="display:none;">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tr>
+								<td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>
+							</tr>
+						</table>
+						<ul class="MM">
+							{% if "600" in control %}
+								<li><a href="/redeem_code/redeem_overview/" target="rightFrame">兑换码总览</a></li>
+							{% endif %}
+							{% if "601" in control %}
+								<li><a href="/redeem_code/redeem_query/" target="rightFrame">兑换码查询</a></li>
+							{% endif %}
+						</ul>
+					</div>
+				{% endif %}
+
+                {% if "500" in control or "501" in control or "502" in control or "503" in control or "504" in control or "505" in control or "506" in control or "507" in control or "508" in control or "509" in control %}
+                    <h1 class="type"><a href="javascript:void(0)">== 活动管理 ==</a></h1>
+                    <div class="content" style="display:none;">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tr>
+								<td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>
+							</tr>
+						</table>
+						<ul class="MM">
+							{% if "500" in control %}
+								<li><a href="/activity_manage/red_packet/" target="rightFrame">红包总览</a></li>
+							{% endif %}
+
+                            {% if "501" in control %}
+                                <li><a href="/activity_manage/login_luxury_gifts/1" target="rightFrame">登录豪礼</a></li>
+                            {% endif %}
+
+                            {% if "502" in control %}
+                                <li><a href="/activity_manage/for_free_give_money/" target="rightFrame">白送50元</a></li>
+                            {% endif %}
+
+                            {% if "503" in control %}
+                                <li><a href="/activity_manage/seven_day_reward/" target="rightFrame">7天登陆奖励</a></li>
+                            {% endif %}
+
+                            {% if "504" in control %}
+                        	    <li><a href="/activity_manage/accumulate_top_up/" target="rightFrame">累积充值返奖</a></li>
+                            {% endif %}
+
+                            {% if "505" in control %}
+                        	    <li><a href="/activity_manage/monopoly/" target="rightFrame">大富翁</a></li>
+                            {% endif %}
+
+                            {% if "506" in control %}
+                        	    <li><a href="/activity_manage/bag_lucky_draw/" target="rightFrame">福袋抽奖</a></li>
+                            {% endif %}
+
+                            {% if "507" in control %}
+                        	    <li><a href="/activity_manage/login_lucky_draw/" target="rightFrame">登陆抽奖</a></li>
+                            {% endif %}
+
+                            {% if "508" in control %}
+                        	    <li><a href="/activity_manage/special_gift_bag/" target="rightFrame">专题礼包</a></li>
+                            {% endif %}
+
+                            {% if "509" in control %}
+                                <li><a href="/activity_manage/recharge_integral/" target="rightFrame">充值积分排行榜</a></li>
+                            {% endif %}
+
+						</ul>
+					</div>
+                {% endif %}
+
+				{% if account_limit == "1" %}
+					<h1 class="type"><a href="javascript:void(0)">== 权限管理 ==</a></h1>
+					<div class="content" style="display:none;">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tr>
+								<td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>
+							</tr>
+						</table>
+						<ul class="MM">
+							{% if account_limit == "1" %}
+								<li><a href="/control_manage/account_set/" target="rightFrame">账号管理</a></li>
+							{% endif %}
+						</ul>
+					</div>
+				{% endif %}
+			</div>
+			<!-- 捕鸟 OFF -->
+
+			<!-- 小游戏 ON------------------------------------------------------ -->
+			<div class="container" id="sGame" style="display:none;">
+				<!--<h1 class="type1"><a href="#">== 斗地主 ==</a></h1>-->
+				<!--<div class="content1" style="display:none;">-->
+					<!--<table width="100%" border="0" cellspacing="0" cellpadding="0">-->
+						<!--<tr>-->
+							<!--<td><img src="/static/images/menu_topline.gif" width="182" height="5" /></td>-->
+						<!--</tr>-->
+					<!--</table>-->
+					<!--<ul class="MM">-->
+						<!--<li><a href="#" target="rightFrame">开关</a></li>-->
+					<!--</ul>-->
+				<!--</div>-->
+			</div>
+			<!-- 小游戏 OFF ---------------------------------------->
+		</td>
+
+		<td width="33" align="left" valign="top" style="padding-top:75px;"><img id="toggleImg" src="/static/images/toggle.png" width="11" height="90" onClick="appoenWindow()" /></td>
+	</tr>
+</table>
+<script type="text/javascript" language="javascript">
+/* 整个左侧菜单展开与收起 */
+var screen    = false;
+var left_td   = document.getElementById('left_td');
+var toggleImg = document.getElementById('toggleImg');
+
+function appoenWindow(){
+	if(screen == false){
+		parent.frame.cols     = '20,*';
+		left_td.style.display = 'none';
+		toggleImg.src         = '/static/images/toggle1.png';
+		screen = true;
+	}else if(screen == true){
+		parent.frame.cols     = '200,*';
+		left_td.style.display = 'table-cell';
+		toggleImg.src         = '/static/images/toggle.png';
+		screen = false;
+	}
+}
+</script>
+</body>
+</html>

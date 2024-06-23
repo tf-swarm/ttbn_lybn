@@ -1,0 +1,140 @@
+{% load extratags %}
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/load.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/common.css"/>
+
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+    <script type="text/javascript" src="/static/js/load-min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.easyui.min.js"></script>
+
+
+    <script>
+        $(function(){
+            $('#paging').click(function () {
+                var pag = $('.pagination-num').val() ;
+                var URL= "/mini_games/Gfanfanle/?page=" + pag;
+                location.href=URL;
+            });
+
+            var error_uid = false;
+
+            $('#query_user_id').click(function(){
+                check_uid();
+                if(error_uid == true)
+                {
+                    $.Load_data();
+                    $("#user_form").submit();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            });
+
+            function check_uid(){
+                var len_uid = $('#user_id').val().length;
+                if(len_uid==0){
+                    msgShow('系统提示', "请输入玩家ID", 'warning');
+                    error_uid = false;
+                }
+                else {
+                    error_uid = true;
+                }
+            }
+
+        });
+        
+        function unlock(uid) {
+            $.post('/users_manage/player_unlock/', {csrfmiddlewaretoken: '{{ csrf_token }}',"uid":uid}, function(result) {
+                if ( result.status) {
+                    alert(result.info);
+                    $(".unlock_status").html("正常");
+                    $(".unlock_status").css("color","#09F");
+                    $('.unlock_id').attr('href','javascript:;');
+                    $(".unlock_id").css("color","#888888");
+                }
+                else {
+                    alert(result.info);
+                }
+
+            });
+        }
+    </script>
+</head>
+<body>
+
+    <div class="body-div">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+            <form action="/users_manage/query_unlock_info/" method="post" id="user_form">
+                {% csrf_token %}
+                <tr>
+                    <td width="16%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">用户管理 &gt; 玩家解锁</strong></td>
+
+                    <td width="62%" align="left" valign="middle" bgcolor="#F5F5F5">
+                        <lable for="introduce" style="padding-left: 10px; font-size:12px;">用户ID:</lable>
+                            <input placeholder="请输入玩家ID" class="player_id" name="user_id" id="user_id" value="{{uid}}" style="border: 1px solid #C6C6C6; margin-right: 20px;margin-left: 20px;height: 28px;">
+                        <input type="button" value="确认查询" id="query_user_id" class="button" style="margin-right: 20px;margin-left: 20px;" >
+                    </td>
+                    <td width="12%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+{#                        <a href="/users_manage/unlock_record/" id="bn_btn_one">操作记录</a>#}
+                    </td>
+                </tr>
+            </form>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF">
+                        <!--主要内容开始-->
+                    <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:30px auto 30px auto;" styler="1px #666 solid " id="userlist">
+                        <tbody id="hover_tf">
+                            <tr>
+                                <th width="100" align="center" bgcolor="#EEEEEE" style="height: 37px;">ID</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE">昵称</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE">手机</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE">总充值金额</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE">注册渠道</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE">登录渠道</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE">转服状态</th>
+                                <th width="100" align="center" bgcolor="#EEEEEE">兑换解锁</th>
+                            </tr>
+
+                            <tr id="hover_tr" bgcolor="#FFFFFF">
+                                {% if play_info|length > 0 %}
+                                    <td align="center" valign="middle" style="height: 50px;">{{ uid }}</td>
+                                    <td align="center" valign="middle" style="height: 50px;">{{ play_info.nick }}</td>
+                                    <td align="center" valign="middle" style="height: 50px;">
+                                        {{play_info.mobile}}<br/>{{play_info.shop_phone}}
+                                    </td>
+                                    <td align="center" valign="middle" style="height: 50px;color: #0ea432">{{play_info.pay_total |default:0 }}</td>
+                                    <td align="center" valign="middle" style="height: 50px;">{{play_info.channelid|channel_name}}</td>
+                                    <td align="center" valign="middle" style="height: 50px;">{{play_info.loginChannelId|channel_name}}</td>
+                                    {% if play_info.change_server == 1 %}
+                                        <td align="center" valign="middle" class="unlock_status" style="height: 50px; color: red">禁止</td>
+                                    {% else %}
+                                        <td align="center" valign="middle" class="unlock_status" style="height: 50px; color: blue">正常</td>
+                                    {% endif %}
+                                    <td align="center" valign="middle" style="height: 50px;">
+                                        <div style="width: auto; height: 17px;">
+                                            {% if play_info.change_server == 1 %}
+                                                <a href="javascript:unlock('{{uid}}');" class="unlock_id" style="color:blue" >解锁</a>
+                                            {% else %}
+                                                <a href="javascript:;" class="unlock_id" style="color: #888888" >解锁</a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!--主要内容结束-->
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

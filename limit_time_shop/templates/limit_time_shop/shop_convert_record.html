@@ -1,0 +1,1474 @@
+{% load extratags %}
+<html>
+<head>
+<title>兑换商城 > 兑换记录</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css" />
+<link rel="stylesheet" type="text/css" href="/static/css/easyui.css">
+<link type="text/css" rel="stylesheet" href="/static/css/load.css">
+<link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+<link type="text/css" rel="stylesheet" href="/static/css/shop_popup.css"/>
+<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css"/>
+
+<script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+<script type="text/javascript" src="/static/js/load-min.js"></script>
+<script type="text/javascript" src="/static/js/common.js"></script>
+<script type="text/javascript" src="/static/js/jquery.easyui.min.js"></script>
+<script type="text/javascript"  src="/static/laydate.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+{#<script type="text/javascript" src="/static/js/account_manage.js"></script>#}
+<script type="text/javascript"  src="/static/js/fixed_header.js"></script>
+<style type="text/css">
+        	.btn_select{height: 40px; margin-top: 30px;}
+        	.btn_select a{display: inline-block;background: #09F;color: #FFF; float: left;
+                width: 100px;text-align: center;line-height: 32px;border-radius: 3px;
+                border: none;cursor: pointer;font-size: 15px;margin-top: -10px;}
+        </style>
+<script>
+$(function(){
+    //全选全消
+	$('#check_all').click(function () {
+		var checked = $(this).prop('checked');
+		$(':checkbox:not(#check_all)').prop('checked',checked)
+	});
+
+	//单个选中
+	$(':checkbox:not(#check_all)').click(function () {
+		//$(':checkbox:not(#check_all)') 拿到所有的checkbox选择框,但除去有#check_all标签的选择框
+		var checkbox=$(':checkbox:not(#check_all)').length;
+		var checked = $(':checked:not(#check_all)').length;
+		$('#check_all').prop('checked',checkbox==checked);
+	});
+
+	$('#paging').click(function () {
+		var pag = $('.pagination-num').val();
+		var URL= "/limit_time_shop/shop_exchange_info/?page=" + pag;
+		location.href=URL;
+	});
+
+	$('#export_data').click(function () {
+		var URL= "/limit_time_shop/exchange_record_xls/";
+		location.href=URL;
+	});
+
+	var error_start = false;
+	var error_end = false;
+
+	$('#query_data').click(function(){
+        check_time();
+		if(error_start == true && error_end == true)
+		{
+		    $.Load_data();
+            $("#form_search").submit();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+    });
+
+	function check_time(){
+		var len_start = $('#start').val().length;
+		var len_end = $('#end').val().length;
+		if(len_start==0 || len_end==0)
+		{
+			msgShow('系统提示', "请输入日期", 'warning');
+			error_start = false;
+			error_end = false;
+		}
+		else
+		{
+			error_start = true;
+			error_end = true;
+		}
+	}
+
+	//关闭发货弹窗
+    $('.returns').click(function(){
+        $('#dialogBg').fadeOut(300,function(){
+            $('#dialog').addClass('bounceOutUp').fadeOut();
+        });
+    });
+
+	//关闭详情弹窗
+	$('.P_cancel').click(function(){
+		$('#dialogmag').fadeOut(300,function(){
+			$('#dialohg').addClass('bounceOutUp').fadeOut();
+		});
+	});
+
+	//关闭单个审核异常
+	$('.cancel_status').click(function(){
+		$('#dialogmag_nine').fadeOut(300,function(){
+			$('#dialohg_nine').addClass('bounceOutUp').fadeOut();
+		});
+	});
+
+	//关闭单个暂不通过
+	$('.D_cancel').click(function(){
+		$('#dialogmag_ten').fadeOut(300,function(){
+			$('#dialohg_ten').addClass('bounceOutUp').fadeOut();
+		});
+	});
+
+	//关闭多个审核异常
+	$('.A_cancel').click(function(){
+		$('#Popout_T_one').fadeOut(300,function(){
+			$('#Popout_F_one').addClass('bounceOutUp').fadeOut();
+		});
+	});
+
+	//关闭多个审核异常
+	$('.B_cancel').click(function(){
+		$('#Popout_T_two').fadeOut(300,function(){
+			$('#Popout_F_two').addClass('bounceOutUp').fadeOut();
+		});
+	});
+
+	//关闭多个审核异常
+	$('.C_cancel').click(function(){
+		$('#Popout_mag').fadeOut(300,function(){
+			$('#Popout_hg').addClass('bounceOutUp').fadeOut();
+		});
+	});
+
+	//关闭多个审核客服审核
+	$('.E_cancel').click(function(){
+		$('#service_mag').fadeOut(300,function(){
+			$('#service_hg').addClass('bounceOutUp').fadeOut();
+		});
+	});
+});
+
+function abnormal(uid,order_id,good_type,pid) {
+    className = $(this).attr('class');
+    $('#dialogmag_nine').fadeIn(300);
+    $('#dialohg_nine').removeAttr('class').addClass('animated '+className+'').fadeIn();
+    $("#convert_id").text(order_id);
+    $("#player_id").text(uid);
+    $("#exchange_id").val(order_id);
+    $("#player_ID").val(uid);
+    $("#Good_type").val(good_type);
+    $("#Pid").val(pid);
+}
+
+function no_pass(uid,order_id,good_type,pid) {
+    className = $(this).attr('class');
+    $('#dialogmag_ten').fadeIn(300);
+    $('#dialohg_ten').removeAttr('class').addClass('animated '+className+'').fadeIn();
+    $("#T_convert_id").text(order_id);
+    $("#T_player_id").text(uid);
+    $("#T_exchange_id").val(order_id);
+    $("#T_player_ID").val(uid);
+    $("#T_Good_type").val(good_type);
+    $("#T_Pid").val(pid);
+}
+
+function many_approve() {
+    className = $(this).attr('class');
+    $('#Popout_T_one').fadeIn(300);
+    $('#Popout_F_one').removeAttr('class').addClass('animated '+className+'').fadeIn();
+}
+
+function many_abnormal() {
+    className = $(this).attr('class');
+    $('#Popout_T_two').fadeIn(300);
+    $('#Popout_F_two').removeAttr('class').addClass('animated '+className+'').fadeIn();
+}
+
+function many_no_pass() {
+    className = $(this).attr('class');
+    $('#Popout_mag').fadeIn(300);
+    $('#Popout_hg').removeAttr('class').addClass('animated '+className+'').fadeIn();
+}
+
+function many_service() {
+    className = $(this).attr('class');
+    $('#service_mag').fadeIn(300);
+    $('#service_hg').removeAttr('class').addClass('animated '+className+'').fadeIn();
+}
+
+
+function approve(uid,order_id,good_type,pid) {
+    var params = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":3,"status":1,"user_ID":uid,"exchange_id":order_id,"good_type":good_type,"Pid":pid});
+    $.post('/limit_time_shop/alter_check_status/', params, function(data) {
+        if ( data.status) {
+            $.each(data.u_list, function(i, value){
+                var exchange_id = value.exchange_id;
+                var user_id = value.user_id;
+                var good_type = value.good_type;
+                var pid = value.pid;
+                $(".convert"+exchange_id).attr("href","javascript:;");
+                $(".convert"+exchange_id).css("background", "#8B8A8A");
+                $(".send"+exchange_id).attr("href","javascript:send_out_info("+user_id+","+exchange_id+","+good_type+","+pid+");");
+                $(".send"+exchange_id).css("background", "#1B9AF7");
+                $("#state"+exchange_id).removeClass("wsh");
+                $("#state"+exchange_id).addClass("jz");
+                $("#state"+exchange_id).html("未发货");
+            });
+            $('#service_mag').fadeOut(300,function(){
+                $('#service_hg').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert("数据异常!");
+        }
+    });
+}
+
+function send_out_info(uid,order_id,good_type,pid) {
+    //显示发货弹框
+    $.post('/limit_time_shop/deal_shipping/', {csrfmiddlewaretoken: '{{ csrf_token }}',"shop_id":1,"uid":uid,"order":order_id,"good_type":good_type,"pid":pid}, function(data) {
+        if (data.status) {
+            alert(data.msg);
+            var good_type = data.good_info.good_type;
+            var good_name = data.good_info.good_name;
+            var pid = data.good_info.pid;
+            var order = data.good_info.order;
+            var uid = data.good_info.uid;
+            var name = data.ship_info.name;
+            var sex = data.ship_info.sex;
+            var area = data.ship_info.area;
+            var address = data.ship_info.address;
+            var mail = data.ship_info.mail;
+            var phone = data.ship_info.phone;
+
+            if(good_type == 1){
+                $("#express_number_show").show();
+                $("#card_number_show").hide();
+                $("#card_close_show").hide();
+            }
+            else if(good_type == 2 || good_type == 4 || good_type == -1){
+                $("#card_number_show").show();
+                $("#card_close_show").show();
+                $("#express_number_show").hide();
+                card_number = hideCard(data.card_number,0,0);
+                $("#card_number").val(card_number);
+                card_data = hideCard(data.card_secret,0,0);
+                $("#card_close").val(card_data);
+
+            }
+            else{
+                $("#express_number_show").hide();
+                $("#card_number_show").hide();
+                $("#card_close_show").hide();
+            }
+
+            $(".good_name").html(good_name);
+            $("#order_name").val(good_name);
+            $("#send_good_type").val(good_type);
+            $("#pid").val(pid);
+            $("#order_id").val(order);
+            $("#user_id").val(uid);
+            $("#payer_name").val(name);
+            if (sex == "0"){
+                $("#sex").val("女");
+            }else {
+                $("#sex").val("男");
+            }
+            $("#area").val(area);
+            $("#address").val(address);
+            $("#phone").val(phone);
+            $("#mail").val(mail);
+
+            className = $(this).attr('class');
+            $('#dialogBg').fadeIn(300);
+            $('#dialog').removeAttr('class').addClass('animated '+className+'').fadeIn();
+		}
+        else {
+            alert(data.msg);
+        }
+
+    });
+}
+
+function send_out_status() {
+    var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}'}) + "&" + $("#shipping_info").serialize();
+    var order_id = $("#order_id").val();
+    var user_id = $("#user_id").val();
+    var express_number = $("#express_number").val();
+    var good_type = parseInt($("#send_good_type").val());
+
+    if (good_type == 1 || good_type == 5){
+        if (express_number.length == 0){
+            alert("快递单号不能为空！");
+        }else {
+            if(confirm("您确定发货？")){
+                $.post('/limit_time_shop/alter_shipping_status/', data_info, function(data) {
+                    if (data.code) {
+                        alert(data.msg);
+                        $(".send"+order_id).attr("href","javascript:;");
+                        $(".send"+order_id).css("background", "#8B8A8A");
+                        $(".part"+order_id).attr("href","javascript:particulars("+user_id+","+order_id+");");
+                        $(".part"+order_id).css("background", "#1B9AF7");
+                        $("#state"+order_id).removeClass("jz");
+                        $("#state"+order_id).addClass("yx");
+                        $("#state"+order_id).html("已发货");
+                        $("#time"+order_id).html(data.uptime);
+                        $("#check"+order_id).css('display','none');
+
+                        $('#dialogBg').fadeOut(300,function(){
+                            $('#dialog').addClass('bounceOutUp').fadeOut();
+                        });
+                    }else {
+                        alert(data.msg);
+                    }
+            });
+            }else {
+                alert("您取消了发货");
+            }
+        }
+    }
+    else if (good_type == 4 || good_type == -1) {
+        number_name = parseInt($("#card_number").val());
+        close_name = parseInt($("#card_close").val());
+        if (number_name.length == 0 || close_name.length == 0 ){
+            alert("卡密和卡号已使用完,请上传卡密和卡号！");
+        }else {
+            if(confirm("您确定发货？")){
+                $.post('/limit_time_shop/alter_shipping_status/', data_info, function(date) {
+                    if ( date.code) {
+                        alert(date.msg);
+                        $(".send"+order_id).attr("href","javascript:;");
+                        $(".send"+order_id).css("background", "#8B8A8A");
+                        $(".part"+order_id).attr("href","javascript:particulars("+user_id+","+order_id+");");
+                        $(".part"+order_id).css("background", "#1B9AF7");
+                        $("#state"+order_id).removeClass("jz");
+                        $("#state"+order_id).addClass("yx");
+                        $("#state"+order_id).html("已发货");
+                        $("#time"+order_id).html(date.uptime);
+                        $("#check"+order_id).css('display','none');
+
+                        $('#dialogBg').fadeOut(300,function(){
+                            $('#dialog').addClass('bounceOutUp').fadeOut();
+                        });
+                    }else {
+                        alert(date.msg);
+                    }
+                });
+            }else {
+                alert("您取消了发货");
+            }
+        }
+    }
+    else {
+        if(confirm("您确定发货？")){
+            $.post('/limit_time_shop/alter_shipping_status/', data_info, function(date) {
+                if ( date.code) {
+                    alert(date.msg);
+                    $(".send"+order_id).attr("href","javascript:;");
+                    $(".send"+order_id).css("background", "#8B8A8A");
+                    $(".part"+order_id).attr("href","javascript:particulars("+user_id+","+order_id+");");
+                    $(".part"+order_id).css("background", "#1B9AF7");
+                    $("#state"+order_id).removeClass("jz");
+                    $("#state"+order_id).addClass("yx");
+                    $("#state"+order_id).html("已发货");
+                    $("#time"+order_id).html(date.uptime);
+                    $("#check"+order_id).css('display','none');
+
+                    $('#dialogBg').fadeOut(300,function(){
+                        $('#dialog').addClass('bounceOutUp').fadeOut();
+                    });
+                }else {
+                    alert(date.msg);
+                }
+            });
+        }else {
+            alert("您取消了发货");
+        }
+    }
+
+}
+
+function particulars(uid,order_id) {
+    $.post('/limit_time_shop/deal_shipping/', {csrfmiddlewaretoken:'{{ csrf_token }}',"shop_id":2,"uid":uid,"order":order_id}, function(data) {
+        if (data.status) {
+            var good_type = data.good_type;
+            var order = data.order;
+            var uid = data.uid;
+            var name = data.name;
+            var area = data.area;
+            var address = data.address;
+            var mail = data.mail;
+            var phone = data.phone;
+            if(good_type == 1){
+                $("#express_number_part").show();
+                $("#card_number_part").hide();
+                $("#card_close_part").hide();
+                $("#express_number_data").val(data.send.express_number);
+
+            }
+            else if(good_type == 2 || good_type == 4 || good_type == -1){
+                $("#card_number_part").show();
+                $("#card_close_part").show();
+                $("#express_number_part").hide();
+                $("#card_number_data").val(data.send.card_number);
+                card_info = hideCard(data.send.card_close,0,0);
+                $("#card_close_data").val(card_info);
+            }
+            else{
+                $("#express_number_part").hide();
+                $("#card_number_part").hide();
+                $("#card_close_part").hide();
+            }
+            $("#order_id_part").val(order);
+            $("#user_id_part").val(uid);
+            $("#name_part").val(name);
+            $("#area_part").val(area);
+            $("#address_part").val(address);
+            $("#phone_part").val(phone);
+            $("#mail_part").val(mail);
+
+            className = $(this).attr('class');
+            $('#dialogmag').fadeIn(300);
+            $('#dialohg').removeAttr('class').addClass('animated '+className+'').fadeIn();
+		}
+        else {
+            alert(data.msg);
+        }
+
+    });
+}
+
+
+function hideCard (str,frontLen,endLen) {
+    var len = str.length-frontLen-endLen;
+    var xing = '';
+    for (var i=0;i<len;i++) {
+        xing+='*';
+    }
+    return str.substring(0,frontLen)+xing+str.substring(str.length-endLen);
+}
+
+function Exchange_record() {
+    var URL= "/limit_time_shop/shop_all_record/?pid=" +"exchange_record";
+	location.href=URL;
+}
+
+</script>
+
+<style>
+.send_out a{float: right;}
+.All_through{display:inline-block;background: #1B9AF7;width: 82px;height: 32px;line-height: 30px;border-radius: 3px; border: 1px solid; text-align: center; margin-left: 20px;}
+</style>
+</head>
+<body style="min-width: 1635px;">
+
+    <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+        <form action="/limit_time_shop/shop_exchange_info/" method="post" id="form_search">
+            {% csrf_token %}
+            <tr>
+                <td width="10%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">兑换商城 > 兑换记录</strong></td>
+                <td width="75%" align="left" valign="top" bgcolor="#F5F5F5" style="padding: 5px;">
+
+                    <lable for="introduce" style="padding-left: 10px; font-size:12px;">渠道:</lable>
+                    <select name="channel" class="select_ht_style" id="channel" style="width: 90px;height: 28px;">
+                        {% for key,value in chanel_info.items %}
+                             <option value="{{ key }}" {% if channel == key %} selected {% endif %} >{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                    商品：
+                    <select name="good_style" class="select_ht_style" id="good_style" style="width: 80px;height: 28px;">
+                        {% for info in good_list %}
+                             <option value="{{ info.vale }}" {% if good_style == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                        {% endfor %}
+                    </select>
+
+                     <lable for="introduce" style="padding-left: 10px; font-size:12px;">发货:</lable>
+                    <select name="ship_status" class="select_ht_style" id="ship_status" style="width: 90px;height: 28px;">
+                        {% for info in shipping_list %}
+                             <option value="{{ info.vale }}" {% if ship_status == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                        {% endfor %}
+                    </select>
+                    <lable for="introduce" style="padding-left: 10px; font-size:12px;">时间:</lable>
+                        <input placeholder="请输入日期" id="start" class="laydate-icon" readonly="" value="{{start_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="start_time" style="margin-right: 5px;margin-left: 5px;height: 28px;width: 160px;">
+                    <lable for="introduce" style="padding-left: 10px; font-size:12px;">至:</lable>
+                        <input placeholder="请输入日期" id="end" class="laydate-icon"  readonly="" value="{{end_day}}" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" name="stop_time" style="margin-right: 20px;margin-left: 5px;height: 28px;width: 160px;">
+
+                    <select name="screen_info" class="select_ht_style" id="screen_info" style="height:28px;" >
+                        {% for info in filter_record %}
+                             <option value="{{ info.vale }}" {% if screen_info == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" class="text-box_normal" id="input_data" value="{{input_data}}" placeholder="" name="input_data" size="30" maxlength="20" style="width:80px;height: 26px;">
+
+                    <input type="button" value="确认查询" class="button" id="query_data" style="width:100px;" />
+
+                    <input type="button" value="操作记录" class="button" onclick="Exchange_record()"  style="float: right;width:100px;"/>
+                </td>
+
+                <td width="5%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                    {% if page.paginator.num_pages %}
+                        <input type="button" value="导出xls" class="button_color" id="export_data" style="margin-right: 20px;width:100px;"/>
+                    {% else %}
+                        <input type="button" value="导出xls" class="button_color"  style="margin-right: 20px;background-color: #8b8a8a"/>
+                    {% endif %}
+                </td>
+              </tr>
+        </form>
+
+        <tr>
+            <td colspan="3" valign="top" bgcolor="#FFFFFF">
+                <!--主要内容开始-->
+                <form method="post" action="" id="record_info">
+                    {% csrf_token %}
+                    <div class='table-cont' id='table-cont' style="margin-bottom: 0px;box-shadow: 3px 1px 3px 0px white;">
+                       <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:-1px auto 0px auto;" id="userlist">
+                             <thead>
+                                    <tr>
+                                        <th style="width:34px" align="center" valign="middle" bgcolor="#EEEEEE">选择</th>
+                                        <th width="73" align="center" valign="middle" bgcolor="#EEEEEE">兑换ID</th>
+                                        <th width="51" align="center" valign="middle" bgcolor="#EEEEEE">注册渠道</th>
+                                        <th width="51" align="center" valign="middle" bgcolor="#EEEEEE">兑换渠道</th>
+                                        <th width="160" align="center" valign="middle" bgcolor="#EEEEEE">兑换时间&nbsp;/&nbsp;发货时间</th>
+                                        <th width="73" align="center" valign="middle" bgcolor="#EEEEEE">商城类别</th>
+                                        <th width="50" align="center" valign="middle" bgcolor="#EEEEEE">商品【ID】</th>
+                                        <th width="50" align="center" valign="middle" bgcolor="#EEEEEE">商品类别</th>
+                                        <th width="90" align="center" valign="middle" bgcolor="#EEEEEE">商品名称</th>
+                                        <th width="80" align="center" valign="middle" bgcolor="#EEEEEE">商品单价</th>
+                                        <th width="80" align="center" valign="middle" bgcolor="#EEEEEE">商品成本</th>
+                                        <!--<th width="110" align="center" valign="middle" bgcolor="#EEEEEE">商品图片</th>-->
+                                        <th width="77" align="center" valign="middle" bgcolor="#EEEEEE">兑换人</th>
+                                        <th width="76" align="center" valign="middle" bgcolor="#EEEEEE">兑换人ID</th>
+                                        <th width="76" align="center" valign="middle" bgcolor="#EEEEEE">期间充值</th>
+                                        <th width="76" align="center" valign="middle" bgcolor="#EEEEEE">充值</th>
+                                        <th width="76" align="center" valign="middle" bgcolor="#EEEEEE">话费券</th>
+                                        <th width="90" align="center" valign="middle" bgcolor="#EEEEEE">发货状态</th>
+                                        <th width="78" align="center" valign="middle" bgcolor="#EEEEEE">审核状态</th>
+                                        <th width="78" align="center" valign="middle" bgcolor="#EEEEEE">操作</th>
+                                    </tr>
+                             </thead>
+                            {% for info  in page %}
+                                <tr id="hover_tr" bgcolor="#FFFFFF">
+                                    <td align="center" valign="middle">
+                                        {% if info.stat == 2  %}
+                                            <input type="checkbox" style="display: none;">
+                                        {% else %}
+                                            {% if info.stat == 6 %}
+                                                {% if "304" in user_limit  or "305" in user_limit %}
+                                                    <input type="checkbox" name="order_id" id="check{{info.order_id}}" value="{{info.order_id}}:{{info.uid}}:{{info.good_type}}:{{info.pid}}">
+                                                {% else %}
+                                                    <input type="checkbox" style="display: none;">
+                                                {% endif %}
+                                            {% elif info.stat == 7 %}
+                                                {% if "305" in user_limit %}
+                                                    <input type="checkbox" name="order_id" id="check{{info.order_id}}" value="{{info.order_id}}:{{info.uid}}:{{info.good_type}}:{{info.pid}}">
+                                                {% else %}
+                                                    <input type="checkbox" style="display: none;">
+                                                {% endif %}
+                                            {% else %}
+                                                <input type="checkbox" name="order_id" id="check{{info.order_id}}" value="{{info.order_id}}:{{info.uid}}:{{info.good_type}}:{{info.pid}}">
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td align="center" valign="middle">{{info.order_id}}</td>
+                                    <td align="center" valign="middle">{{info.channelid| channel_name}}</td>
+                                    <td align="center" valign="middle">{{info.pay_channel| channel_name}}</td>
+                                    <td align="center" valign="middle">
+                                        <label>{{info.start_time}}</label>
+                                        <br /><br />
+                                        <label id="time{{info.order_id}}">{{info.end_time}}</label>
+                                    </td>
+                                    {% if info.shop == 6 %}
+                                      <td align="center" valign="middle" class="goods_type">限时商城</td>
+                                    {% elif info.shop == 10 %}
+                                        <td align="center" valign="middle" class="goods_type">白送50元</td>
+                                    {% elif info.shop == 11 %}
+                                        <td align="center" valign="middle" class="goods_type">捕鸟争霸</td>
+                                    {% else %}
+                                        <td align="center" valign="middle" class="goods_type">充值排行榜</td>
+                                    {% endif %}
+                                    <td align="center" valign="middle">{{info.pid}}</td>
+                                    {% for g_name in good_list%}
+                                        {% if info.good_type == g_name.vale %}
+                                            <td align="center" valign="middle" id="type{{info.id}}" class="goods_type">{{ g_name.content}}</td>
+                                        {% endif %}
+{#                                        {% if info.good_type == g_name.vale and info.shop == 11 %}#}
+{#                                            <td align="center" valign="middle" id="type{{info.id}}" class="goods_type">捕鸟争霸</td>#}
+{#                                        {% endif %}#}
+{#                                        {% if info.good_type == g_name.vale and info.shop == 12 %}#}
+{#                                            <td align="center" valign="middle" id="type{{info.id}}" class="goods_type">充值排行榜</td>#}
+{#                                        {% endif %}#}
+                                    {% endfor %}
+                                    <td align="center" valign="middle">{{ info.good_name }}</td>
+                                    <td align="center" valign="middle">{{ info.price }}{{ info.buy_type|currency_type }}</td>
+                                    <td align="center" valign="middle">{{info.cost}}元</td>
+                                    <td align="center" valign="middle">{{info.nick}}</td>
+                                    <td align="center" valign="middle">{{info.uid}}</td>
+                                    <td align="center" valign="middle">{{info.all_pay}}</td>
+                                    <td align="center" valign="middle" style="width: 126px;">
+                                        <font color="#0a0afd">支付宝:{{info.ali_pay}}</font>
+                                        </br>
+                                        <font color="#208f20">微信:{{info.weixin_pay}}</font>
+                                        </br>
+                                        <font color="#da70d6">sdk:{{info.sdk_pay}}</font>
+                                        </br>
+                                        <font color="#fd3e3e">兑换码:{{info.cdkey_pay}}</font>
+                                    </td>
+                                    <td align="center" valign="middle">
+                                        <font color="#008000">{{info.in_silver_coupon}}</font>
+                                        </br>
+                                        <font color="red">{{info.other_coupon}}</font>
+                                        </br>
+                                        <font color="#09F">{{info.silver_coupon}}</font>
+                                    </td>
+                                    <td align="center" valign="middle">
+                                        {% if info.stat == 0 %}
+                                            <span class="yx_jz_pub wsh" id="state{{info.order_id}}">未审核</span>
+                                        {% elif info.stat == 1  %}
+                                            <span class="yx_jz_pub jz" id="state{{info.order_id}}">未发货</span>
+                                        {% elif info.stat == 2  %}
+                                            <span class="yx_jz_pub yx">已发货</span>
+                                        {% elif info.stat == 6  %}
+                                            <span class="yx_jz_pub wsh" style="background: #fd3e3e" id="state{{info.order_id}}">审核异常</span>
+                                        {% else  %}
+                                            <span class="yx_jz_pub wsh" style="background: #da70d6" id="state{{info.order_id}}">暂不通过</span>
+                                        {% endif %}
+                                    </td>
+                                    {% if info.stat == 0 %}
+                                        {% if "304" in user_limit or "305" in user_limit %}
+                                            <td align="center" valign="middle" class="w_update"><a href="javascript:;" id="approve" class="convert{{info.order_id}}">审核通过</a></td>
+                                        {% else %}
+                                            <td align="center" valign="middle" class="w_update"><a href="javascript:approve('{{info.uid}}','{{info.order_id}}','{{info.good_type}}','{{info.pid}}');" id="approve" class="convert{{info.order_id}}">审核通过</a></td>
+                                        {% endif %}
+                                        <td align="center" valign="middle" class="send_out">
+                                            <a href="javascript:;" id="no_send" class="send{{info.order_id}}">发货</a>
+                                            <a href="javascript:;" id="no_send" class="part{{info.order_id}}">详情</a>
+                                        </td>
+                                    {% endif %}
+                                    {% if info.stat == 1 %}
+                                        <td align="center" valign="middle" class="w_update"><a href="javascript:;" id="approve" style="background: #8B8A8A;" class="convert{{info.order_id}}">审核通过</a></td>
+                                        <td align="center" valign="middle" class="send_out">
+                                            <a href="javascript:send_out_info('{{info.uid}}','{{info.order_id}}','{{info.good_type}}','{{info.pid}}');" id="send_out" class="send{{info.order_id}}">发货</a>
+                                            <a href="javascript:;" id="no_send" class="part{{info.order_id}}">详情</a>
+                                        </td>
+                                    {% endif %}
+                                    {% if info.stat == 2 %}
+                                        <td align="center" valign="middle" class="w_update"><a href="javascript:;" id="no_approve" class="convert{{info.order_id}}">审核通过</a></td>
+                                        {% if info.good_type == "3" or info.good_type == "5" %}
+                                            <td align="center" valign="middle" class="send_out">
+                                                <a href="javascript:;" id="no_send">发货</a>
+                                                <a href="javascript:;" id="no_send" class="part{{info.order_id}}">详情</a>
+                                            </td>
+                                        {% else %}
+                                            <td align="center" valign="middle" class="send_out">
+                                                <a href="javascript:;" id="no_send">发货</a>
+                                                <a href="javascript:particulars('{{info.uid}}','{{info.order_id}}');" id="send_out">详情</a>
+                                            </td>
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if info.stat == 6 %}
+                                        {% if "304" in user_limit or "305" in user_limit %}
+                                            <td align="center" valign="middle" class="w_update">
+                                                <a href="javascript:abnormal('{{info.uid}}','{{info.order_id}}','{{info.good_type}}','{{info.pid}}');" id="abnormal" class="convert{{info.order_id}}" style="background:#fd3e3e">审核异常</a>
+                                            </td>
+                                        {% else %}
+                                            <td align="center" valign="middle" class="w_update">
+                                                <a href="javascript:;" id="abnormal" style="background:#fd3e3e">审核异常</a>
+                                            </td>
+                                        {% endif %}
+                                        <td align="center" valign="middle" class="send_out">
+                                            <a href="javascript:;" id="no_send" class="send{{info.order_id}}">发货</a>
+                                            <a href="javascript:;" id="no_send" class="">详情</a>
+                                        </td>
+                                    {% endif %}
+                                    {% if info.stat == 7 %}
+                                        {% if "305" in user_limit %}
+                                            <td align="center" valign="middle" class="w_update">
+                                                <a href="javascript:no_pass('{{info.uid}}','{{info.order_id}}','{{info.good_type}}','{{info.pid}}');" id="abnormal" class="convert{{info.order_id}}" style="background:#da70d6">暂不通过</a>
+                                            </td>
+                                        {% else %}
+                                            <td align="center" valign="middle" class="w_update">
+                                                <a href="javascript:;" id="abnormal" class="no_pass" style="background:#da70d6">暂不通过</a>
+                                            </td>
+                                        {% endif %}
+                                        <td align="center" valign="middle" class="send_out">
+                                            <a href="javascript:;" id="no_send" class="send{{info.order_id}}">发货</a>
+                                            <a href="javascript:;" id="no_send">详情</a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    <div class="page" style="margin: 0px 27px  0px 10px;">
+                        <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:auto;">
+                            <tr>
+                                <td align="center" bgcolor="#F9F9F9" style="width:34px">
+                                    <input type="checkbox" id="check_all"/>&nbsp;
+                                </td>
+                                <td colspan="13" bgcolor="#F9F9F9" >
+                                    <a href="javascript:;" class="All_through" style="color: #FFF;background: #888888;float: left">全选</a>
+                                    {% if page.paginator.num_pages %}
+                                        {% if "304" in user_limit %}
+                                            <a href="javascript:many_approve();" class="All_through" style="color: #FFF;float: left">审核通过</a>
+                                            <a href="javascript:many_abnormal();" class="All_through" style="color: #FFF;background: #fd3e3e;float: left" >审核异常</a>
+                                            <a href="javascript:many_no_pass();" class="All_through" style="color: #FFF;background: #da70d6;float: left" >暂不通过</a>
+                                        {% elif "305" in user_limit %}
+                                            <a href="javascript:many_approve();" class="All_through" style="color: #FFF;float: left">审核通过</a>
+                                            <a href="javascript:many_abnormal();" class="All_through" style="color: #FFF;background: #fd3e3e;float: left" >审核异常</a>
+                                            <a href="javascript:many_no_pass();" class="All_through" style="color: #FFF;background: #da70d6;float: left" id="no_pass" >暂不通过</a>
+                                        {% else %}
+                                            <a href="javascript:many_service();" class="All_through" style="color: #FFF;float: left">审核通过</a>
+                                            <a href="javascript:many_abnormal();" class="All_through" style="color: #FFF;background: #fd3e3e;float: left" >审核异常</a>
+                                            <a href="javascript:;" class="All_through" style="color: #FFF;background: #888888;float: left" >暂不通过</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="javascript:;" class="All_through" style="color: #FFF;background: #888888;float: left">审核通过</a>
+                                        <a href="javascript:;" class="All_through" style="color: #FFF;background: #888888;float: left" >审核异常</a>
+                                        <a href="javascript:;" class="All_through" style="color: #FFF;background: #888888;float: left" >暂不通过</a>
+                                    {% endif %}
+                                    <table cellspacing="0" cellpadding="0" border="0" style="float: right;">
+                                        <tbody>
+                                        <tr>
+                                            <!--<td>-->
+                                                <!--<select class="pagination-page-list">-->
+                                                    <!--<option>10</option>-->
+                                                    <!--<option>20</option>-->
+                                                    <!--<option>30</option>-->
+                                                    <!--<option>40</option>-->
+                                                    <!--<option>50</option>-->
+                                                <!--</select>-->
+                                            <!--</td>-->
+                                            <td>
+                                                <div class="pagination-btn-separator"></div>
+                                            </td>
+                                            {% if page.has_previous %}
+                                                <td>
+                                                    <a href="{{url_date}}?page=1" class="l-btn l-btn-small l-btn-plain">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="{{url_date}}?page={{ page.number|add:-1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            {% else %}
+                                                <td>
+                                                    <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-first">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-prev">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            {% endif %}
+
+                                            <td>
+                                                <div class="pagination-btn-separator"></div>
+                                            </td>
+                                            <td>
+                                                <span style="padding-left:6px;">Page</span>
+                                            </td>
+                                            <td>
+                                                <input class="pagination-num" value="{{number}}" size="2" type="text">
+                                            </td>
+                                            <td>
+                                                <span style="padding-right:6px;">of {{ page.paginator.num_pages }}</span>
+                                            </td>
+
+                                            <td>
+                                                <div class="pagination-btn-separator"></div>
+                                            </td>
+                                            {% if page.has_next %}
+                                                <td>
+                                                    <a href="{{url_date}}?page={{ page.number|add:1 }}" class="l-btn l-btn-small l-btn-plain">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="{{url_date}}?page={{ page.paginator.num_pages }}" class="l-btn l-btn-small l-btn-plain">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            {% else %}
+                                                <td>
+                                                    <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-next">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-last">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            {% endif %}
+                                            <td>
+                                                <div class="pagination-btn-separator"></div>
+                                            </td>
+                                            {% if page.has_next or page.has_previous %}
+                                                <td>
+                                                    <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain" group="" id="paging">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            {% else %}
+                                                <td>
+                                                    <a href="javascript:void(0)" class="l-btn l-btn-small l-btn-plain l-btn-disabled l-btn-plain-disabled" group="">
+                                                        <span class="l-btn-left l-btn-icon-left">
+                                                            <span class="l-btn-text l-btn-empty">&nbsp;</span>
+                                                            <span class="l-btn-icon pagination-load">&nbsp;</span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    </tbody>
+                                    </table>
+
+                                    <label style="float: right; font-size: 16px; line-height: 34px; margin-right: 20px;">元</label>
+                                    <input type="text" name="" id="" readonly="readonly" value="{{ cost_total }}" style="border: 0px;float: right;text-align: center;background:#F9F9F9;line-height: 32px;font-size: 16px;width: 100px;"/>
+                                    <label style="float: right; font-size: 16px; line-height: 34px;">成本统计:</label>
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+                </form>
+            <!--主要内容结束-->
+            </td>
+        </tr>
+    </table>
+
+
+<!--发货弹框-->
+<div id="dialogBg"></div>
+<div id="dialog" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 600px;height:auto;">
+    <form action="" method="post" id="shipping_info">
+        <h5 style="margin:10px;">
+       		<div style="height: auto;width: auto;text-align: center;">
+       			<label style="color:black;font-size: 18px; font-weight: 600;" class="good_name"></label >
+       		</div>
+       	</h5>
+        <input type="text" style="display: none;" id="order_name" name="good_name" value="" />
+        <input type="text" style="display: none;" id="send_good_type" name="good_type" value="" />
+        <input type="text" style="display: none;" id="pid" name="pid" value="" />
+        <table width="97%" border="0" align="center" cellpadding="10" cellspacing="1" bgcolor="#DFDFDF" style="margin:15px auto 30px auto;" id="userlist">
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>订单ID：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="order_id" id="order_id" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>兑换人ID：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="uid" id="user_id" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>姓名：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="payer_name" id="payer_name" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+{#            <tr>#}
+{#                <td width="20" align="right" bgcolor="#F9F9F9"><strong>性别：</strong></td>#}
+{#                <td bgcolor="#F9F9F9" width="80">#}
+{#                    <input type="text" name="sex" id="sex" readonly="readonly" style="border:none;background:#F9F9F9" value="" />#}
+{#                </td>#}
+{#            </tr>#}
+
+            <tr>
+                <td width="20" align="right" bgcolor="#F9F9F9"><strong>地区：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="area" id="area" readonly="readonly" style="border:none;background:#F9F9F9;width:100%;" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>地址：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="address" id="address" readonly="readonly" style="border:none;background:#F9F9F9;width:100%;" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>手机号码：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="phone" id="phone" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9" ><strong>邮箱：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="mail" id="mail" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+            <tr id="express_number_show">
+                <td align="right" width="20" bgcolor="#F9F9F9" ><strong>快递单号：</strong></td>
+                <td bgcolor="#E3F8FF" width="80" class="cursor"><input type="text" name="express_number" value="" id="express_number" /></td>
+            </tr>
+
+            <tr id="card_number_show">
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>卡号：</strong></td>
+                <td bgcolor="#F9F9F9" width="80" class="cursor"><input type="text" name="card_number" value="" id="card_number" readonly="readonly" style="border:none;background:#F9F9F9" /></td>
+            </tr>
+
+            <tr id="card_close_show">
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>卡密：</strong></td>
+                <td bgcolor="#F9F9F9" width="80" class="cursor"><input type="text" name="card_close" value="" id="card_close" readonly="readonly" style="border:none;background:#F9F9F9"/></td>
+            </tr>
+
+        </table>
+
+        <div class="btn_select" style="height: 60px; margin-top: 30px;border-top: 1px dotted #ccc;">
+              <input  type="button" class="returns" style=" margin-top:15px; float: right;margin-right: 10px;color: rgba(0,0,0,.8);background: #cacbcd;" value="取消" >
+              <input id="send_info" type="button" style="float: right;margin-right: 10px; margin-top:15px;" value="确定发货" class="confirm" onclick="send_out_status()">
+         </div>
+    </form>
+</div>
+
+<!--详情弹框-->
+<div id="dialogmag"></div>
+<div id="dialohg" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 600px;height:auto;">
+    <form action="" method="post" id="shipping_info">
+        <input type="text" style="display: none;" id="particulars_type" name="good_type" value="" />
+        <input type="text" style="display: none;" id="pid" name="pid" value="" />
+        <table width="97%" border="0" align="center" cellpadding="10" cellspacing="1" bgcolor="#DFDFDF" style="margin:30px auto 30px auto;" id="userlist">
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>订单ID：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="order_id" id="order_id_part" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>兑换人ID：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="uid" id="user_id_part" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>姓名：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="payer_name" id="name_part" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+{#            <tr>#}
+{#                <td width="20" align="right" bgcolor="#F9F9F9"><strong>性别：</strong></td>#}
+{#                <td bgcolor="#F9F9F9" width="80">#}
+{#                    <input type="text" name="sex" id="sex_part" readonly="readonly" style="border:none;background:#F9F9F9" value="" />#}
+{#                </td>#}
+{#            </tr>#}
+
+            <tr>
+                <td width="20" align="right" bgcolor="#F9F9F9"><strong>地区：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="area" id="area_part" readonly="readonly" style="border:none;background:#F9F9F9;width:100%; " value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>地址：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="address" id="address_part" readonly="readonly" style="border:none;background:#F9F9F9; width:100%;" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>手机号码：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="phone" id="phone_part" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right" width="20" bgcolor="#F9F9F9" ><strong>邮箱：</strong></td>
+                <td bgcolor="#F9F9F9" width="80">
+                    <input type="text" name="mail" id="mail_part" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+            <tr id="express_number_part">
+                <td align="right" width="20" bgcolor="#F9F9F9" ><strong>快递单号：</strong></td>
+                <td bgcolor="#F9F9F9" width="80" class="cursor">
+                    <input type="text" name="express_number" id="express_number_data" readonly="readonly" style="border:none;background:#F9F9F9" value="" />
+                </td>
+            </tr>
+
+            <tr id="card_number_part">
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>卡号：</strong></td>
+                <td bgcolor="#F9F9F9" width="80" class="cursor"><input type="text" name="card_number" value="" id="card_number_data" readonly="readonly" style="border:none;background:#F9F9F9" /></td>
+            </tr>
+
+            <tr id="card_close_part">
+                <td align="right" width="20" bgcolor="#F9F9F9"><strong>卡密：</strong></td>
+                <td bgcolor="#F9F9F9" width="80" class="cursor"><input type="text" name="card_close" value="" id="card_close_data" readonly="readonly" style="border:none;background:#F9F9F9"/></td>
+            </tr>
+        </table>
+
+        <div class="btn_select" style="height: 60px; margin-top: 30px;border-top: 1px dotted #ccc;">
+              <input  type="button" class="P_cancel" style="width: 80px;height: 35px; margin-top:15px; float: right;margin-right: 30px;color: rgba(0,0,0,.8);background: #cacbcd;" value="取消" >
+         </div>
+    </form>
+</div>
+
+<!--单个审核异常弹框-->
+<div id="dialogmag_nine"></div>
+<div id="dialohg_nine" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 520px;height:auto;">
+    <form id="one_info">
+        {% csrf_token %}
+        <div class="dialogTophg" style="height: 30px;width: 100%;">
+            <h4  style="text-align: left; margin-left: 16px; font-size: 20px;font-weight: 800;margin-top: 6px;">
+                兑换ID：<label style="font-size: 20px;font-weight: 800;" id="convert_id"></label>
+                玩家ID：<label style="font-size: 20px;font-weight: 800;" id="player_id"></label>
+                <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="exchange_id" name="exchange_id" value="" />
+                <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="player_ID" name="user_ID" value="" />
+                <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="Good_type" name="good_type" value="" />
+                <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="Pid" name="Pid" value="" />
+            </h4>
+        </div>
+        <ul class="editInfos">
+            <div class="btn_select" style="height: 40px; margin-top: 30px;">
+                <a href="javascript:;" id="Approve" style="margin-left: 15px;background:#1B9AF7">审核通过</a>
+                <a href="javascript:;" id="No_pass" style="margin-left: 96px;background:#da70d6;">暂不通过</a>
+                <a href="javascript:;" class="cancel_status" style="float: right; margin-right: 15px;color: rgba(0,0,0,.8);background: #cacbcd;">取消</a>
+            </div>
+        </ul>
+    </form>
+</div>
+
+<!--单个暂不通过弹框-->
+<div id="dialogmag_ten"></div>
+<div id="dialohg_ten" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 520px;height:auto;">
+    <form id="two_info">
+        {% csrf_token %}
+        <div class="dialogTophg" style="height: 30px;width: 100%;">
+            <h4  style="text-align: left; margin-left: 16px; font-size: 20px;font-weight: 800;margin-top: 6px;">
+                兑换ID：<label style="font-size: 20px;font-weight: 800;" id="T_convert_id"></label>
+                玩家ID：<label style="font-size: 20px;font-weight: 800;" id="T_player_id"></label>
+                <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="T_exchange_id" name="exchange_id" value="" />
+                <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="T_player_ID" name="user_ID" value="" />
+                <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="T_Good_type" name="good_type" value="" />
+                <input type="text" style="display: none;float: right;font-size: 6px; width:55px;" id="T_Pid" name="Pid" value="" />
+            </h4>
+        </div>
+        <ul class="editInfos">
+            <div class="btn_select" style="height: 40px; margin-top: 30px;">
+                <a href="javascript:;" id="T_approve" style="margin-left: 15px;background:#1B9AF7">审核通过</a>
+                <a href="javascript:;" id="Anomaly" style="margin-left: 96px;background:#fd3e3e;">审核异常</a>
+                <a href="javascript:;" class="D_cancel" style="float: right; margin-right: 15px;color: rgba(0,0,0,.8);background: #cacbcd;">取消</a>
+            </div>
+        </ul>
+    </form>
+</div>
+
+<!--客服多个审核通过弹框-->
+<div id="service_mag"></div>
+<div id="service_hg" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 520px;height:auto;">
+    <form id="one_info">
+        {% csrf_token %}
+        <div class="dialogTophg" style="height: 30px;width: 100%;">
+            <h4  style="text-align: left; margin-left: 16px; font-size: 20px;font-weight: 800;margin-top: 6px;">
+                请选择：
+            </h4>
+        </div>
+        <ul class="editInfos">
+            <div class="btn_select" style="height: 40px; margin-top: 30px;">
+                <a href="javascript:;" id="service_Approve" style="margin-left: 75px;background:#1B9AF7">审核通过</a>
+                <a href="javascript:;" class="E_cancel" style="float: right; margin-right: 80px;color: rgba(0,0,0,.8);background: #cacbcd;">取消</a>
+            </div>
+        </ul>
+    </form>
+</div>
+
+<!--多个审核通过弹框-->
+<div id="Popout_T_one"></div>
+<div id="Popout_F_one" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 520px;height:auto;">
+    <form id="one_info">
+        {% csrf_token %}
+        <div class="dialogTophg" style="height: 30px;width: 100%;">
+            <h4  style="text-align: left; margin-left: 16px; font-size: 20px;font-weight: 800;margin-top: 6px;">
+                请选择：
+            </h4>
+        </div>
+        <ul class="editInfos">
+            <div class="btn_select" style="height: 40px; margin-top: 30px;">
+                <a href="javascript:;" id="many_Approve" style="margin-left: 75px;background:#1B9AF7">审核通过</a>
+                <a href="javascript:;" class="A_cancel" style="float: right; margin-right: 80px;color: rgba(0,0,0,.8);background: #cacbcd;">取消</a>
+            </div>
+        </ul>
+    </form>
+</div>
+
+<!--多个审核异常弹框-->
+<div id="Popout_T_two"></div>
+<div id="Popout_F_two" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 520px;height:auto;">
+    <form id="one_info">
+        {% csrf_token %}
+        <div class="dialogTophg" style="height: 30px;width: 100%;">
+            <h4  style="text-align: left; margin-left: 16px; font-size: 20px;font-weight: 800;margin-top: 6px;">
+                请选择：
+            </h4>
+        </div>
+        <ul class="editInfos">
+            <div class="btn_select" style="height: 40px; margin-top: 30px;">
+                <a href="javascript:;" id="many_anomaly" style="margin-left: 75px;background:#fd3e3e">审核异常</a>
+                <a href="javascript:;" class="B_cancel" style="float: right; margin-right: 80px;color: rgba(0,0,0,.8);background: #cacbcd;">取消</a>
+            </div>
+        </ul>
+    </form>
+</div>
+
+<!--多个暂不通过弹框-->
+<div id="Popout_mag"></div>
+<div id="Popout_hg" class="animated" style="margin: auto;position: fixed; left: 34%; top: 10%;width: 520px;height:auto;">
+    <form id="one_info">
+        {% csrf_token %}
+        <div class="dialogTophg" style="height: 30px;width: 100%;">
+            <h4  style="text-align: left; margin-left: 16px; font-size: 20px;font-weight: 800;margin-top: 6px;">
+                请选择：
+            </h4>
+        </div>
+        <ul class="editInfos">
+            <div class="btn_select" style="height: 40px; margin-top: 30px;">
+                <a href="javascript:;" id="many_No_pass" style="margin-left: 75px;background:#da70d6;">暂不通过</a>
+                <a href="javascript:;" class="C_cancel" style="float: right; margin-right: 80px;color: rgba(0,0,0,.8);background: #cacbcd;">取消</a>
+            </div>
+        </ul>
+    </form>
+</div>
+
+<script>
+!function(){
+laydate.skin('molv');//切换皮肤，请查看skins下面皮肤库
+laydate({elem: '#demo'});//绑定元素
+}();
+//日期范围限制
+var start = {
+    elem: '#start',
+    format: 'YYYY-MM-DD hh:mm:ss',
+    //min: laydate.now(), //设定最小日期为当前日期
+    max: '2099-06-16', //最大日期
+    istime: true,
+    istoday: false,
+    choose: function(datas){
+         end.min = datas; //开始日选好后，重置结束日的最小日期
+         end.start = datas //将结束日的初始值设定为开始日
+    }
+};
+var end = {
+    elem: '#end',
+    format: 'YYYY-MM-DD hh:mm:ss',
+    // min: laydate.now(),
+    max: '2099-06-16',
+    istime: true,
+    istoday: false,
+    choose: function(datas){
+        start.max = datas; //结束日选好后，充值开始日的最大日期
+    }
+};
+laydate(start);
+laydate(end);
+//自定义日期格式
+laydate({
+    elem: '#test1',
+    format: 'YYYY年MM月DD日',
+    festival: true, //显示节日
+    choose: function(datas){ //选择日期完毕的回调
+        alert('得到：'+datas);
+    }
+});
+//日期范围限定在昨天到明天
+laydate({
+    elem: '#hello3',
+    min: laydate.now(-1), //-1代表昨天，-2代表前天，以此类推
+    max: laydate.now(+1) //+1代表明天，+2代表后天，以此类推
+});
+
+$('#Approve').click(function() {
+    var params = $.param({"pid":1,"status":0}) + "&" + $('#one_info').serialize();
+    $.post('/limit_time_shop/alter_check_status/', params, function(data) {
+        if ( data.status) {
+            $.each(data.u_list, function(i, value){
+                var exchange_id = value.exchange_id;
+                $(".convert"+exchange_id).attr("href","javascript:;");
+                $(".convert"+exchange_id).css("background", "#1B9AF7");
+                $(".convert"+exchange_id).html("审核通过");
+                $("#state"+exchange_id).css("background", "#0000FF");
+                $("#state"+exchange_id).html("未审核");
+            });
+            $('#dialogmag_nine').fadeOut(300,function(){
+                $('#dialohg_nine').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert("数据异常!");
+        }
+
+    });
+});
+
+$('#No_pass').click(function() {
+    var params = $.param({"pid":1,"status":7}) + "&" + $('#one_info').serialize();
+    $.post('/limit_time_shop/alter_check_status/', params, function(data) {
+        if ( data.status) {
+            $.each(data.u_list, function(i, value){
+                var exchange_id = value.exchange_id;
+                var user_id = value.user_id;
+                var good_type = value.good_type;
+                var pid = value.pid;
+                $(".convert"+exchange_id).css("background", "#da70d6");
+                $(".convert"+exchange_id).html("暂不通过");
+                $("#state"+exchange_id).css("background", "#da70d6");
+                $("#state"+exchange_id).html("暂不通过");
+                if($.inArray("305", {{ json_limit|safe  }}) >= 0){
+                    $(".convert"+exchange_id).attr("href","javascript:no_pass("+user_id+","+exchange_id+","+good_type+","+pid+");");
+                }
+                if($.inArray("304", {{ json_limit|safe  }}) >= 0){
+                  $(".convert"+exchange_id).attr("href","javascript:;");
+                  $("#check"+exchange_id).css('display','none');
+                }
+                if($.inArray("304", {{ json_limit|safe  }}) >= 0 && $.inArray("305", {{ json_limit|safe  }}) >= 0){
+                  $(".convert"+exchange_id).attr("href","javascript:;");
+                  $("#check"+exchange_id).css('display','none');
+                }
+            });
+            $('#dialogmag_nine').fadeOut(300,function(){
+                $('#dialohg_nine').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert("数据异常!");
+        }
+
+    });
+});
+
+
+$('#T_approve').click(function() {
+    var params = $.param({"pid":1,"status":0}) + "&" + $('#two_info').serialize();
+    $.post('/limit_time_shop/alter_check_status/', params, function(data) {
+        if ( data.status) {
+            $.each(data.u_list, function(i, value){
+                var exchange_id = value.exchange_id;
+                $(".convert"+exchange_id).attr("href","javascript:;");
+                $(".convert"+exchange_id).css("background", "#1B9AF7");
+                $(".convert"+exchange_id).html("审核通过");
+                $("#state"+exchange_id).css("background", "#0000FF");
+                $("#state"+exchange_id).html("未审核");
+            });
+            $('#dialogmag_ten').fadeOut(300,function(){
+                $('#dialohg_ten').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert("数据异常!");
+        }
+
+    });
+});
+
+
+$('#Anomaly').click(function() {
+    var params = $.param({"pid":1,"status":6}) + "&" + $('#two_info').serialize();
+    $.post('/limit_time_shop/alter_check_status/', params, function(data) {
+        if ( data.status) {
+            $.each(data.u_list, function(i, value){
+                var exchange_id = value.exchange_id;
+                var user_id = value.user_id;
+                var good_type = value.good_type;
+                var pid = value.pid;
+
+                if($.inArray("304", {{ json_limit|safe  }}) >= 0){
+                    $(".convert"+exchange_id).attr("href","javascript:abnormal("+user_id+","+exchange_id+","+good_type+","+pid+");");
+                }
+                if($.inArray("305", {{ json_limit|safe  }}) >= 0){
+                    $(".convert"+exchange_id).attr("href","javascript:abnormal("+user_id+","+exchange_id+","+good_type+","+pid+");");
+                }
+                if($.inArray("304", {{ json_limit|safe  }}) >= 0 && $.inArray("305", {{ json_limit|safe  }}) >= 0){
+                  $(".convert"+exchange_id).attr("href","javascript:;");
+                  $("#check"+exchange_id).css('display','none');
+                }
+
+                $(".convert"+exchange_id).css("background", "#fd3e3e");
+                $(".convert"+exchange_id).html("审核异常");
+                $(".send"+exchange_id).attr("href","javascript:;");
+                $(".send"+exchange_id).css("background", "#8B8A8A");
+                $("#state"+exchange_id).removeClass("wsh");
+                $("#state"+exchange_id).css("background", "#fd3e3e");
+                $("#state"+exchange_id).html("审核异常");
+            });
+            $('#dialogmag_ten').fadeOut(300,function(){
+                $('#dialohg_ten').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert("数据异常!");
+        }
+
+    });
+});
+
+{#客服多个审核#}
+$('#service_Approve').click(function() {
+    var params = $.param({"pid":4,"status":1}) + "&" + $('#record_info').serialize();
+    $.post('/limit_time_shop/alter_check_status/', params, function(data) {
+        if ( data.status) {
+            $.each(data.u_list, function(i, value){
+                var exchange_id = value.exchange_id;
+                var user_id = value.user_id;
+                var good_type = value.good_type;
+                var pid = value.pid;
+                $(".convert"+exchange_id).attr("href","javascript:;");
+                $(".convert"+exchange_id).css("background", "#8B8A8A");
+                $(".send"+exchange_id).attr("href","javascript:send_out_info("+user_id+","+exchange_id+","+good_type+","+pid+");");
+                $(".send"+exchange_id).css("background", "#1B9AF7");
+                $("#state"+exchange_id).removeClass("wsh");
+                $("#state"+exchange_id).addClass("jz");
+                $("#state"+exchange_id).html("未发货");
+            });
+            $('#service_mag').fadeOut(300,function(){
+                $('#service_hg').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert("数据异常!");
+        }
+
+    });
+});
+
+$('#many_Approve').click(function() {
+    var params = $.param({"pid":2,"status":0}) + "&" + $('#record_info').serialize();
+    $.post('/limit_time_shop/alter_check_status/', params, function(data) {
+        if ( data.status) {
+            $.each(data.u_list, function(i, value){
+                var exchange_id = value.exchange_id;
+                $(".convert"+exchange_id).attr("href","javascript:;");
+                $(".convert"+exchange_id).css("background", "#1B9AF7");
+                $(".convert"+exchange_id).html("审核通过");
+                $("#state"+exchange_id).css("background", "#0000FF");
+                $("#state"+exchange_id).html("未审核");
+                $(".send"+exchange_id).attr("href","javascript:;");
+                $(".send"+exchange_id).css("background", "#8B8A8A");
+            });
+            $('#Popout_T_one').fadeOut(300,function(){
+                $('#Popout_F_one').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert("数据异常!");
+        }
+
+    });
+});
+
+$('#many_anomaly').click(function() {
+    var params = $.param({"pid":2,"status":6}) + "&" + $('#record_info').serialize();
+    $.post('/limit_time_shop/alter_check_status/', params, function(data) {
+        if ( data.status) {
+            $.each(data.u_list, function(i, value){
+                var exchange_id = value.exchange_id;
+                var user_id = value.user_id;
+                var good_type = value.good_type;
+                var pid = value.pid;
+
+                if($.inArray("304", {{ json_limit|safe  }}) >= 0){
+                    $(".convert"+exchange_id).attr("href","javascript:abnormal("+user_id+","+exchange_id+","+good_type+","+pid+");");
+                }
+                if($.inArray("305", {{ json_limit|safe  }}) >= 0){
+                    $(".convert"+exchange_id).attr("href","javascript:abnormal("+user_id+","+exchange_id+","+good_type+","+pid+");");
+                }
+                if($.inArray("304", {{ json_limit|safe  }}) >= 0 && $.inArray("305", {{ json_limit|safe  }}) >= 0){
+                  $(".convert"+exchange_id).attr("href","javascript:;");
+                  $("#check"+exchange_id).css('display','none');
+                }
+
+                $(".convert"+exchange_id).css("background", "#fd3e3e");
+                $(".convert"+exchange_id).html("审核异常");
+                $(".send"+exchange_id).attr("href","javascript:;");
+                $(".send"+exchange_id).css("background", "#8B8A8A");
+                $("#state"+exchange_id).removeClass("wsh");
+                $("#state"+exchange_id).css("background", "#fd3e3e");
+                $("#state"+exchange_id).html("审核异常");
+            });
+            $('#Popout_T_two').fadeOut(300,function(){
+                $('#Popout_F_two').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert("数据异常!");
+        }
+
+    });
+});
+
+$('#many_No_pass').click(function() {
+    var params = $.param({"pid":2,"status":7}) + "&" + $('#record_info').serialize();
+    $.post('/limit_time_shop/alter_check_status/', params, function(data) {
+        if ( data.status) {
+            $.each(data.u_list, function(i, value){
+                var exchange_id = value.exchange_id;
+                var user_id = value.user_id;
+                var good_type = value.good_type;
+                var pid = value.pid;
+                $(".convert"+exchange_id).css("background", "#da70d6");
+                $(".convert"+exchange_id).html("暂不通过");
+                $("#state"+exchange_id).css("background", "#da70d6");
+                $("#state"+exchange_id).html("暂不通过");
+                if($.inArray("305", {{ json_limit|safe  }}) >= 0){
+                    $(".convert"+exchange_id).attr("href","javascript:no_pass("+user_id+","+exchange_id+","+good_type+","+pid+");");
+                }
+                if($.inArray("304", {{ json_limit|safe  }}) >= 0){
+                  $(".convert"+exchange_id).attr("href","javascript:;");
+                  $("#check"+exchange_id).css('display','none');
+                }
+                if($.inArray("304", {{ json_limit|safe  }}) >= 0 && $.inArray("305", {{ json_limit|safe  }}) >= 0){
+                  $(".convert"+exchange_id).attr("href","javascript:;");
+                  $("#check"+exchange_id).css('display','none');
+                }
+            });
+            $('#Popout_mag').fadeOut(300,function(){
+                $('#Popout_hg').addClass('bounceOutUp').fadeOut();
+            });
+        }
+        else {
+            alert("数据异常!");
+        }
+
+    });
+});
+
+</script>
+</body>
+</html>

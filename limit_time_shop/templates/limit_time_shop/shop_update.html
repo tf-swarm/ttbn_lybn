@@ -1,0 +1,164 @@
+<html>
+<head>
+{% if ntype == 2 %}
+    <title>实物兑换商城 &gt; 更新</title>
+{% else %}
+    <title>限时商城 &gt; 更新</title>
+{% endif %}
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+<link type="text/css" rel="stylesheet" href="/static/css/style.css">
+<script src="/static/js/jquery-2.0.0.min.js"></script>
+<style>
+.cursor label{cursor:pointer;}
+.ht_big_bor0 select{height:32px;line-height:32px;font-size:14px;border:1px solid #DDD;}
+</style>
+<script>
+$(function (){
+
+    var mark0  		= document.getElementById('GoodsModel_goods_mark_0');
+    var mark1  		= document.getElementById('GoodsModel_goods_mark_1');
+    var oGoodsTitle = document.getElementById('goods_title');
+    var oPropId     = document.getElementById('prop_id');
+
+    mark0.onclick = function(){
+        oGoodsTitle.style.display = 'block';
+        oGoodsTitle.value 		  = '';
+        oPropId.style.display  	  = 'none';
+    }
+
+    mark1.onclick = function(){
+        oGoodsTitle.style.display = 'none';
+        oPropId.style.display     = 'block';
+    }
+
+});
+</script>
+</head>
+<body>
+    <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+        <tbody>
+            <tr>
+                <td height="40" align="left" valign="middle" bgcolor="#F5F5F5">
+                    {% if ntype == 2 %}
+                        <strong style="color:#A0A0A0;padding-left:20px;" name="ntype" value="1">实物兑换商城 &gt; 更新</strong></td>
+                    {% else %}
+                        <strong style="color:#A0A0A0;padding-left:20px;" name="ntype" value="2">限时商城 &gt; 更新</strong></td>
+                    {% endif %}
+            </tr>
+
+            <tr>
+                <td valign="top" bgcolor="#FFFFFF">
+                    <!--主要内容开始-->
+                    <form enctype="multipart/form-data" id="form_order" action="/limit_time_shop/shop_update_date/{{ntype}}/" method="post">
+                        {% csrf_token %}
+                        <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:30px auto 30px auto;" id="userlist">
+                                <tbody>
+                                    <tr>
+                                        <td align="right" bgcolor="#F9F9F9"><strong><label>商品ID：</label></strong></td>
+                                        <td bgcolor="#F9F9F9">
+                                            <input type="text" name="gids" readonly="readonly" style="border:none;background:#F9F9F9" value="{{shop_info.gid}}" />
+                                        </td>
+
+                                        <td width="423" rowspan="9" align="center" valign="middle" bgcolor="#F9F9F9">
+                                            <input type="image" src="/static/images/{{shop_info.gid}}.png" width="257" height="177" border="0">
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td width="191" align="right" bgcolor="#F9F9F9"><strong><label for="GoodsModel_goods_type">商品类别：</label></strong></td>
+                                        <td width="1149" bgcolor="#F9F9F9">
+                                           <select name="goods_type" id="GoodsModel_goods_type">
+                                               {% for info in shop_name %}
+                                                     <option value="{{ info.vale }}" {% if shop_info.goods_type == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                                               {% endfor %}
+                                            </select>
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td width="191" align="right" bgcolor="#ECF3FF"><strong><label>商品名称/数量：</label></strong></td>
+                                        <td width="1149" bgcolor="#ECF3FF">
+                                            <input size="30" maxlength="9" id="goods_title" placeholder="2~9个字符" class="text-box_normal" style="float:left;" name="goods_name" type="text" value="{{shop_info.goods_name}}">
+                                            <input size="10" maxlength="9" placeholder="数量" class="text-box_normal" style="float:left;margin-left:5px;" name="count" type="text" value="{{shop_info.count}}">
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td width="191" align="right" bgcolor="#ECF3FF"><strong><label for="GoodsModel_have_num">当日库存量：</label></strong>
+                                        </td>
+                                        <td width="1149" bgcolor="#ECF3FF">
+                                            <select name="prop_limit" id="prop" style="width: 98px;">
+                                                <option value="2">有限制</option>
+                                                <option value="0">无限制</option>
+                                            </select>
+                                            <input size="10" maxlength="9" class="text-box_normal" name="limit_num" id="GoodsModel_have_num" type="text" value="{{shop_info.limit_num}}">
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td width="191" align="right" bgcolor="#FFEEEE"><strong><label for="GoodsModel_goods_price_type">商品单价：</label></strong></td>
+                                        <td width="1149" bgcolor="#FFEEEE">
+                                            <input size="10" maxlength="9" id="prop_num" placeholder="数量" class="text-box_normal" style="float:left;margin-left:5px;" name="goods_price" type="text" value="{{shop_info.goods_price}}">
+                                            <select name="money_type" id="GoodsModel_goods_price_type" style="width: 90px;">
+                                                <option value="5" selected="selected">鸟券</option>
+                                                <!--<option value="2">钻石</option>-->
+                                                <!--<option value="1">金币</option>-->
+                                            </select>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td width="191" align="right" bgcolor="#FFEEEE"><strong><label>VIP等级最低购买要求：</label></strong></td>
+                                        <td width="1149" bgcolor="#FFEEEE">
+                                            <select name="vip_limit" style="width: 90px;">
+                                                {% for info in vip_grade %}
+                                                     <option value="{{ info.vale }}" {% if shop_info.vip_limit == info.vale %} selected {% endif %} >{{ info.content }}</option>
+                                               {% endfor %}
+                                            </select>
+                                        </td>
+                                    </tr>
+
+                                    <!--<tr>-->
+                                        <!--<td width="191" align="right" bgcolor="#F9F9F9"><strong><label for="GoodsModel_goods_img">商品图片：</label></strong></td>-->
+                                        <!--<td width="1149" bgcolor="#F9F9F9">-->
+                                            <!--<input id="ytGoodsModel_goods_img" type="hidden" value="" name="GoodsModel[goods_img]">-->
+                                            <!--<input name="GoodsModel[goods_img]" id="GoodsModel_goods_img" type="file">                        【图片格式：.png 或 .jpg】【图片大小：&lt; 20KB】【图片尺寸：257PX * 177PX】&nbsp;&nbsp;&nbsp;-->
+                                            <!--<div class="errorMessage" id="GoodsModel_goods_img_em_" style="display:none"></div></td>-->
+                                    <!--</tr>-->
+
+                                    <tr>
+                                        <td align="right" bgcolor="#F9F9F9"><strong><label for="GoodsModel_is_online">是否上线出售：</label></strong></td>
+                                        <td bgcolor="#F9F9F9" class="cursor">
+                                            <span id="GoodsModel_is_online">
+                                                {% if shop_info.line == 0 %}
+                                                    <input style="cursor:pointer" id="GoodsModel_is_online_1" value="0" checked="checked" type="radio" name="line">
+                                                    <label for="GoodsModel_is_online_1">暂不上线</label>
+                                                    <input style="cursor:pointer" id="online_0" value="1" type="radio" name="line">
+                                                    <label for="online_0">上线出售</label>&nbsp;
+                                                {% else %}
+                                                    <input style="cursor:pointer" id="GoodsModel_is_online_0" value="1" checked="checked" type="radio" name="line">
+                                                    <label for="GoodsModel_is_online_0">上线出售</label>&nbsp;
+                                                    <input style="cursor:pointer" id="online_1" value="0" type="radio" name="line">
+                                                    <label for="GoodsModel_is_online_1">暂不上线</label>
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td align="center" bgcolor="#F9F9F9">&nbsp;</td>
+                                        <td colspan="2" align="left" bgcolor="#F9F9F9"><input id="registSubmit" type="submit" value="确定更新" class="button"></td>
+                                    </tr>
+                                </tbody>
+                        </table>
+                    </form>
+                    <!--主要内容结束-->
+                </td>
+            </tr>
+    </tbody>
+    </table>
+</body>
+</html>

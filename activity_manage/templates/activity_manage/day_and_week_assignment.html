@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<meta charset="UTF-8">
+		<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/laydate.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/fixed_header.css">
+
+		<script type="text/javascript" src="/static/laydate.js"></script>
+	    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+		<style>
+			.edit_permission {
+				margin-bottom: 10px;
+				background: #009c95;
+				color: white;
+				border-radius: 3px;
+				border: none;
+				cursor: pointer;
+			}
+
+			.head_div {
+				margin-left: 20px;
+				width: 100%;
+				height: auto;
+				margin-top: 15px;
+				display: inline-block;
+			}
+
+			.head_div span,
+			span {
+				float: left;
+				font-size: 18px;
+				height: 30px;
+				line-height: 30px;
+				color: black;
+				font-weight: 600;
+			}
+
+			.head_div select {
+				width: 100px;
+				height: 36px;
+				border: solid 1px #cccccc;
+				font-size: 17px;
+			}
+
+			select option {
+				font-size: 17px;
+			}
+
+			h1 {
+				display: inline-block;
+				font-size: 24px;
+				line-height: 40px;
+				height: 45px;
+				float: left;
+				color: black;
+				font-weight: 600;
+			}
+
+			.input_text {
+				width: auto;
+				height: 36px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px #cccccc;
+				text-align: center;
+				padding: 0px;
+			}
+
+			.btn_model {
+				width: 70px;
+				height: 36px;
+				background: #e8e8e8;
+				float: left;
+				border: 1px #cccccc solid;
+			}
+
+			.btn_model p {
+				color: rgba(0, 0, 0, .5);
+				font-weight: 700;
+				text-align: center;
+				line-height: 36px;
+				font-size: 1em;
+				margin: 0;
+			}
+
+			.remove {
+				display: inline-block;
+				width: 20px;
+				height: 20px;
+				cursor: pointer;
+				float: left;
+				margin: 8px 10px 8px 18px;
+				background: url(/static/images/close_btn.png) no-repeat -220px -315px;
+			}
+
+			.spinner_select option {
+				font-size: 18px;
+			}
+
+			.activity_name {
+				width: auto;
+				height: 30px;
+				margin: 0;
+				font-size: 16px;
+				border: solid 1px rgb(169, 169, 169);
+				;
+				text-align: center;
+			}
+		</style>
+	</head>
+    <body style="line-height: 0.1em; overflow-x:auto; max-height: 900px;min-width: 1470px;">
+        <div class="body-div">
+            <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+                <tr>
+					<td width="25%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">活动管理 &gt;每日每周任务</strong></td>
+					<td width="25%" align="left" valign="middle" bgcolor="#F5F5F5">
+					</td>
+					<td width="60%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+
+					</td>
+
+					<td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+{#						<a href="javascript:;" id="bn_btn_one">操作记录</a>#}
+					</td>
+				</tr>
+                <tr>
+                    <td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: 1000px;">
+                        <!--主要内容开始-->
+                        <form action="" method="post" id="form_wheel">
+                            {% csrf_token %}
+                            <div style="height:45px; width:100%;margin-left: 20px;margin-top: 20px;">
+                                <h1 style="width:auto">每日/每週任務———
+                                    <a href="javascript:;" id="alter_luck_wheel" style="color: white;width: 112px; height: 35px; background:#1B9AF7;border-radius: 3px; float:right;margin-top: 4px;">确认更改</a>
+                                </h1>
+                            </div>
+                            <div class="head_div">
+                                <span>每日任務</span>
+                                <div style="height: auto;width: 400px; display: inline-block;">
+                                    {% for num in count %}
+                                        <div style="height: auto;float: left;margin-bottom: 10px;">
+                                            <div class="btn_model" >
+                                                <p>活跃宝箱{{ num }}</p>
+                                            </div>
+                                            <select style="width: 120px;height: 38px;float: left;" name="reward_name" id="">
+                                                {% for data in give_reward %}
+                                                     <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="btn_model">
+                                                <p>数量</p>
+                                            </div>
+                                            <input type="text" class="input_text" name="reward_number" value="{{ info.value }}" placeholder="" style="float: left;width:100px;">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div style="height: 1px;width: 100%; height:auto;border-top: 1px #C2C2C2 solid"></div>
+                            <div class="head_div">
+                                <span>每周任務</span>
+                                <div style="height: auto;width: 400px; display: inline-block;">
+                                    {% for num in count %}
+                                        <div style="height: auto;float: left;margin-bottom: 10px;">
+                                            <div class="btn_model" >
+                                                <p>活跃宝箱{{ num }}</p>
+                                            </div>
+                                            <select style="width: 120px;height: 38px;float: left;" name="reward_name" id="">
+                                                {% for data in give_reward %}
+                                                     <option value="{{ data.vale }}" {% if info.option == data.vale %} selected {% endif %} >{{ data.content }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="btn_model">
+                                                <p>数量</p>
+                                            </div>
+                                            <input type="text" class="input_text" name="reward_number" value="{{ info.value }}" placeholder="" style="float: left;width:100px;">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    <script type="text/javascript">
+        $('#alter_luck_wheel').click(function () {
+            var data_info = $('#form_wheel').serialize();
+            if(confirm("您确定修改每日每周任务?")){
+                            $.post('/activity_manage/change_day_and_week_assignment/', data_info, function(date) {
+                                if ( date.code) {
+                                    alert(date.info);
+                                }
+                                else {
+                                    alert(date.info);
+                                }
+                            });
+                        }else {
+                            alert("您取消了修改每日每周任务");
+                        }
+        })
+    </script>
+
+    </body>
+</html>

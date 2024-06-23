@@ -1,0 +1,306 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/tree.css">
+	<script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/hint.js"></script>
+    <script>
+        $(function(){
+            var look_uid = false;
+            $('#overlook').click(function(){
+                check_look_uid();
+                if(look_uid == true){
+                    user_id = $("#overlook_uid").val();
+                    var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":1,"o_id":user_id});
+                    $.post('/control_manage/stop_service/', data_info, function(data) {
+                        if ( data.status) {
+                            alert(data.msg);
+                            add_user(data.uid,data.leg);
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+                    return true;
+                }else {
+                    return false;
+                }
+
+            });
+
+            var look_count = 1;
+            function add_user(uid,leg){
+                var stc_html = '';
+                stc_html += '<div class="to__item">';
+                stc_html += '<span class="to__prefix">';
+                stc_html += '<img src="/static/images/header-icon.png">';
+                stc_html += '</span>';
+                stc_html += '<span class="to__name" id="render-0-1-0">'+uid+'</span>';
+                {#stc_html += '<div class="to__parentName">总鸟券：'+100+'（兑换鸟券:'+50+'）</div>';#}
+                stc_html += '<span class="to__close" id="remove'+uid+'"></span>';
+                stc_html += '</div>';
+                $('#overlook_Cont').append(stc_html);
+                //删除内容
+                $("#remove"+uid).click(function (){
+                    var del_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":2,"o_id":uid});
+                    $.post('/control_manage/stop_service/', del_info, function(data) {
+                        if ( data.status) {
+                            $("#remove"+uid).parent().remove();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+                });
+                look_count++;
+                $("#overlook_Num").html(leg)
+            }
+
+            function check_look_uid(){
+                var len_uid = $('#overlook_uid').val().length;
+                if(len_uid==0)
+                {
+                    $.MsgBox.Alert("消息", "请输入玩家ID!");
+                    look_uid = false;
+                }
+                else
+                {
+                    look_uid = true;
+                }
+            }
+
+            var for_uid = false;
+            $('#forbid').click(function(){
+                check_bid_uid();
+                if (for_uid == true){
+                    var forbid_id = $("#forbid_uid").val();
+                    var data_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":3,"f_id":forbid_id});
+                    $.post('/control_manage/stop_service/', data_info, function(data) {
+                        if ( data.status) {
+                            alert(data.msg);
+                            add_forbid(data.uid,data.leg);
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+                    return true;
+                }else {
+                    return false;
+                }
+            });
+
+            var for_count = 1;
+            function add_forbid(uid,leg){
+                var stc_html = '';
+                stc_html += '<div class="to__item">';
+                stc_html += '<span class="to__prefix">';
+                stc_html += '<img src="/static/images/header-icon.png">';
+                stc_html += '</span>';
+                stc_html += '<span class="to__name" id="render-0-1-0">'+uid+'</span>';
+                {#stc_html += '<div class="to__parentName">总鸟券：'+100+'（兑换鸟券:'+50+'）</div>';#}
+                stc_html += '<span class="to__close" id="remove'+uid+'"></span>';
+                stc_html += '</div>';
+                $('#forbid_Cont').append(stc_html);
+                //删除内容
+                $("#remove"+uid).click(function (){
+                    var del_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":4,"f_id":uid});
+                    $.post('/control_manage/stop_service/', del_info, function(data) {
+                        if ( data.status) {
+                            $("#remove"+uid).parent().remove();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+                });
+                for_count++;
+                $("#forbid_Num").html(leg)
+            }
+
+            function check_bid_uid(){
+                var f_uid = $('#forbid_uid').val().length;
+                if(f_uid==0)
+                {
+                    $.MsgBox.Alert("消息", "请输入玩家ID!");
+                    for_uid = false;
+                }
+                else
+                {
+                    for_uid = true;
+                }
+            }
+
+             //关闭弹窗
+            $('.claseDialogBtn').click(function(){
+                $('#dialogmag').fadeOut(300,function(){
+                    $('#dialohg').addClass('bounceOutUp').fadeOut();
+                });
+            });
+
+
+            $('#set_stop_service').click(function(){
+                var params = $.param({"pid":4}) + "&" + $('#stop_from').serialize();
+                if (confirm("您确定停服维护?")) {
+                    $.post('/control_manage/stop_service/', params, function (data) {
+                        if (data.status) {
+                            alert(data.msg);
+                            $('#dialogmag').fadeOut(300, function () {
+                                $('#dialohg').addClass('bounceOutUp').fadeOut();
+                            });
+                        }
+                    });
+                } else {
+                    alert(data.msg);
+                }
+            });
+        });
+
+        function remove_overlook(uid) {
+            if(confirm("您确定删除ID?")){
+                var del_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":2,"o_id":uid});
+                    $.post('/control_manage/stop_service/', del_info, function(data) {
+                        if ( data.status) {
+                            $("#overlook"+uid).parent().remove();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+            }else {
+                alert("已经取消了删除操作");
+            }
+        }
+
+        function remove_forbid(uid) {
+            if(confirm("您确定删除ID?")){
+                var del_info = $.param({csrfmiddlewaretoken: '{{ csrf_token }}',"pid":4,"f_id":uid});
+                    $.post('/control_manage/stop_service/', del_info, function(data) {
+                        if ( data.status) {
+                            $("#forbid"+uid).parent().remove();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    });
+            }else {
+                alert("已经取消了删除操作");
+            }
+        }
+
+        function early_record() {
+            var URL= "/run_manage/all_record/?pid=" +"early_record";
+            location.href=URL;
+        }
+
+        function stop_server() {
+            //列表 i 为索引，item为遍历值
+            className = $(this).attr('class');
+            $('#dialogmag').fadeIn(300);
+            $('#dialohg').removeAttr('class').addClass('by_value '+className+'').fadeIn();
+        }
+    </script>
+    <style>
+        td.a_link a {
+            text-decoration: underline;
+        }
+        #dialogmag{width:100%;height:100%;background-color:#000000;opacity:.8;filter:alpha(opacity=60);position:fixed;top:0;left:0;z-index:9999;display:none;}
+        #dialohg{ width: 300px; height: 300px; margin: 0 auto; display: none; background-color: #ffffff; position: fixed; left: 38%; margin: -120px 0 0 -150px; z-index: 10000; border: 1px solid #ccc; border-radius: 10px; -webkit-border-radius: 10px; box-shadow: 3px 2px 4px rgba(0,0,0,0.2); -webkit-box-shadow: 3px 2px 4px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body style="min-width:1890px;">
+    <div class="body-div">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0" >
+                <tr>
+                    <td width="15%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">权限管理&gt; 停服维护</strong></td>
+
+                    <td width="15%" align="center" valign="middle" bgcolor="#F5F5F5">
+                        <input type="button" value="停服设置" onclick="stop_server()" class="button" style="width: 112px;margin-left: 260px;background: tomato;">
+
+                     </td>
+                    <td width="70%" align="center" valign="middle" bgcolor="#F5F5F5">
+{#                        <input type="button" class="add_btn" value="操作记录" onclick="early_record();" style="border: 0px;;background: #1B9AF7;color: #FFF;width: 100px;height: 30px;line-height: 30px;border-radius: 3px;margin: 10px; "/>#}
+                    </td>
+                </tr>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF">
+                    <!--主要内容开始-->
+                    <table width="100%" border="0" align="center" cellpadding="12" cellspacing="1" bgcolor="#DFDFDF"  style="margin-top: -1px;">
+                        <thead>
+                            <tr>
+                                <th  width="100%" height="600px" bgcolor="#fff">
+                                    <div class="to__block">
+                                        <div class="to__right">
+                                            <div style="width: 42%">
+                                                <span class="zySearch" id="zySearch">
+                                                    <b class="search-img" style="top: 0px; height: 0px;"></b>
+                                                    <input id="overlook_uid" class="search-input" name="overlook_uid" maxlength="7" value="" oninput="value=value.replace(/[^\d]/g,'')" style="color: #999;border: 1px solid #d0d0d0;height: 33px;line-height: 33px;margin-right: 5px;padding: 0 10px;width: 268px;" type="text" placeholder="添加白名单ID">
+                                                    <button class="" id="overlook" style="background: none repeat scroll 0 0 #f04243;border: 0;border-radius: 0;color: #fff;cursor: pointer;height: 35px;line-height: 33px;padding: 0;vertical-align: baseline!important;width: 76px;text-align: center;font-weight: 400;font-size: 14px">添加</button>
+                                                </span>
+                                            </div>
+                                            <div class="to__title">已添加（<span id="overlook_Num">{{ o_leg }}</span>）人</div>
+                                            <div class="to__content" id="overlook_Cont">
+                                                {% for o_id in o_list %}
+                                                    <div class="to__item">
+                                                        <span class="to__prefix">
+                                                            <img src="/static/images/header-icon.png">
+                                                        </span>
+                                                        <span class="to__name" id="render-0-1-0">{{o_id}}</span>
+                                                        <span class="to__close" onclick="remove_overlook('{{o_id}}')" id="overlook{{o_id}}"></span>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="dialogmag"></div>
+    <div id="dialohg" class="by_value" style="margin: auto;position: fixed; left: 25%; top: 10%;width: 800px;height:auto;">
+        <form id="stop_from" action="" method="post">
+            {% csrf_token %}
+            <div style="color: red; width: 30px; height: 30px; float: right; line-height: 30px; text-align: center;cursor: pointer;font-size: 25px; font-weight: 800;"  class="claseDialogBtn">x</div>
+                <table width="97%" border="0" align="center" cellpadding="8" cellspacing="1" bgcolor="#DFDFDF" style="margin:30px auto 10px auto;height: 450px;" id="userlist">
+                    <tbody>
+                        <tr>
+                            <td width="191" align="right" bgcolor="#F9F9F9">
+                                <strong><label>停服内容：</label></strong>
+                            </td>
+                            <td width="1149"  id="add_date"bgcolor="#F9F9F9">
+                                <div id="exchanges">
+                                    <div class="exchange" style="padding: 0px;">
+                                        <textarea id="title" cols="50" rows="15" id="led" name="led" style=" margin-left: 15px;width:350px;height:165px;font-size: 12px; resize:none;"></textarea>
+                                        <span>(中文100字以内)</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                         <tr>
+                            <td width="191" align="right" bgcolor="#F9F9F9"><strong>
+                                <label>停服状态：</label></strong>
+                            </td>
+                             <td colspan="2" align="left" bgcolor="#F9F9F9">
+                                 <input type="radio" id="general" name="close_server" value="0" checked style="margin-left: 15px;"/>开启
+                                 <input type="radio" id="loop" name="close_server" value="1" />关闭
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            <div class="cxcolor_lock" style="display: none;"></div>
+            <div class="modal-footer">
+                <div class="actions" style="margin:10px 10px 10px 10px;line-height: normal;float: right;">
+                    <input type="button" id="set_stop_service" value="设置" class="button">
+                    <input type="reset" value="清除" class="button">
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

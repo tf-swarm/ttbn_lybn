@@ -1,0 +1,43 @@
+.rank_switch {
+	margin-top: auto;
+	margin-right: auto;
+	margin-left: auto;
+	margin-bottom: auto;
+    float: left;
+	}
+.rank_switch li {
+	clear: both;
+	line-height: 44px;
+	border-bottom: 1px solid #CCC;
+	list-style: none;
+	}
+.rank_switch input {
+	display: none
+	}
+.rank_switch label {
+    float: right;
+	width: 80px;
+	background: #CCC;
+	height: 28px;
+	border-radius: 14px;
+	margin: 3px 10px 0 10px;
+	box-shadow: 0 1px 2px rgba(0,0,0,.1) inset;
+	}
+.rank_switch label em {
+	width: 26px;
+	height: 26px;
+	float: left;
+	margin: 1px;
+	border-radius: 13px;
+	box-shadow: 2px 3px 8px rgba(0,0,0,.1);
+	background: #FFF;
+	}
+.rank_switch input:checked + label {
+	background: #a4d714;
+	}
+.rank_switch input:checked + label em {
+	float: right;
+	}
+.rank_switch input:disabled + label {
+	opacity: 0.5
+	}

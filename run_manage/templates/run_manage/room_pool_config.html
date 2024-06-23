@@ -1,0 +1,426 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link type="text/css" rel="stylesheet" href="/static/css/ht_style.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/add_pool.css">
+
+    <script type="text/javascript" src="/static/js/jquery-1.7.2.min.js"></script>
+    <style>
+        .head_div {
+            margin-left: 20px;
+            width: 115%;
+            height: auto;
+            margin-top: 15px;
+            display:inline-block;
+        }
+        .head_div span,span{ float: left;
+                        font-size: 18px;
+                        height: 30px;
+                        line-height: 30px;
+                        color: black;
+                        font-weight: 600;}
+
+        .head_div select{
+            width: 100px;
+            height: 36px;
+            border: solid 1px #cccccc;
+            font-size: 17px;
+        }
+        select option{
+            font-size: 17px;
+        }
+        h1{    display: block;
+                font-size: 24px;
+                line-height: 40px;
+                height: 45px;
+                float: left;
+                color: black;
+                font-weight: 600;}
+
+        .btn_model{
+            width: 100px;
+            height: 38px;
+            background: #e8e8e8;
+            border-radius: 4px 0px 0px 4px;
+            float: left;
+        }
+        .btn_model p{
+            color: #00B895;
+            font-weight: 700;
+            text-align: center;
+            line-height: 38px;
+            font-size: 1em;
+            margin: 0;
+        }
+        .spinner_select option{font-size: 18px;}
+    </style>
+    <script type="text/javascript">
+        var w,h,className;
+        function getSrceenWH(){
+            w = $(window).width();
+            h = $(window).height();
+            $('#dialogBg').width(w).height(h);
+        }
+
+        window.onresize = function(){
+            getSrceenWH();
+        };
+        $(window).resize();
+
+        $(function(){
+            getSrceenWH();
+            //关闭弹窗
+            $('.claseDialogBtn').click(function(){
+                $('#dialogBg').fadeOut(300,function(){
+                    $('#dialog').addClass('bounceOutUp').fadeOut();
+                });
+            });
+        });
+
+        function pool_record() {
+            var URL= "/run_manage/all_record/?pid=" +"power_pool_control";
+            location.href=URL;
+        }
+    </script>
+</head>
+
+<body style="overflow-x:auto; max-height: 900px;">
+    <div class="body-div">
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="ht_big_bor0">
+            <tr>
+                <td width="25%" height="40" align="left" valign="middle" bgcolor="#F5F5F5"><strong style="color:#A0A0A0;padding-left:9%;white-space:nowrap;">运营管理 &gt;鸟蛋场房间池控制</strong></td>
+                <td width="25%" align="left" valign="middle" bgcolor="#F5F5F5"></td>
+                <td width="60%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update"></td>
+                <td width="15%" align="center" valign="middle" bgcolor="#F5F5F5" class="w_update">
+                    <a href="javascript:;" id="bn_btn_one" onclick="pool_record()">操作记录</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: auto;">
+                    <form action="" method="post" id="form_coin_pool">
+                        {% csrf_token %}
+                        <div style="height: 40px; width:100%;margin-left: 30px;margin-top: 20px;">
+                            <h1 style="width:356px;">刺激战场-体验场</h1>
+                        </div>
+                        <div style="height: 450px; margin: 10px;overflow-x: hidden;">
+                            <div class="head_div" style="height: auto">
+                                {% for zero_info  in zero_list %}
+                                    <div style="width: 560px;float: left;" id="add_div">
+                                        <div style="margin-left: 210px;">
+                                            <input type="text" style="border: none;font-size: 23px;text-align: center;width: 70px;height: 32px;float: left;" readonly="readonly" class="for_up" name="room_id" id="room_id{{ zero_info.room_id }}" value="{{ zero_info.room_id }}">
+                                            <h1 style="height: 36px;width: 45px;margin-top: -5px;">房</h1>
+                                            <h1></h1>
+                                        </div>
+                                        <div style="width: 540px;float: left;">
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                                <div class="btn_model">
+                                                    <p>1座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat0{{ zero_info.seat0 }}" value="{{ zero_info.seat0 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>2座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat1{{ zero_info.seat1 }}" value="{{ zero_info.seat1 }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                <p>3座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat2{{ zero_info.seat2 }}" value="{{ zero_info.seat2 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>4座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat3{{ zero_info.seat3 }}" value="{{ zero_info.seat3 }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                    <p style="color: #d70f41;">房间池</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly"  class="for_up" name="total" onclick="zero_alter_pool('{{ zero_info.room_id }}','{{ zero_info.table_pool }}')" value="{{ zero_info.table_pool|default:0 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>收益</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly"  class="for_up" name="point" id="seat3{{ zero_info.table_profit }}" value="{{ zero_info.table_profit|default:0 }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: auto;">
+                    <!--主要内容开始-->
+                    <form action="" method="post" id="form_power_pool">
+                        {% csrf_token %}
+                        <div style="height: 40px; width:100%;margin-left: 30px;margin-top: 20px;">
+                            <h1 style="width:356px;">刺激战场-猎龙峡谷</h1>
+                        </div>
+                        <div style="height: 450px; margin: 10px;overflow-x: hidden;">
+                            <div class="head_div" style="height: auto">
+                                {% for one_info  in one_list %}
+                                    <div style="width: 560px;float: left;" id="add_div">
+                                        <div style="margin-left: 210px;">
+                                            <input type="text" style="border: none;font-size: 23px;text-align: center;width: 70px;height: 32px;float: left;" readonly="readonly" class="for_up" name="room_id" id="room_id{{ one_info.room_id }}" value="{{ one_info.room_id }}">
+                                            <h1 style="height: 36px;width: 45px;margin-top: -5px;">房</h1>
+                                            <h1></h1>
+                                        </div>
+                                        <div style="width: 540px;float: left;">
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                                <div class="btn_model">
+                                                    <p>1座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat0{{ one_info.seat0 }}" value="{{ one_info.seat0 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>2座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat1{{ one_info.seat1 }}" value="{{ one_info.seat1 }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                <p>3座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat2{{ one_info.seat2 }}" value="{{ one_info.seat2 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>4座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat3{{ one_info.seat3 }}" value="{{ one_info.seat3 }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                    <p style="color: #d70f41;">房间池</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly"  class="for_up" name="total" onclick="one_alter_pool('{{ one_info.room_id }}','{{ one_info.table_pool }}')" value="{{ one_info.table_pool|default:0 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>收益</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly"  class="for_up" name="point" id="seat3{{ one_info.table_profit }}" value="{{ one_info.table_profit|default:0 }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </form>
+                    <!--主要内容结束-->
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: auto;">
+                    <!--主要内容开始-->
+                    <form action="" method="post" id="form_power_pool">
+                        {% csrf_token %}
+                        <div style="height: 40px; width:100%;margin-left: 30px;margin-top: 20px;">
+                            <h1 style="width:356px;">刺激战场-绝境炼狱</h1>
+                        </div>
+                        <div style="height: 450px; margin: 10px;overflow-x: hidden;">
+                            <div class="head_div" style="height: auto">
+                                {% for two_info  in two_list %}
+                                    <div style="width: 560px;float: left;" id="add_div">
+                                        <div style="margin-left: 210px;">
+                                            <input type="text" style="border: none;font-size: 23px;text-align: center;width: 70px;height: 32px;float: left;" readonly="readonly" class="for_up" name="room_id" id="room_id{{ two_info.room_id }}" value="{{ two_info.room_id }}">
+                                            <h1 style="height: 36px;width: 45px;margin-top: -5px;">房</h1>
+                                            <h1></h1>
+                                        </div>
+                                        <div style="width: 540px;float: left;">
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                                <div class="btn_model">
+                                                    <p>1座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat0{{ two_info.seat0 }}" value="{{ two_info.seat0 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>2座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat1{{ two_info.seat1 }}" value="{{ two_info.seat1 }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                <p>3座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat2{{ two_info.seat2 }}" value="{{ two_info.seat2 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>4座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat3{{ two_info.seat3 }}" value="{{ two_info.seat3 }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                    <p style="color: #d70f41;">房间池</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly"  class="for_up" name="total" onclick="two_alter_pool('{{ two_info.room_id }}','{{ two_info.table_pool }}')" value="{{ two_info.table_pool|default:0 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>收益</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly"  class="for_up" name="point" id="seat3{{ two_info.table_profit }}" value="{{ two_info.table_profit|default:0 }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </form>
+                    <!--主要内容结束-->
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="4" valign="top" bgcolor="#FFFFFF" style="height: auto;">
+                    <!--主要内容开始-->
+                    <form action="" method="post" id="form_power_pool">
+                        {% csrf_token %}
+                        <div style="height: 40px; width:100%;margin-left: 30px;margin-top: 20px;">
+                            <h1 style="width:356px;">刺激战场-极度魔界</h1>
+                        </div>
+                        <div style="height: 450px; margin: 10px;overflow-x: hidden;">
+                            <div class="head_div" style="height: auto">
+                                {% for three_info  in three_list %}
+                                    <div style="width: 560px;float: left;" id="add_div">
+                                        <div style="margin-left: 210px;">
+                                            <input type="text" style="border: none;font-size: 23px;text-align: center;width: 70px;height: 32px;float: left;" readonly="readonly" class="for_up" name="room_id" id="room_id{{ three_info.room_id }}" value="{{ three_info.room_id }}">
+                                            <h1 style="height: 36px;width: 45px;margin-top: -5px;">房</h1>
+                                            <h1></h1>
+                                        </div>
+                                        <div style="width: 540px;float: left;">
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                                <div class="btn_model">
+                                                    <p>1座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat0{{ three_info.seat0 }}" value="{{ three_info.seat0 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>2座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat1{{ three_info.seat1 }}" value="{{ three_info.seat1 }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                <p>3座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat2{{ three_info.seat2 }}" value="{{ three_info.seat2 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>4座位</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly" class="for_up" name="" id="seat3{{ three_info.seat3 }}" value="{{ three_info.seat3 }}">
+                                            </div>
+
+                                            <div style="float: left;width: 100%;margin-bottom: 20px;">
+                                               <div class="btn_model">
+                                                    <p style="color: #d70f41;">房间池</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly"  class="for_up" name="total" onclick="three_alter_pool('{{ three_info.room_id }}','{{ three_info.table_pool }}')" value="{{ three_info.table_pool|default:0 }}">
+                                                <div class="btn_model" style="margin-left: 10px;">
+                                                    <p>收益</p>
+                                                </div>
+                                                <input type="text" style="background:#C2C2C2;height: 38px;float: left;" readonly="readonly"  class="for_up" name="point" id="seat3{{ three_info.table_profit }}" value="{{ three_info.table_profit|default:0 }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </form>
+                    <!--主要内容结束-->
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="dialogBg"></div>
+    <div id="dialog" class="animated">
+        <img class="dialogIco" width="50" height="50" src="/static/images/add_ico.png" alt="" />
+    <div class="dialogTop">
+        <a href="javascript:;" class="claseDialogBtn">关闭</a>
+    </div>
+    <form action="" method="post" id="form_pool">
+        {% csrf_token %}
+        <ul class="editInfos">
+            <input type="text" name="room" id="room_id" required value="" class="ipt" style="display: none;" />
+            <input type="text" name="table" id="table_id" required value="" class="ipt" style="display: none;" />
+            <li><label><font color="#ff0000">* </font>当前选中池额度：<input type="text" name="table_pool" readonly="readonly" id="table_pool" style="background:#C2C2C2;" required value="" class="ipt" /></label></li>
+            <li><label><font color="#ff0000">* </font>添加池中额度：<input type="text" name="add_pool" id="add_pool" oninput="value=value.replace(/[^\-?\d]/g,'')" required value="" class="ipt" /></label></li>
+            <li><input type="button" id="alter_room_pool" value="修改额度" class="submitBtn" /></li>
+        </ul>
+    </form>
+    </div>
+
+<script type="text/javascript">
+    function zero_alter_pool(room, pool)
+    {
+        className = $(this).attr('class');
+		$('#dialogBg').fadeIn(300);
+		$('#dialog').removeAttr('class').addClass('animated '+className+'').fadeIn();
+        $("#table_pool").val(pool);
+        $("#add_pool").val("");
+        $("#room_id").val("400");
+        $("#table_id").val(room);
+    }
+
+    function one_alter_pool(room, pool)
+    {
+        className = $(this).attr('class');
+		$('#dialogBg').fadeIn(300);
+		$('#dialog').removeAttr('class').addClass('animated '+className+'').fadeIn();
+        $("#table_pool").val(pool);
+        $("#add_pool").val("");
+        $("#room_id").val("401");
+        $("#table_id").val(room);
+    }
+
+    function two_alter_pool(room, pool)
+    {
+        className = $(this).attr('class');
+		$('#dialogBg').fadeIn(300);
+		$('#dialog').removeAttr('class').addClass('animated '+className+'').fadeIn();
+        $("#table_pool").val(pool);
+        $("#add_pool").val("");
+        $("#room_id").val("402");
+        $("#table_id").val(room);
+    }
+
+    function three_alter_pool(room, pool)
+    {
+        className = $(this).attr('class');
+		$('#dialogBg').fadeIn(300);
+		$('#dialog').removeAttr('class').addClass('animated '+className+'').fadeIn();
+        $("#table_pool").val(pool);
+        $("#add_pool").val("");
+        $("#room_id").val("403");
+        $("#table_id").val(room);
+    }
+
+    $(function(){
+        $('#alter_room_pool').click(function(){
+			var pool_info = $.param({"pid":2}) + "&" + $("#form_pool").serialize();
+            if(confirm("您确定修改房间池?")){
+                $.post('/run_manage/room_control_config/', pool_info, function(data) {
+                    if (data.status) {
+                        alert(data.msg);
+                        $('#dialogBg').fadeOut(300,function(){
+                            $('#dialog').addClass('bounceOutUp').fadeOut();
+                        });
+					    location.href = "/run_manage/room_control_config/";
+                    }
+                    else {
+                        alert(data.msg);
+                    }
+                });
+            }else {
+                alert("您取消了修改房间池");
+            }
+		});
+    });
+
+    </script>
+</body>
+</html>
